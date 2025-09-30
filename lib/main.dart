@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
           fontFamily: "Poppins",
           colorScheme: ColorScheme.fromSeed(seedColor: ColorsClass.primary),
         ),
-        home: const ReferScreen(),
+        home: const MobileReferenceScreen(),
       ),
     );
   }
