@@ -1,7 +1,5 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:provider/provider.dart';
 import 'package:validate_phone_number/validation.dart';
 import '../../color_class.dart';
@@ -177,9 +175,12 @@ class ReferralList extends StatelessWidget {
                 return;
               }
 
-              // ignore: await_only_futures
-              bool isValid =await Validator.validatePhoneNumber(
-                referral.mobileController.text,
+              String rawNumber = referral.mobileController.text.trim();
+
+              String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+
+              bool isValid = await Validator.validatePhoneNumber(
+                cleanNumber,
                 referral.isoCode,
               );
 
@@ -338,15 +339,19 @@ class ReferralRow extends StatelessWidget {
   }
 }
 
-/// Button to send all referrals at once
-class SendAllButton extends StatelessWidget {
-  final bool isMobile;
+class SendAllButton extends StatefulWidget {
   const SendAllButton({super.key, required this.isMobile});
+  final bool isMobile;
+
+  @override
+  State<SendAllButton> createState() => _SendAllButtonState();
+}
+
+class _SendAllButtonState extends State<SendAllButton> {
 
   bool validateField(TextEditingController controller, String type) {
     final text = controller.text.trim();
     if (text.isEmpty) return false;
-
     switch (type) {
       case 'name':
         return RegExp(r'^[a-zA-Z\s]+$').hasMatch(text);
@@ -356,65 +361,64 @@ class SendAllButton extends StatelessWidget {
         return true;
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<ReferralProvider>(
-      builder: (context, provider, _) {
-        if (provider.referrals.length <= 1) return const SizedBox();
+    return Consumer<ReferralProvider>(builder: (context, value, _) {
+      return GestureDetector(
+          onTap: () async {
+            // Create a temporary copy so we don’t modify while iterating
+            final referrals = List.of(value.referrals);
 
-        return Padding(
-          padding: const EdgeInsets.only(left: 10.0),
-          child: InkWell(
-            onTap: () async {
-              for (int i = 0; i < provider.referrals.length; i++) {
-                final referral = provider.referrals[i];
+            for (int i = 0; i < referrals.length; i++) {
+              ReferralRowData referral = referrals[i];
 
-                if (!validateField(referral.nameController, 'name')) {
-                 CustomSnackBar.show('Form ${i + 1}: Enter a valid name', isMobile);
-                  return;
-                }
-                bool isValid = await PhoneNumber.getRegionInfoFromPhoneNumber(
-                  referral.mobileController.text,
-                  referral.isoCode,
-                ).then((_) => true).catchError((_) => false);
-
-                if (!isValid) {
-                  CustomSnackBar.show("Invalid mobile number", true);
-                  return;
-                }
-                if (!validateField(referral.emailController, 'email')) {
-                  CustomSnackBar.show('Form ${i + 1}: Enter a valid email', isMobile);
-                  return;
-                }
+              // Validate name
+              if (!validateField(referral.nameController, 'name')) {
+                CustomSnackBar.show('Form ${i + 1}: Enter a valid name', widget.isMobile);
+                return;
               }
 
-              for (int i = provider.referrals.length - 1; i >= 0; i--) {
-                final referral = provider.referrals[i];
-                ReferredRestaurantsModel data = ReferredRestaurantsModel(
-                  referringRestaurantId: 123,
-                  referredBy: "Gourmet Grill",
-                  mobile: referral.mobileController.text,
-                  claimed: false,
-                  email: referral.emailController.text,
-                  name: referral.nameController.text,
-                );
+              // Clean phone number
+              String rawNumber = referral.mobileController.text.trim();
+              String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
 
-                final saveData = await provider.addRestaurantReferralData(data);
-                CustomSnackBar.show(saveData, isMobile);
-                referral.dispose();
-                provider.removeReferral(i);
+              bool isValid = await Validator.validatePhoneNumber(
+                cleanNumber,
+                referral.isoCode,
+              );
+
+              if (!isValid) {
+                CustomSnackBar.show('Form ${i + 1}: Enter phone number properly', widget.isMobile);
+                return;
               }
-              Navigator.pop(context);
-            },
-            child: const CustomButton(
-              value: "Send All",
-              color: ColorsClass.primary,
-            ),
-          ),
-        );
-      },
-    );
+
+              // Validate email
+              if (!validateField(referral.emailController, 'email')) {
+                CustomSnackBar.show('Form ${i + 1}: Enter a valid email', widget.isMobile);
+                return;
+              }
+
+              // Prepare model
+              ReferredRestaurantsModel data = ReferredRestaurantsModel(
+                referringRestaurantId: 123,
+                referredBy: "Gourmet Grill",
+                mobile: cleanNumber,
+                claimed: false,
+                email: referral.emailController.text.trim(),
+                name: referral.nameController.text.trim(),
+              );
+
+              // Send each referral
+              final addData = await value.addRestaurantReferralData(data);
+              CustomSnackBar.show(addData, widget.isMobile);
+            }
+            value.clearList();
+            value.disposeAll();
+            Navigator.pop(context);
+          },
+          child: CustomButton(value: "Send All", color: ColorsClass.primary),
+      );
+    },);
   }
 }
 

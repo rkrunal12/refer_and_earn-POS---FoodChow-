@@ -46,6 +46,15 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
       backgroundColor: ColorsClass.white,
       body: Consumer<ReferralProvider>(
         builder: (context, provider, _) {
+          if(provider.referrals.isEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            });
+            // Return a placeholder while popping
+            return const SizedBox.shrink();
+          }
           final referrals = provider.referrals;
           final referral = provider.referrals[0];
           return Column(
@@ -107,7 +116,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                   ),
                 )
               else
-              // Single referral input form
+              /// Single referral input form
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +157,6 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                       // Spacer pushes the button to the bottom
                       const Spacer(),
 
-                      // Sticky Save button
                       Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: InkWell(
@@ -158,10 +166,19 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                               return;
                             }
 
+                            String rawNumber = referral.mobileController.text.trim();
+
+                            String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+
                             bool isValid = await Validator.validatePhoneNumber(
-                              referral.mobileController.text,
+                              cleanNumber,
                               referral.isoCode,
                             );
+
+                            if(!isValid){
+                              CustomSnackBar.show("Enter Phone number properly", true);
+                              return;
+                            }
 
                             if (!isValid) {
                               CustomSnackBar.show("Invalid mobile number", true);

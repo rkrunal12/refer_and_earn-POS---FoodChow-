@@ -23,6 +23,15 @@ class ReferralProvider with ChangeNotifier {
     referrals.removeAt(index);
     notifyListeners();
   }
+  void clearList(){
+    referrals = [];
+    notifyListeners();
+  }
+  void disposeAll(){
+    for(var data in referrals){
+      data.dispose();
+    }
+  }
 
   /// ********************************* Main screen **************************///
   int _selectedIndex = 0;
