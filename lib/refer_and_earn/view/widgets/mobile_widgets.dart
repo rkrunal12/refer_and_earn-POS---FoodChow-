@@ -607,8 +607,6 @@ class MobileHeader extends StatelessWidget {
   }
 }
 
-
-
 /// Content container card
 class ContentContainerMobile extends StatelessWidget {
   final Widget leading;

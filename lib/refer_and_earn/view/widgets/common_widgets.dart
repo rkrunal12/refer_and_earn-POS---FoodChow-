@@ -18,7 +18,6 @@ class CustomSnackBar {
       autoCloseDuration: const Duration(seconds: 2),
       title: Text(
         message,
-        textAlign: TextAlign.justify,
         style: const TextStyle(fontSize: 16),
       ),
       description: SizedBox(

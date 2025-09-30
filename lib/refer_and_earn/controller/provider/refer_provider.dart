@@ -163,10 +163,6 @@ class ReferralProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
-
-
-
   /// ********************************* Cashback Api Data **************************///
   CashbackModel? _allCashback;
   bool _isCashbackGetLoading = false;

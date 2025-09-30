@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:validate_phone_number/validation.dart';
@@ -339,15 +338,10 @@ class ReferralRow extends StatelessWidget {
   }
 }
 
-class SendAllButton extends StatefulWidget {
+/// Send all Button
+class SendAllButton extends StatelessWidget {
   const SendAllButton({super.key, required this.isMobile});
   final bool isMobile;
-
-  @override
-  State<SendAllButton> createState() => _SendAllButtonState();
-}
-
-class _SendAllButtonState extends State<SendAllButton> {
 
   bool validateField(TextEditingController controller, String type) {
     final text = controller.text.trim();
@@ -361,6 +355,7 @@ class _SendAllButtonState extends State<SendAllButton> {
         return true;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ReferralProvider>(builder: (context, value, _) {
@@ -374,7 +369,7 @@ class _SendAllButtonState extends State<SendAllButton> {
 
               // Validate name
               if (!validateField(referral.nameController, 'name')) {
-                CustomSnackBar.show('Form ${i + 1}: Enter a valid name', widget.isMobile);
+                CustomSnackBar.show('Form ${i + 1}: Enter a valid name', isMobile);
                 return;
               }
 
@@ -388,13 +383,13 @@ class _SendAllButtonState extends State<SendAllButton> {
               );
 
               if (!isValid) {
-                CustomSnackBar.show('Form ${i + 1}: Enter phone number properly', widget.isMobile);
+                CustomSnackBar.show('Form ${i + 1}: Enter phone number properly', isMobile);
                 return;
               }
 
               // Validate email
               if (!validateField(referral.emailController, 'email')) {
-                CustomSnackBar.show('Form ${i + 1}: Enter a valid email', widget.isMobile);
+                CustomSnackBar.show('Form ${i + 1}: Enter a valid email', isMobile);
                 return;
               }
 
@@ -410,7 +405,7 @@ class _SendAllButtonState extends State<SendAllButton> {
 
               // Send each referral
               final addData = await value.addRestaurantReferralData(data);
-              CustomSnackBar.show(addData, widget.isMobile);
+              CustomSnackBar.show(addData, isMobile);
             }
             value.clearList();
             value.disposeAll();
