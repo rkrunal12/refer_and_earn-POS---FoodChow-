@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/refer_screen.dart';
+import 'package:refer_and_earn/refer_and_earn/view/mobile/mobile_refer_screen.dart';
 import 'package:toastification/toastification.dart';
 import 'package:window_manager/window_manager.dart';
 
