@@ -47,9 +47,6 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
       body: Consumer<ReferralProvider>(
         builder: (context, provider, _) {
           final referrals = provider.referrals;
-          if (provider.referrals.isEmpty) {
-            return const Center(child: CustomText(text: "No referrals", style: TextStyle()));
-          }
           final referral = provider.referrals[0];
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,

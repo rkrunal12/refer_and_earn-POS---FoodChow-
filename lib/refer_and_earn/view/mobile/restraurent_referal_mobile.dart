@@ -51,27 +51,24 @@ class _RestraurentReferalMobileState extends State<RestraurentReferalMobile> {
             Card(
               color: ColorsClass.white,
               elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Consumer<ReferralProvider>(
-                  builder: (context, provider, _) {
-                    if (provider.isReferralLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      );
-                    }
-                    if (provider.referralError != null) {
-                      return Center(child: Text(provider.referralError!));
-                    }
-                    if (provider.referralList == null ||
-                        provider.referralList!.isEmpty) {
-                      return const Center(child: Text("No Referred Restaurant added"));
-                    }
-                    return CustomTableRestaurantMobile(
-                      list: provider.referralList,
+              child: Consumer<ReferralProvider>(
+                builder: (context, provider, _) {
+                  if (provider.isReferralLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
                     );
-                  },
-                ),
+                  }
+                  if (provider.referralError != null) {
+                    return Center(child: Text(provider.referralError!));
+                  }
+                  if (provider.referralList == null ||
+                      provider.referralList!.isEmpty) {
+                    return const Center(child: Text("No Referred Restaurant added"));
+                  }
+                  return CustomTableRestaurantMobile(
+                    list: provider.referralList,
+                  );
+                },
               ),
             ),
           ],
