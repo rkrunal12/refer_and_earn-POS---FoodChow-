@@ -170,7 +170,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
 
                             String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
 
-                            bool isValid = await Validator.validatePhoneNumber(
+                            bool isValid = Validator.validatePhoneNumber(
                               cleanNumber,
                               referral.isoCode,
                             );

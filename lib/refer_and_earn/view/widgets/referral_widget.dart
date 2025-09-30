@@ -179,7 +179,7 @@ class ReferralList extends StatelessWidget {
 
               String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
 
-              bool isValid = await Validator.validatePhoneNumber(
+              bool isValid = Validator.validatePhoneNumber(
                 cleanNumber,
                 referral.isoCode,
               );
@@ -382,7 +382,7 @@ class _SendAllButtonState extends State<SendAllButton> {
               String rawNumber = referral.mobileController.text.trim();
               String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
 
-              bool isValid = await Validator.validatePhoneNumber(
+              bool isValid = Validator.validatePhoneNumber(
                 cleanNumber,
                 referral.isoCode,
               );

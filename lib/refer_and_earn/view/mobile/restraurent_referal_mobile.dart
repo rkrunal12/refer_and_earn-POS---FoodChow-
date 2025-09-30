@@ -61,8 +61,7 @@ class _RestraurentReferalMobileState extends State<RestraurentReferalMobile> {
                   if (provider.referralError != null) {
                     return Center(child: Text(provider.referralError!));
                   }
-                  if (provider.referralList == null ||
-                      provider.referralList!.isEmpty) {
+                  if (provider.referralList.isEmpty) {
                     return const Center(child: Text("No Referred Restaurant added"));
                   }
                   return CustomTableRestaurantMobile(

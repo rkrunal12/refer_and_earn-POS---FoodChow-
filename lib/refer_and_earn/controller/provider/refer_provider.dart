@@ -8,7 +8,6 @@ import '../../model/cashback_model.dart';
 import '../../model/fetch_data_model.dart';
 import '../../model/referral_row_data.dart';
 import '../../model/referred_restrauant_model.dart';
-import '../../view/widgets/common_widgets.dart';
 
 class ReferralProvider with ChangeNotifier {
   /// ********************************* restraurent referral screen **************************///
@@ -158,7 +157,7 @@ class ReferralProvider with ChangeNotifier {
         return errorMsg;
       }
     } catch (e, stackTrace) {
-      return "Error: $e";
+      return "Error: $e -> $stackTrace";
     } finally {
       _loadingId = null;
       notifyListeners();
