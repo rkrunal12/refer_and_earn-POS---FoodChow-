@@ -29,7 +29,6 @@ void main() async {
       await windowManager.setMinimumSize(const Size(500, 750));
     });
   }
-
   runApp(
     ToastificationWrapper(
       child: const MyApp(),
