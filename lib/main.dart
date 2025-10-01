@@ -18,9 +18,7 @@ void main() async {
           defaultTargetPlatform == TargetPlatform.linux)) {
     await windowManager.ensureInitialized();
 
-    WindowOptions options = const WindowOptions(
-      title: "FoodChow",
-    );
+    WindowOptions options = const WindowOptions(title: "FoodChow");
 
     windowManager.waitUntilReadyToShow(options, () async {
       await windowManager.maximize();
@@ -29,12 +27,9 @@ void main() async {
       await windowManager.setMinimumSize(const Size(500, 750));
     });
   }
-  runApp(
-    ToastificationWrapper(
-      child: const MyApp(),
-    ),
-  );
+  runApp(ToastificationWrapper(child: const MyApp()));
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
