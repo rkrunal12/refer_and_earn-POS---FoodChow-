@@ -66,6 +66,7 @@ class _RestraurentReferalMobileState extends State<RestraurentReferalMobile> {
                   }
                   return CustomTableRestaurantMobile(
                     list: provider.referralList,
+                    isMobile: true,
                   );
                 },
               ),

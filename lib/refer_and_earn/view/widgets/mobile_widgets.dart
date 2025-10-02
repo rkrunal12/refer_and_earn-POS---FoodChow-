@@ -324,8 +324,9 @@ class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
 /// Mobile RestRestaurant
 class CustomTableRestaurantMobile extends StatelessWidget {
   final List<ReferredRestaurantsModel>? list;
+  final bool? isMobile;
 
-  const CustomTableRestaurantMobile({super.key, required this.list});
+  const CustomTableRestaurantMobile({super.key, required this.list, this.isMobile});
 
   @override
   Widget build(BuildContext context) {
@@ -448,7 +449,7 @@ class CustomTableRestaurantMobile extends StatelessWidget {
                         context,
                         listen: false,
                       ).deleteRestaurantReferralData(data.restaurantId);
-                      CustomSnackBar.show(deleteData, true);
+                      CustomSnackBar.show(deleteData, isMobile ?? false);
                     },
                     child: SizedBox(
                       height: 25,

@@ -19,7 +19,7 @@ class CustomTableRestaurant extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 650) {
-          return CustomTableRestaurantMobile(list: list);
+          return CustomTableRestaurantMobile(list: list, );
         } else {
           // Large screen: keep DataTable
           return SingleChildScrollView(
