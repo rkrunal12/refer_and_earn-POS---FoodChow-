@@ -111,7 +111,7 @@ class _AllCampaignState extends State<AllCampaign> {
                     InkWell(
                       onTap: () async {
                         provider.setTogglingInactive(true);
-                        await Future.delayed(const Duration(seconds: 1));
+                        await Future.delayed(const Duration(milliseconds: 500));
                         await provider.updateInactive();
                         provider.setTogglingInactive(false);
                       },
