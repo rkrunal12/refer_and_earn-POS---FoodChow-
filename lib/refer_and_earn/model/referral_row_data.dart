@@ -30,12 +30,4 @@ class ReferralRowData {
     emailController.dispose();
   }
 
-  /// Convert current row data to a Map
-  Map<String, String> toMap() {
-    return {
-      'restaurantName': nameController.text,
-      'mobile': mobileController.text,
-      'email': emailController.text,
-    };
-  }
 }
