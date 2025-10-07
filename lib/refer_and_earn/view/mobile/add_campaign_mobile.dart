@@ -88,6 +88,7 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
     final provider = Provider.of<ReferralProvider>(context, listen: false);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: widget.isMobile ? const MobileAppBar(title: "Refer and Earn") : null,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

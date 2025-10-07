@@ -197,6 +197,7 @@ class _AddCampaignState extends State<AddCampaign> {
                                 ),
                               ],
                             ),
+                            SizedBox(height: 100,),
                           ],
                         ),
                       ),

@@ -173,9 +173,11 @@ class CampaignDetailed extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              FittedBox(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                ),
               ),
               const SizedBox(height: 10),
               Text(
