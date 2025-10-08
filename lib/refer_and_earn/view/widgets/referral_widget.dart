@@ -218,7 +218,6 @@ class ReferralList extends StatelessWidget {
               referral: referral,
               onSend: onSend,
               onDelete: () {
-                referral.dispose();
                 provider.removeReferral(index);
               },
             );
