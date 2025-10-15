@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
@@ -26,14 +25,14 @@ class MobileCampaignCard extends StatelessWidget {
       customerReward: data.customerReward,
       referrerReward: data.referrerReward,
       minPurchase: data.minPurchase,
-      expiryEnable: data.expiryEnable,
+      expiryEnable: data.expiryEnable == true ? 1 : 0,
       expiryType: data.expiryType,
       fixedPeriodType: data.fixedPeriodType,
-      endDate: data.endDate!.toIso8601String(),
-      notifyCustomer: data.notifyCustomer,
+      endDate: data.endDate!.toString(),
+      notifyCustomer: data.notifyCustomer == true ? 1 : 0,
       rewardType: data.rewardType,
       shopId: data.shopId,
-      status: data.status,
+      status: data.status == "1" ? 1 : 0,
     );
 
     const gap = SizedBox(height: 8);
@@ -71,12 +70,13 @@ class MobileCampaignCard extends StatelessWidget {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : Switch(
-                              value: data.status ?? false,
+                              value: (data.status == 1 || data.status == "1"),
                               onChanged: (val) {
                                 CampaignService.updateCampaigns(
-                                  campaignModel..status = val,
-                                  true,
+                                  campaignModel..status = val == true ? 1 : 0,
+
                                   context,
+                                  true,
                                   true,
                                 );
                               },
@@ -117,8 +117,7 @@ class MobileCampaignCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: CustomText(
-                      text:
-                          "Validity : ${data.expiryEnable! ? (data.expiryType == "Fixed Period" ? DateFormat('yyyy-mm-dd hh:mm:ss a').format(data.endDate!) : "After Friend's First Order") : "No Expiry"}",
+                      text: "Validity : ${data.endDate ?? "No Expiry"}",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -155,7 +154,7 @@ class MobileCampaignCard extends StatelessWidget {
                               await Provider.of<ReferralProvider>(
                                 context,
                                 listen: false,
-                              ).deleteCampaign(data.campaignId);
+                              ).deleteCampaign(data.campaignId, data.shopId);
                           CustomSnackBar.show(deleteData, true);
                         },
                         child: SizedBox(
@@ -326,7 +325,11 @@ class CustomTableRestaurantMobile extends StatelessWidget {
   final List<ReferredRestaurantsModel>? list;
   final bool? isMobile;
 
-  const CustomTableRestaurantMobile({super.key, required this.list, this.isMobile});
+  const CustomTableRestaurantMobile({
+    super.key,
+    required this.list,
+    this.isMobile,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -430,7 +433,6 @@ class CustomTableRestaurantMobile extends StatelessWidget {
 
   Widget _buildActions(BuildContext context, ReferredRestaurantsModel data) {
     return Row(
-
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildStatus(data),
@@ -454,7 +456,9 @@ class CustomTableRestaurantMobile extends StatelessWidget {
                     child: SizedBox(
                       height: 25,
                       width: 25,
-                      child: Image.asset("assets/images/refer_and_earn/mobile_delete.png"),
+                      child: Image.asset(
+                        "assets/images/refer_and_earn/mobile_delete.png",
+                      ),
                     ),
                   );
           },

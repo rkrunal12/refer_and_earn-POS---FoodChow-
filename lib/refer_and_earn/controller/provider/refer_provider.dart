@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -22,12 +24,14 @@ class ReferralProvider with ChangeNotifier {
     referrals.removeAt(index);
     notifyListeners();
   }
-  void clearList(){
+
+  void clearList() {
     referrals = [];
     notifyListeners();
   }
-  void disposeAll(){
-    for(var data in referrals){
+
+  void disposeAll() {
+    for (var data in referrals) {
       data.dispose();
     }
   }
@@ -40,7 +44,6 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// ********************************* Campaign API Data **************************///
   String baseUrl = "https://api.foodchow.com/api/Refer_and_earn";
   bool _isLoading = false;
   String? _error;
@@ -52,43 +55,88 @@ class ReferralProvider with ChangeNotifier {
   int? get loadingId => _loadingId;
   List<Data> get data => _data;
 
-
   List<Data> get activeCampaigns =>
-      _data.where((c) => c.status == true).toList();
+      _data.where((c) => c.status == "1").toList();
 
   List<Data> get inactiveCampaigns =>
-      _data.where((c) => c.status != true).toList();
+      _data.where((c) => c.status != "1").toList();
 
   int get totalReferrals =>
       _data.fold(0, (sum, c) => sum + (c.referrerReward ?? 0));
 
-
   Future<void> fetchData(bool isUpdating) async {
-    if (!isUpdating) _isLoading = true;
-    _error = null;
-    notifyListeners();
+    if (!isUpdating) {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+    }
 
     try {
-      final response = await http.get(Uri.parse("$baseUrl/AllCampaign"));
+      final response = await http
+          .get(Uri.parse("$baseUrl/CampaignsByShop?shopId=7866"))
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-        final List<dynamic> jsonData = decoded["data"] ?? [];
+        if (response.body.trim().isEmpty) {
+          _error = "No data received from server";
+          _data = [];
+          return;
+        }
 
-        _data = jsonData
-            .whereType<Map<String, dynamic>>()
-            .map((item) => Data.fromJson(item))
-            .toList();
+        try {
+          final decoded = jsonDecode(response.body);
+          log("API Response decoded successfully");
+
+          // Direct access to the nested list structure
+          if (decoded is Map<String, dynamic> &&
+              decoded.containsKey('data') &&
+              decoded['data'] is List &&
+              decoded['data'].isNotEmpty &&
+              decoded['data'][0] is List) {
+            final List<dynamic> dataList = decoded['data'][0];
+            log("Extracted ${dataList.length} campaigns from nested structure");
+
+            final List<Data> jsonData = [];
+            for (var item in dataList) {
+              if (item is Map<String, dynamic>) {
+                try {
+                  final data = Data.fromJson(item);
+                  jsonData.add(data);
+                  log("✓ Successfully parsed campaign: ${data.campaignId}");
+                } catch (e) {
+                  log("✗ Error parsing campaign: $e");
+                }
+              }
+            }
+
+            _data = jsonData;
+            _error = null;
+            log("Successfully loaded ${_data.length} campaigns");
+            log("Active campaigns: ${activeCampaigns.length}");
+            log("Inactive campaigns: ${inactiveCampaigns.length}");
+          } else {
+            _error = "Unexpected API response structure";
+            _data = [];
+          }
+        } catch (e) {
+          _error = "Failed to parse response: $e";
+          _data = [];
+          log("JSON parsing error: $e");
+        }
       } else {
-        _error = "Failed with status code ${response.statusCode}";
+        _error = "Failed to fetch data (Code: ${response.statusCode})";
+        _data = [];
       }
     } catch (e) {
-      _error = e.toString();
+      _error = "Error: $e";
+      log("Unexpected error: $e");
+      _data = [];
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
+
   Future<String> addCampaign(CampaignModel campaign) async {
     try {
       final response = await http.post(
@@ -97,6 +145,8 @@ class ReferralProvider with ChangeNotifier {
         body: jsonEncode(campaign.toAddJson()),
       );
 
+      log(campaign.toAddJson().toString());
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decoded = jsonDecode(response.body);
         await fetchData(false);
@@ -104,56 +154,85 @@ class ReferralProvider with ChangeNotifier {
       } else {
         return "Failed with ${response.statusCode} → ${response.body}";
       }
-
     } catch (e) {
       return e.toString();
     } finally {
       notifyListeners();
     }
   }
-  Future<String> updateCampaign(CampaignModel campaign, bool isStatus) async {
-    if (isStatus) _loadingId = campaign.campaignId;
+
+  Future<String> updateCampaign(
+    CampaignModel campaign,
+    bool isStateUpdating,
+  ) async {
+    // Set loading state
+    if (isStateUpdating) {
+      _loadingId = campaign.campaignId;
+    }
+    notifyListeners();
+
+    log("Data come AT provider: ${campaign.toJson()}");
+    log("Updating Campaign: ${campaign.toJson()}");
 
     try {
-      final response = await http.post(
-        Uri.parse("$baseUrl/UpdateCampaign"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(campaign.toJson()),
-      );
+      final response = await http
+          .post(
+            Uri.parse("$baseUrl/UpdateCampaign"),
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode(campaign.toJson()),
+          )
+          .timeout(const Duration(seconds: 30));
+
+      log("Update API Response: ${response.statusCode} - ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decoded = jsonDecode(response.body);
-        await fetchData(true);
-        return decoded["message"] ?? "Success";
+
+        // Check for success in response
+        if (decoded['success'] == true || decoded['message'] != null) {
+          // Refresh data
+          await fetchData(true);
+          return decoded["message"] ?? "Campaign updated successfully";
+        } else {
+          return "API returned unsuccessful response";
+        }
       } else {
-        return "Failed with ${response.statusCode} => ${response.body}";
+        log(
+          "Update Campaign Failed: ${response.statusCode} => ${response.body}",
+        );
+        return "Failed with status ${response.statusCode}";
       }
     } catch (e) {
-      return e.toString();
+      log("Unexpected error: $e");
+      return "Unexpected error: $e";
     } finally {
       _loadingId = null;
       notifyListeners();
     }
   }
-  Future<String> deleteCampaign(int? campaignID) async {
+
+  Future<String> deleteCampaign(int? campaignID, String? shopId) async {
     if (campaignID == null) {
       return "Campaign ID cannot be null";
     }
 
     try {
       final response = await http.delete(
-        Uri.parse("$baseUrl/DeleteCampaign"),
+        Uri.parse(
+          "$baseUrl/DeleteCampaign?campaign_id=$campaignID&shop_id=$shopId",
+        ),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({'campaign_id': campaignID}),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decoded = jsonDecode(response.body);
-        await fetchData(true); // refresh data after deletion
+        await fetchData(true); // refresh data after deletions
         String message = decoded["message"] ?? "Deleted successfully";
         return message;
       } else {
-        final errorMsg = "Failed with ${response.statusCode} => ${response.body}";
+        final errorMsg =
+            "Failed with ${response.statusCode} => ${response.body}";
+        log(errorMsg);
         return errorMsg;
       }
     } catch (e, stackTrace) {
@@ -163,6 +242,7 @@ class ReferralProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
   /// ********************************* Cashback Api Data **************************///
   CashbackModel? _allCashback;
   bool _isCashbackGetLoading = false;
@@ -181,7 +261,9 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await http.get(Uri.parse("$baseUrl/AllCashback"));
+      final response = await http.get(
+        Uri.parse("$baseUrl/GetCashback?shop_id=7866"),
+      );
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -205,20 +287,21 @@ class ReferralProvider with ChangeNotifier {
               : 0;
         } else {
           _allCashback = null;
-          debugPrint("No cashback data available from API.");
+          log("No cashback data available from API.");
         }
       } else {
         _cashbackError = "Failed to fetch data (Code: ${response.statusCode})";
-        debugPrint(_cashbackError);
+        log(_cashbackError.toString());
       }
     } catch (e) {
       _cashbackError = "Error: $e";
-      debugPrint(_cashbackError);
+      log(_cashbackError.toString());
     } finally {
       _isCashbackGetLoading = false;
       notifyListeners();
     }
   }
+
   Future<String> saveCashback(CashbackModel model) async {
     _isCashbackAddLoading = true;
     notifyListeners();
@@ -226,7 +309,7 @@ class ReferralProvider with ChangeNotifier {
     try {
       final isUpdate = model.cashbackId != null;
       final url = isUpdate ? "$baseUrl/UpdateCashback" : "$baseUrl/AddCashback";
-
+      log(model.toJson().toString());
       final response = await http.post(
         Uri.parse(url),
         body: jsonEncode(model.toAddJson()),
@@ -238,8 +321,8 @@ class ReferralProvider with ChangeNotifier {
         await fetchCashbackData(false);
         return decode["message"] ?? "Success";
       } else {
+        log("Cashback save failed: ${response.statusCode} -> ${response.body}");
         return "Failed with ${response.statusCode} → ${response.body}";
-
       }
     } catch (e) {
       return e.toString();
@@ -248,7 +331,6 @@ class ReferralProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   /// ********************************* Referral Api Data **************************///
   bool _isReferralLoading = false;
@@ -266,7 +348,7 @@ class ReferralProvider with ChangeNotifier {
       _referralList.where((c) => c.claimed != true).toList();
 
   Future<void> fetchRestaurantReferralData(bool isUpdate) async {
-    if(!isUpdate)  _isReferralLoading = true;
+    if (!isUpdate) _isReferralLoading = true;
     _referralError = null;
     notifyListeners();
 
@@ -297,7 +379,9 @@ class ReferralProvider with ChangeNotifier {
     }
   }
 
-  Future<String> addRestaurantReferralData(ReferredRestaurantsModel model) async {
+  Future<String> addRestaurantReferralData(
+    ReferredRestaurantsModel model,
+  ) async {
     final response = await http.post(
       Uri.parse(
         "https://api.foodchow.com/api/Restaurant_Refer_Earn/AddReferredRestaurants",
@@ -312,9 +396,7 @@ class ReferralProvider with ChangeNotifier {
         await fetchRestaurantReferralData(true);
         return decode["message"];
       } else {
-
         return "Failed with code ${response.statusCode} -> ${response.body}";
-
       }
     } on Exception catch (e) {
       return e.toString();
@@ -334,13 +416,11 @@ class ReferralProvider with ChangeNotifier {
         await fetchRestaurantReferralData(true);
         return "Delete Success";
       } else {
-
-         return "Failed with code ${response.statusCode} -> ${response.body}";
-
+        return "Failed with code ${response.statusCode} -> ${response.body}";
       }
     } on Exception catch (e) {
       return e.toString();
-    }finally{
+    } finally {
       notifyListeners();
     }
   }
@@ -359,7 +439,7 @@ class ReferralProvider with ChangeNotifier {
   bool notifyCustomers = false;
   bool isSaving = false;
 
-  void setTogglingInactive(bool select){
+  void setTogglingInactive(bool select) {
     _isTogglingInactive = select;
     notifyListeners();
   }

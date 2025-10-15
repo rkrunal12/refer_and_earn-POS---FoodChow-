@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -5,18 +7,27 @@ import '../../model/campaign_model.dart';
 import '../../view/widgets/common_widgets.dart';
 import '../provider/refer_provider.dart';
 
-
 class CampaignService {
   /// Update campaign status
   static Future<void> updateCampaigns(
     CampaignModel data,
-    bool isStatus,
     BuildContext context,
-      bool isMobile
+    bool isMobile,
+    bool isStateUpdating,
   ) async {
-    final provider = Provider.of<ReferralProvider>(context, listen: false);
-    final msg = await provider.updateCampaign(data, isStatus);
-    CustomSnackBar.show(msg, isMobile);
+    log("Data come to update: ${data.toJson()}");
+    try {
+      final provider = Provider.of<ReferralProvider>(context, listen: false);
+      final msg = await provider.updateCampaign(data, isStateUpdating);
+
+      if (msg.contains("Failed") || msg.contains("Error")) {
+        CustomSnackBar.show("Error: $msg", isMobile);
+      } else {
+        CustomSnackBar.show(msg, isMobile);
+      }
+    } catch (e) {
+      CustomSnackBar.show("Error updating campaign: $e", isMobile);
+    }
   }
 
   static Future<bool> validateAndSaveCampaign({
@@ -27,12 +38,12 @@ class CampaignService {
     String? customerRewardText,
     String? referralRewardText,
     String? minPurchaseText,
-    bool? status,
-    int? shopId,
+    String? status,
+    String? shopId,
     int? campaignId,
-    required isMobile
+    required isMobile,
   }) async {
-    void showError(String msg) => CustomSnackBar.show(msg,isMobile);
+    void showError(String msg) => CustomSnackBar.show(msg, isMobile);
 
     final campaignName = campaignNameText?.trim() ?? "";
     final customerRewardStr = customerRewardText?.trim() ?? "";
@@ -100,28 +111,29 @@ class CampaignService {
 
     provider.setIsSaving(true);
 
-
     try {
       if (isUpdate) {
         await CampaignService.updateCampaigns(
           CampaignModel(
-            status: status,
+            status: status == "1" ? 1 : 0,
             shopId: shopId,
             rewardType: provider.rewardType,
             referrerReward: referralReward,
-            notifyCustomer: provider.notifyCustomers,
+            notifyCustomer: provider.notifyCustomers ? 1 : 0,
             minPurchase: minPurchase,
             fixedPeriodType: provider.expiryOption,
             expiryType: provider.campaignType,
-            expiryEnable: provider.campaignExpiry,
-            endDate: expiryEndDate?.toIso8601String() ?? DateTime(1970, 1, 1).toIso8601String(),
+            expiryEnable: provider.campaignExpiry ? 1 : 0,
+            endDate:
+                expiryEndDate?.toIso8601String() ??
+                DateTime(1970, 1, 1).toIso8601String(),
             customerReward: customerReward,
             campaignName: campaignName,
             campaignId: campaignId,
           ),
-          false,
           context,
-          isMobile
+          isMobile,
+          false
         );
       } else {
         await CampaignService.saveCampaign(
@@ -135,12 +147,12 @@ class CampaignService {
           provider.expiryOption,
           expiryEndDate,
           provider.notifyCustomers,
-          true,
+          "1",
           context,
-          isMobile
+          isMobile,
         );
       }
-      return true; // ✅ success
+      return true;
     } catch (e) {
       showError("Something went wrong: $e");
       return false;
@@ -161,9 +173,9 @@ class CampaignService {
     String? fixedPeriodType,
     DateTime? endDate,
     bool? notifyCustomer,
-    bool? status,
+    String? status,
     BuildContext context,
-      bool isMobile
+    bool isMobile,
   ) async {
     // Validation / defaults for expiry
     if (expiryEnable == true) {
@@ -206,22 +218,22 @@ class CampaignService {
 
     // Build campaign object
     final campaign = CampaignModel.add(
+      shopId: "7866",
       campaignName: campaignName,
       rewardType: rewardType,
       customerReward: customerReward,
       referrerReward: referrerReward,
       minPurchase: minPurchase,
-      expiryEnable: expiryEnable,
+      expiryEnable: expiryEnable == true ? 1 : 0,
       expiryType: expiryType,
       fixedPeriodType: fixedPeriodType,
-      endDate: endDate?.toIso8601String(),
-      notifyCustomer: notifyCustomer,
-      status: status,
+      endDate: endDate?.toString(),
+      notifyCustomer: notifyCustomer == true ? 1 : 0,
+      status: status == "1" ? 1 : 0,
     );
 
     final provider = Provider.of<ReferralProvider>(context, listen: false);
     final msg = await provider.addCampaign(campaign);
     CustomSnackBar.show(msg, isMobile);
-
   }
 }

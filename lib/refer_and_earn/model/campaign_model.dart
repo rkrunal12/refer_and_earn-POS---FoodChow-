@@ -1,19 +1,19 @@
 class CampaignModel {
   int? campaignId;
-  int? shopId;
+  String? shopId;
   String? campaignName;
   String? rewardType;
   int? customerReward;
   int? referrerReward;
   int? minPurchase;
-  bool? expiryEnable;
+  int? expiryEnable;
   String? expiryType;
   String? fixedPeriodType;
   String? endDate;
-  bool? notifyCustomer;
-  bool? status;
+  int? notifyCustomer;
+  int? status;
 
-  CampaignModel({ 
+  CampaignModel({
     this.campaignId,
     this.shopId,
     this.campaignName,
@@ -30,6 +30,7 @@ class CampaignModel {
   });
 
   CampaignModel.add({
+    this.shopId,
     this.campaignName,
     this.rewardType,
     this.customerReward,
@@ -61,14 +62,6 @@ class CampaignModel {
 
   /// From JSON
   factory CampaignModel.fromJson(Map<String, dynamic> json) {
-    bool parseStatus(dynamic val) {
-      if (val == null) return false;
-      if (val is bool) return val;
-      if (val is String) return val.toLowerCase() == 'active' || val == '1';
-      if (val is num) return val == 1;
-      return false;
-    }
-
     return CampaignModel(
       campaignId: json['campaign_id'],
       shopId: json['shop_id'],
@@ -82,7 +75,7 @@ class CampaignModel {
       fixedPeriodType: json['fixed_period_type'],
       endDate: json['end_date'],
       notifyCustomer: json['notify_customer'] ?? false,
-      status: parseStatus(json['status']),
+      status: json['status'],
     );
   }
 
@@ -107,6 +100,7 @@ class CampaignModel {
 
   Map<String, dynamic> toAddJson() {
     return {
+      'shop_id': shopId,
       'campaign_name': campaignName,
       'reward_type': rewardType,
       'customer_reward': customerReward,

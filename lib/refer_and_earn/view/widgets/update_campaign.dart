@@ -44,7 +44,7 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
       final provider = context.read<ReferralProvider>();
       provider
         ..updateRewardType(widget.data.rewardType ?? "Flat")
-        ..updateCampaignExpiry(widget.data.expiryEnable ?? false)
+        ..updateCampaignExpiry(widget.data.expiryEnable == true ? true : false)
         ..updateCampaignType(widget.data.expiryType ?? "Fixed Period")
         ..updateExpiryOption(
           widget.data.fixedPeriodType ?? "Set Specific End Date & Time",
@@ -52,7 +52,7 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
         ..updateExpiryDate(
           DateTime.tryParse(widget.data.endDate ?? '') ?? DateTime.now(),
         )
-        ..updateNotifyCustomers(widget.data.notifyCustomer ?? false)
+        ..updateNotifyCustomers(widget.data.notifyCustomer == true ? true : false)
         ..setIsSaving(false);
     });
   }
@@ -262,7 +262,7 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
                               referralRewardText:
                                   _referralRewardController.text,
                               minPurchaseText: _minPurchaseController.text,
-                              status: widget.data.status,
+                              status: widget.data.status == 1 ? "1" : "0",
                               shopId: widget.data.shopId,
                               campaignId: widget.data.campaignId,
                             );

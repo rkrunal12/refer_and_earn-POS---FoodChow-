@@ -10,13 +10,17 @@ import '../widgets/common_widgets.dart';
 class CashBack extends StatefulWidget {
   const CashBack({super.key});
 
-  static Future<void> saveData(TabController tab, BuildContext context,bool isMobile) async {
+  static Future<void> saveData(
+    TabController tab,
+    BuildContext context,
+    bool isMobile,
+  ) async {
     final provider = Provider.of<ReferralProvider>(context, listen: false);
     final existingData = provider.allCashback;
 
     final model = CashbackModel(
-      cashbackId: existingData?.cashbackId,
-      shopId: existingData?.shopId,
+      cashbackId: existingData?.cashbackId ?? 1,
+      shopId: existingData?.shopId ?? "7866",
       cashbackEnable: provider.isEnables ? 1 : 0,
       cashbackType: tab.index == 0 ? "Discount" : "Flat",
       cashbackValue:
@@ -34,7 +38,8 @@ class CashBack extends StatefulWidget {
   State<CashBack> createState() => _CashBackState();
 }
 
-class _CashBackState extends State<CashBack> with SingleTickerProviderStateMixin {
+class _CashBackState extends State<CashBack>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -60,67 +65,79 @@ class _CashBackState extends State<CashBack> with SingleTickerProviderStateMixin
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 550;
     return SingleChildScrollView(
-      child: isMobile ? MobileCashback(isMobile: false,) :Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 2,
-          child: Consumer<ReferralProvider>(
-            builder: (context, value, child) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "Cash Back",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Poppins",
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-
-                    /// Enable/Disable toggle
-                    ToggleCard(
-                      isEnable: value.isEnables,
-                      onChanged: (val) {
-                        value.setIsEnables(val); // updates provider instantly
-                      },
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    /// Cashback rules
-                    SizedBox(
-                      width: double.infinity,
-                      child: CashbackRulesCard(tabController: _tabController),
-                    ),
-                    const SizedBox(height: 20),
-
-                    SizedBox(
-                      height: 50,
-                      width: 200,
-                      child: value.isCashbackAddLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : GestureDetector(
-                              child: const CustomButton(
-                                value: "Save",
-                                color: ColorsClass.primary,
-                              ),
-                              onTap: () {
-                                CashBack.saveData(_tabController, context,false);
-                              },
+      child: isMobile
+          ? MobileCashback(isMobile: false)
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                elevation: 2,
+                child: Consumer<ReferralProvider>(
+                  builder: (context, value, child) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            "Cash Back",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Poppins",
                             ),
-                    ),
-                  ],
+                          ),
+                          const SizedBox(height: 15),
+
+                          /// Enable/Disable toggle
+                          ToggleCard(
+                            isEnable: value.isEnables,
+                            onChanged: (val) {
+                              value.setIsEnables(
+                                val,
+                              ); // updates provider instantly
+                            },
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          /// Cashback rules
+                          SizedBox(
+                            width: double.infinity,
+                            child: CashbackRulesCard(
+                              tabController: _tabController,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          SizedBox(
+                            height: 50,
+                            width: 200,
+                            child: value.isCashbackAddLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : GestureDetector(
+                                    child: const CustomButton(
+                                      value: "Save",
+                                      color: ColorsClass.primary,
+                                    ),
+                                    onTap: () {
+                                      CashBack.saveData(
+                                        _tabController,
+                                        context,
+                                        false,
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 }

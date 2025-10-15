@@ -1,6 +1,6 @@
 class CashbackModel {
   int? cashbackId;
-  int? shopId;
+  String? shopId;
   int? cashbackEnable;
   String? cashbackType;
   int? cashbackValue;
@@ -51,7 +51,7 @@ class CashbackModel {
 
   CashbackModel copyWith({
     int? cashbackId,
-    int? shopId,
+    String? shopId,
     int? cashbackEnable,
     String? cashbackType,
     int? cashbackValue,

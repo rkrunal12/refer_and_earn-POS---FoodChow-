@@ -7,6 +7,7 @@ import '../../model/campaign_model.dart';
 import '../screens/campaign_expiry_screen.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/mobile_widgets.dart';
+
 class AddCampaignMobile extends StatefulWidget {
   final CampaignModel? campaign;
   final bool isMobile;
@@ -44,14 +45,16 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
 
     if (widget.campaign != null) {
       provider
-        ..campaignExpiry = widget.campaign!.expiryEnable ?? false
+        ..campaignExpiry = widget.campaign!.expiryEnable == true ? true : false
         ..campaignType = widget.campaign!.expiryType ?? "Fixed Period"
         ..expiryOption =
             widget.campaign!.fixedPeriodType ?? "Set Specific End Date & Time"
         ..expiryDate = widget.campaign!.endDate != null
             ? DateTime.parse(widget.campaign!.endDate!)
             : null
-        ..notifyCustomers = widget.campaign!.notifyCustomer ?? false
+        ..notifyCustomers = widget.campaign!.notifyCustomer == true
+            ? true
+            : false
         ..rewardType = widget.campaign!.rewardType ?? "Flat";
     } else {
       _clearForm(provider);
@@ -89,7 +92,9 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: widget.isMobile ? const MobileAppBar(title: "Refer and Earn") : null,
+      appBar: widget.isMobile
+          ? const MobileAppBar(title: "Refer and Earn")
+          : null,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -164,19 +169,20 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
                 if (!provider.campaignExpiry) return const SizedBox.shrink();
                 return CampaignExpiryScreen(
                   isMobile: widget.isMobile,
-                  onChanged: ({
-                    required String campaignType,
-                    required String expiryOption,
-                    DateTime? selectedDate,
-                    required bool notifyCustomers,
-                    int? duration,
-                  }) {
-                    provider
-                      ..updateCampaignType(campaignType)
-                      ..updateExpiryOption(expiryOption)
-                      ..updateExpiryDate(selectedDate ?? DateTime.now())
-                      ..updateNotifyCustomers(notifyCustomers);
-                  },
+                  onChanged:
+                      ({
+                        required String campaignType,
+                        required String expiryOption,
+                        DateTime? selectedDate,
+                        required bool notifyCustomers,
+                        int? duration,
+                      }) {
+                        provider
+                          ..updateCampaignType(campaignType)
+                          ..updateExpiryOption(expiryOption)
+                          ..updateExpiryDate(selectedDate ?? DateTime.now())
+                          ..updateNotifyCustomers(notifyCustomers);
+                      },
                 );
               },
             ),
@@ -188,24 +194,26 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
               onTap: provider.isSaving
                   ? null
                   : () async {
-                final success = await CampaignService.validateAndSaveCampaign(
-                  isUpdate: widget.campaign != null,
-                  provider: provider,
-                  context: context,
-                  campaignNameText: _campaignNameController.text,
-                  customerRewardText: _customerRewardController.text,
-                  referralRewardText: _referralRewardController.text,
-                  minPurchaseText: _minPurchaseController.text,
-                  campaignId: widget.campaign?.campaignId,
-                  shopId: widget.campaign?.shopId,
-                  status: widget.campaign?.status ?? false,
-                  isMobile: widget.isMobile
-                );
+                      final success =
+                          await CampaignService.validateAndSaveCampaign(
+                            isUpdate: widget.campaign != null,
+                            provider: provider,
+                            context: context,
+                            campaignNameText: _campaignNameController.text,
+                            customerRewardText: _customerRewardController.text,
+                            referralRewardText: _referralRewardController.text,
+                            minPurchaseText: _minPurchaseController.text,
+                            campaignId: widget.campaign?.campaignId,
+                            shopId: widget.campaign?.shopId,
+                            status: widget.campaign?.status == 1 ? "1" : "0",
+                            isMobile: widget.isMobile,
+                          );
 
-                if (success && widget.isMobile) {
-                  Navigator.pop(context);
-                }
-              },
+                      if (success && widget.isMobile) {
+                        Navigator.pop(context);
+                      }
+                      _clearForm(provider);
+                    },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: CustomButton(
@@ -221,4 +229,3 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
     );
   }
 }
-

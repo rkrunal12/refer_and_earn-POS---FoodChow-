@@ -70,7 +70,8 @@ class ContentContainer extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
               ),
-              overflow: TextOverflow.ellipsis, // optional: shows "..." if text is too long
+              overflow: TextOverflow
+                  .ellipsis, // optional: shows "..." if text is too long
             ),
           ),
         ],
@@ -176,7 +177,10 @@ class CampaignDetailed extends StatelessWidget {
               FittedBox(
                 child: Text(
                   title,
-                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -204,104 +208,125 @@ class BuildCustomTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: constraints.maxWidth),
-            child: DataTable(
-              headingRowColor: MaterialStateProperty.all(Color(0x550AA89E)),
-              border: TableBorder.all(color: Colors.grey.shade300, width: 1),
-              columnSpacing: 20,
-              columns: const [
-                DataColumn(label: Text("Campaign Name")),
-                DataColumn(label: Text("Reward Type")),
-                DataColumn(label: Text("Friend's Reward")),
-                DataColumn(label: Text("Your Reward")),
-                DataColumn(label: Text("Validity")),
-                DataColumn(label: Text("Action")),
-              ],
-              rows: data.map((campaign) {
-                final campaignModel = CampaignModel(
-                  campaignId: campaign.campaignId,
-                  campaignName: campaign.campaignName,
-                  customerReward: campaign.customerReward,
-                  referrerReward: campaign.referrerReward,
-                  minPurchase: campaign.minPurchase,
-                  expiryEnable: campaign.expiryEnable,
-                  expiryType: campaign.expiryType,
-                  fixedPeriodType: campaign.fixedPeriodType,
-                  endDate: campaign.endDate!.toIso8601String(),
-                  notifyCustomer: campaign.notifyCustomer,
-                  rewardType: campaign.rewardType,
-                  shopId: campaign.shopId,
-                  status: campaign.status,
-                );
-
-                return DataRow(
-                  cells: [
-                    DataCell(Text(campaign.campaignName ?? "")),
-                    DataCell(Text(campaign.rewardType ?? "")),
-                    DataCell(Text("${campaign.customerReward}%")),
-                    DataCell(Text("${campaign.referrerReward}%")),
-                    DataCell(
-                      Text(
-                        campaign.expiryEnable == false
-                            ? "No Expiry"
-                            : (campaign.expiryType ==
-                                  "After Friend's First Order")
-                            ? "Expires After Friend's First Order"
-                            : "End: ${DateFormat('yyyy-mm-dd hh:mm:ss a').format(campaign.endDate!)}",
-                      ),
+    return data.isEmpty
+        ? SizedBox()
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                  child: DataTable(
+                    headingRowColor: MaterialStateProperty.all(
+                      Color(0x550AA89E),
                     ),
-                    DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.teal),
-                            onPressed: () =>
-                                buildDialogeBox(context, campaignModel),
+                    border: TableBorder.all(
+                      color: Colors.grey.shade300,
+                      width: 1,
+                    ),
+                    columnSpacing: 20,
+                    columns: const [
+                      DataColumn(label: Text("Campaign Name")),
+                      DataColumn(label: Text("Reward Type")),
+                      DataColumn(label: Text("Friend's Reward")),
+                      DataColumn(label: Text("Your Reward")),
+                      DataColumn(label: Text("Validity")),
+                      DataColumn(label: Text("Action")),
+                    ],
+                    rows: data.map((campaign) {
+                      final campaignModel = CampaignModel(
+                        campaignId: campaign.campaignId,
+                        campaignName: campaign.campaignName,
+                        customerReward: campaign.customerReward,
+                        referrerReward: campaign.referrerReward,
+                        minPurchase: campaign.minPurchase,
+                        expiryEnable: campaign.expiryEnable == true ? 1 : 0,
+                        expiryType: campaign.expiryType,
+                        fixedPeriodType: campaign.fixedPeriodType,
+                        endDate:
+                            "${campaign.endDate?.year ?? DateTime.now().year}-${campaign.endDate?.month ?? DateTime.now().month}-${campaign.endDate?.day ?? DateTime.now().day} ${campaign.endDate?.hour ?? DateTime.now().hour}:${campaign.endDate?.minute ?? DateTime.now().minute}:${campaign.endDate?.second ?? DateTime.now().second}",
+                        notifyCustomer: campaign.notifyCustomer == true ? 1 : 0,
+                        rewardType: campaign.rewardType,
+                        shopId: campaign.shopId?.toString(),
+                        status: campaign.status == "1" ? 1 : 0,
+                      );
+
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(campaign.campaignName ?? "")),
+                          DataCell(Text(campaign.rewardType ?? "")),
+                          DataCell(Text("${campaign.customerReward}%")),
+                          DataCell(Text("${campaign.referrerReward}%")),
+                          DataCell(
+                            Text(
+                              campaign.expiryEnable == false
+                                  ? "No Expiry"
+                                  : (campaign.expiryType ==
+                                        "After Friend's First Order")
+                                  ? "Expires After Friend's First Order"
+                                  : "End: ${DateFormat('dd-MM-yyyy HH:mm:ss a').format(DateTime(campaign.endDate?.year ?? 1970, campaign.endDate?.month ?? 1, campaign.endDate?.day ?? 1, campaign.endDate?.hour ?? 0, campaign.endDate?.minute ?? 0, campaign.endDate?.second ?? 0))}",
+                            ),
                           ),
-                          Consumer<ReferralProvider>(
-                            builder: (context, provider, child) {
-                              return provider.loadingId == campaign.campaignId
-                                  ? const CircularProgressIndicator()
-                                  : Switch.adaptive(
-                                      value: campaign.status ?? false,
-                                      onChanged: (val) {
-                                        CampaignService.updateCampaigns(
-                                          campaignModel..status = val,
-                                          true,
+                          DataCell(
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.teal,
+                                  ),
+                                  onPressed: () =>
+                                      buildDialogeBox(context, campaignModel),
+                                ),
+                                Consumer<ReferralProvider>(
+                                  builder: (context, provider, child) {
+                                    return provider.loadingId ==
+                                            campaign.campaignId
+                                        ? const CircularProgressIndicator()
+                                        : Switch.adaptive(
+                                            value: campaignModel.status == 1,
+                                            onChanged: (val) {
+                                              debugPrint("Status Change: $val");
+                                              CampaignService.updateCampaigns(
+                                                campaignModel
+                                                  ..status = val ? 1 : 0,
+                                                context,
+                                                false,
+                                                true,
+                                              );
+                                            },
+                                          );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () async {
+                                    final deleteData =
+                                        await Provider.of<ReferralProvider>(
                                           context,
-                                          false
+                                          listen: false,
+                                        ).deleteCampaign(
+                                          campaign.campaignId,
+                                          campaign.shopId,
                                         );
-                                      },
-                                    );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              final deleteData = await Provider.of<ReferralProvider>(
-                                context,
-                                listen: false,
-                              ).deleteCampaign(campaign.campaignId);
-                              CustomSnackBar.show(deleteData, false);
-                            },
+                                    CustomSnackBar.show(deleteData, false);
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
+                      );
+                    }).toList(),
+                  ),
+                ),
+              );
+            },
+          );
   }
 }
 
@@ -333,7 +358,11 @@ class BuildExpiryContainer extends StatelessWidget {
   final ReferralProvider provider;
   final bool isMobile;
 
-  const BuildExpiryContainer({super.key, required this.provider, required this.isMobile});
+  const BuildExpiryContainer({
+    super.key,
+    required this.provider,
+    required this.isMobile,
+  });
 
   @override
   Widget build(BuildContext context) {

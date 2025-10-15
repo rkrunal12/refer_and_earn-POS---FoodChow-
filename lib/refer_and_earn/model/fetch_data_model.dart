@@ -1,6 +1,6 @@
 class Data {
   int? campaignId;
-  int? shopId;
+  String? shopId;
   String? campaignName;
   String? rewardType;
   int? customerReward;
@@ -9,11 +9,11 @@ class Data {
   bool? expiryEnable;
   String? expiryType;
   String? fixedPeriodType;
-  DateTime? endDate;
+  EndDate? endDate;
   bool? notifyCustomer;
-  bool? status;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? status;
+  EndDate? createdAt;
+  dynamic updatedAt;
 
   Data({
     this.campaignId,
@@ -33,66 +33,107 @@ class Data {
     this.updatedAt,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) {
-    // Helper to safely parse nested datetime
-    DateTime? parseDateTime(Map? dateObj) {
-      if (dateObj == null) return null;
-      final value = dateObj['value'];
-      if (value is String && value.isNotEmpty) {
-        return DateTime.tryParse(value);
-      }
-      return null;
-    }
-
-    // Convert status to bool
-    bool parseStatus(dynamic val) {
-      if (val == null) return false;
-      if (val is bool) return val;
-      if (val is String) {
-        return val.toLowerCase() == 'active' || val == '1';
-      }
-      if (val is num) return val == 1;
-      return false;
-    }
-
-    return Data(
-      campaignId: json['campaign_id'],
-      shopId: json['shop_id'],
-      campaignName: json['campaign_name'],
-      rewardType: json['reward_type'],
-      customerReward: json['customer_reward'],
-      referrerReward: json['referrer_reward'],
-      minPurchase: json['min_purchase'],
-      expiryEnable: json['expiry_enable'],
-      expiryType: json['expiry_type'],
-      fixedPeriodType: json['fixed_period_type'],
-      endDate: parseDateTime(json['end_date']),
-      notifyCustomer: json['notify_customer'] ?? false,
-      status: parseStatus(json['status']),
-      createdAt: parseDateTime(json['created_at']),
-      updatedAt: parseDateTime(json['updated_at']),
-    );
+  Data.fromJson(Map<String, dynamic> json) {
+    campaignId = json['campaign_id'];
+    shopId = json['shop_id'];
+    campaignName = json['campaign_name'];
+    rewardType = json['reward_type'];
+    customerReward = json['customer_reward'];
+    referrerReward = json['referrer_reward'];
+    minPurchase = json['min_purchase'];
+    expiryEnable = json['expiry_enable'];
+    expiryType = json['expiry_type'];
+    fixedPeriodType = json['fixed_period_type'];
+    endDate = json['end_date'] != null
+        ? new EndDate.fromJson(json['end_date'])
+        : null;
+    notifyCustomer = json['notify_customer'];
+    status = json['status'];
+    createdAt = json['created_at'] != null
+        ? new EndDate.fromJson(json['created_at'])
+        : null;
+    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
-    String? formatDate(DateTime? dt) => dt?.toIso8601String();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['campaign_id'] = this.campaignId;
+    data['shop_id'] = this.shopId;
+    data['campaign_name'] = this.campaignName;
+    data['reward_type'] = this.rewardType;
+    data['customer_reward'] = this.customerReward;
+    data['referrer_reward'] = this.referrerReward;
+    data['min_purchase'] = this.minPurchase;
+    data['expiry_enable'] = this.expiryEnable;
+    data['expiry_type'] = this.expiryType;
+    data['fixed_period_type'] = this.fixedPeriodType;
+    if (this.endDate != null) {
+      data['end_date'] = this.endDate!.toJson();
+    }
+    data['notify_customer'] = this.notifyCustomer;
+    data['status'] = this.status;
+    if (this.createdAt != null) {
+      data['created_at'] = this.createdAt!.toJson();
+    }
+    data['updated_at'] = this.updatedAt;
+    return data;
+  }
+}
 
-    return {
-      'campaign_id': campaignId,
-      'shop_id': shopId,
-      'campaign_name': campaignName,
-      'reward_type': rewardType,
-      'customer_reward': customerReward,
-      'referrer_reward': referrerReward,
-      'min_purchase': minPurchase,
-      'expiry_enable': expiryEnable,
-      'expiry_type': expiryType,
-      'fixed_period_type': fixedPeriodType,
-      'end_date': formatDate(endDate),
-      'notify_customer': notifyCustomer,
-      'status': status,
-      'created_at': formatDate(createdAt),
-      'updated_at': formatDate(updatedAt),
-    };
+class EndDate {
+  bool? isValidDateTime;
+  int? year;
+  int? month;
+  int? day;
+  int? hour;
+  int? minute;
+  int? second;
+  int? millisecond;
+  int? microsecond;
+  bool? isNull;
+  String? value;
+
+  EndDate({
+    this.isValidDateTime,
+    this.year,
+    this.month,
+    this.day,
+    this.hour,
+    this.minute,
+    this.second,
+    this.millisecond,
+    this.microsecond,
+    this.isNull,
+    this.value,
+  });
+
+  EndDate.fromJson(Map<String, dynamic> json) {
+    isValidDateTime = json['isValidDateTime'];
+    year = json['year'];
+    month = json['month'];
+    day = json['day'];
+    hour = json['hour'];
+    minute = json['minute'];
+    second = json['second'];
+    millisecond = json['millisecond'];
+    microsecond = json['microsecond'];
+    isNull = json['isNull'];
+    value = json['value'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['isValidDateTime'] = this.isValidDateTime;
+    data['year'] = this.year;
+    data['month'] = this.month;
+    data['day'] = this.day;
+    data['hour'] = this.hour;
+    data['minute'] = this.minute;
+    data['second'] = this.second;
+    data['millisecond'] = this.millisecond;
+    data['microsecond'] = this.microsecond;
+    data['isNull'] = this.isNull;
+    data['value'] = this.value;
+    return data;
   }
 }
