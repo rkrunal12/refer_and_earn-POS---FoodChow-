@@ -52,7 +52,9 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
         ..updateExpiryDate(
           DateTime.tryParse(widget.data.endDate ?? '') ?? DateTime.now(),
         )
-        ..updateNotifyCustomers(widget.data.notifyCustomer == true ? true : false)
+        ..updateNotifyCustomers(
+          widget.data.notifyCustomer == true ? true : false,
+        )
         ..setIsSaving(false);
     });
   }
@@ -92,7 +94,11 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 23.0, left: 16, right: 16),
+                          padding: const EdgeInsets.only(
+                            top: 23.0,
+                            left: 16,
+                            right: 16,
+                          ),
                           child: DropdownButtonFormField<String>(
                             value: provider.rewardType,
                             hint: const Text("Reward Type"),
@@ -200,8 +206,8 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
                         CustomRadioListTile(
                           value: "Set Specific End Date & Time",
                           title: "Set Specific End Date & Time",
-                          groupValue:  provider.expiryOption,
-                          onChanged:  (val) {
+                          groupValue: provider.expiryOption,
+                          onChanged: (val) {
                             provider.updateExpiryOption(val!);
                             provider.updateExpiryDate(DateTime.now());
                           },
@@ -209,19 +215,23 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
                         CustomRadioListTile(
                           title: "Based on Hours",
                           value: "Based on Hours",
-                          groupValue:  provider.expiryOption,
-                          onChanged:    (val) {
+                          groupValue: provider.expiryOption,
+                          onChanged: (val) {
                             provider.updateExpiryOption(val!);
-                            CustomSnackBar.show("Campaign will expire in 72 hours", false);
+                            CustomSnackBar.showSuccess(
+                              "Campaign will expire in 72 hours",
+                            );
                           },
                         ),
                         CustomRadioListTile(
                           value: "Based on Days",
                           title: "Based on Days",
-                          groupValue:  provider.expiryOption,
-                          onChanged:  (val) {
+                          groupValue: provider.expiryOption,
+                          onChanged: (val) {
                             provider.updateExpiryOption(val!);
-                            CustomSnackBar.show("Campaign will expire in 30 Days", false);
+                            CustomSnackBar.showSuccess(
+                              "Campaign will expire in 30 Days",
+                            );
                           },
                         ),
                       ],
@@ -250,26 +260,27 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
                         ? null
                         : () async {
                             provider.setIsSaving(true);
-
-                            await CampaignService.validateAndSaveCampaign(
-                              isMobile: false,
-                              isUpdate: true,
-                              provider: provider,
-                              context: context,
-                              campaignNameText: _campaignNameController.text,
-                              customerRewardText:
-                                  _customerRewardController.text,
-                              referralRewardText:
-                                  _referralRewardController.text,
-                              minPurchaseText: _minPurchaseController.text,
-                              status: widget.data.status == 1 ? "1" : "0",
-                              shopId: widget.data.shopId,
-                              campaignId: widget.data.campaignId,
-                            );
-
+                            final result =
+                                await CampaignService.validateAndSaveCampaign(
+                                  isMobile: false,
+                                  isUpdate: true,
+                                  provider: provider,
+                                  context: context,
+                                  campaignNameText:
+                                      _campaignNameController.text,
+                                  customerRewardText:
+                                      _customerRewardController.text,
+                                  referralRewardText:
+                                      _referralRewardController.text,
+                                  minPurchaseText: _minPurchaseController.text,
+                                  status: widget.data.status == 1 ? "1" : "0",
+                                  shopId: widget.data.shopId,
+                                  campaignId: widget.data.campaignId,
+                                );
                             provider.setIsSaving(false);
-
-                            if (context.mounted) Navigator.pop(context);
+                            if (result && mounted) {
+                              Navigator.pop(context);
+                            }
                           },
                     child: provider.isSaving
                         ? const SizedBox(
@@ -277,7 +288,10 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
                             width: 40,
                             child: CircularProgressIndicator(),
                           )
-                        : CustomButton(value: "Save",color:  ColorsClass.primary),
+                        : CustomButton(
+                            value: "Save",
+                            color: ColorsClass.primary,
+                          ),
                   ),
                 ],
               ),

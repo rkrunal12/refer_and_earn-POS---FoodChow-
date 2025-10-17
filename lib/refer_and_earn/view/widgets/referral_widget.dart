@@ -19,7 +19,7 @@ class CustomTableRestaurant extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 650) {
-          return CustomTableRestaurantMobile(list: list, );
+          return CustomTableRestaurantMobile(list: list);
         } else {
           // Large screen: keep DataTable
           return SingleChildScrollView(
@@ -28,7 +28,9 @@ class CustomTableRestaurant extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
               child: DataTable(
-                headingRowColor: MaterialStateProperty.all(const Color(0x550AA89E)),
+                headingRowColor: MaterialStateProperty.all(
+                  const Color(0x550AA89E),
+                ),
                 headingTextStyle: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
@@ -62,40 +64,54 @@ class CustomTableRestaurant extends StatelessWidget {
   DataRow _buildDataRow(ReferredRestaurantsModel data, BuildContext context) {
     const cellStyle = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
 
-    return DataRow(cells: [
-      DataCell(Center(child: Text(data.name ?? "-", style: cellStyle))),
-      DataCell(Center(child: Text(data.mobile ?? "-", style: cellStyle))),
-      DataCell(Center(child: Text(data.email ?? "-", style: cellStyle))),
-      DataCell(Center(child: Text("NO", style: cellStyle))),
-      DataCell(Center(child: Text("Claim(1 Month Free)", style: cellStyle))),
-      DataCell(Center(
-          child: Container(
-            height: 30,
-            width: 150,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: data.claimed! ? const Color(0x808DBD90) : const Color(0x80D87E7E),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: data.claimed! ? const Color(0xFF007521) : const Color(0xFFFC0005),
-                width: 2,
+    return DataRow(
+      cells: [
+        DataCell(Center(child: Text(data.name ?? "-", style: cellStyle))),
+        DataCell(Center(child: Text(data.mobile ?? "-", style: cellStyle))),
+        DataCell(Center(child: Text(data.email ?? "-", style: cellStyle))),
+        DataCell(Center(child: Text("NO", style: cellStyle))),
+        DataCell(Center(child: Text("Claim(1 Month Free)", style: cellStyle))),
+        DataCell(
+          Center(
+            child: Container(
+              height: 30,
+              width: 150,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: data.claimed!
+                    ? const Color(0x808DBD90)
+                    : const Color(0x80D87E7E),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: data.claimed!
+                      ? const Color(0xFF007521)
+                      : const Color(0xFFFC0005),
+                  width: 2,
+                ),
+              ),
+              child: Text(
+                data.claimed! ? "Completed" : "Pending",
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
-            child: Text(data.claimed! ? "Completed" : "Pending",
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-          ))),
-      DataCell(Center(
-        child: IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
-          onPressed: () async {
-            final deleteData = await Provider.of<ReferralProvider>(context, listen: false)
-                .deleteRestaurantReferralData(data.restaurantId);
-            CustomSnackBar.show(deleteData, false);
-          },
+          ),
         ),
-      )),
-    ]);
+        DataCell(
+          Center(
+            child: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                 await Provider.of<ReferralProvider>(
+                  context,
+                  listen: false,
+                ).deleteRestaurantReferralData(data.restaurantId);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -142,8 +158,9 @@ class ReferralHeader extends StatelessWidget {
 
 /// List of referral rows
 class ReferralList extends StatelessWidget {
-  final bool isMobile;
   const ReferralList({super.key, required this.isMobile});
+
+  final bool isMobile;
 
   bool validateField(TextEditingController controller, String type) {
     final text = controller.text.trim();
@@ -170,26 +187,29 @@ class ReferralList extends StatelessWidget {
 
             void onSend() async {
               if (!validateField(referral.nameController, 'name')) {
-                CustomSnackBar.show('Enter a valid name', isMobile);
+                CustomSnackBar.showError('Enter a valid name');
                 return;
               }
 
               String rawNumber = referral.mobileController.text.trim();
 
-              String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+              String cleanNumber = rawNumber.replaceAll(
+                RegExp(r'[\s\-\(\)]'),
+                '',
+              );
 
               bool isValid = Validator.validatePhoneNumber(
                 cleanNumber,
                 referral.isoCode,
               );
 
-              if(!isValid){
-                CustomSnackBar.show("Enter Phone number properly", isMobile);
+              if (!isValid) {
+                CustomSnackBar.showError("Enter Phone number properly");
                 return;
               }
 
               if (!validateField(referral.emailController, 'email')) {
-                CustomSnackBar.show('Enter a valid email', isMobile);
+                CustomSnackBar.showError('Enter a valid email');
                 return;
               }
 
@@ -202,14 +222,12 @@ class ReferralList extends StatelessWidget {
                 name: referral.nameController.text,
               );
 
-              final addData = await provider.addRestaurantReferralData(data);
-              CustomSnackBar.show(addData, isMobile);
+              await provider.addRestaurantReferralData(data);
               referral.clear();
               referral.dispose();
               provider.removeReferral(index);
 
               Navigator.pop(context);
-
             }
 
             return ReferralRow(
@@ -249,9 +267,8 @@ class ReferralRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-
-        if(isMobile){
-          return  ReferralRowMobile(
+        if (isMobile) {
+          return ReferralRowMobile(
             referral: referral,
             onSend: onSend,
             onDelete: onDelete,
@@ -290,7 +307,8 @@ class ReferralRow extends StatelessWidget {
                   controller: referral.mobileController,
                   type: TextInputType.phone,
                   onIsoCodeChanged: (code) {
-                    referral.isoCode = code ?? "IN"; // 👈 directly save into referral
+                    referral.isoCode =
+                        code ?? "IN"; // 👈 directly save into referral
                   },
                 ),
               ),
@@ -340,6 +358,7 @@ class ReferralRow extends StatelessWidget {
 /// Send all Button
 class SendAllButton extends StatelessWidget {
   const SendAllButton({super.key, required this.isMobile});
+
   final bool isMobile;
 
   bool validateField(TextEditingController controller, String type) {
@@ -357,8 +376,9 @@ class SendAllButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ReferralProvider>(builder: (context, value, _) {
-      return GestureDetector(
+    return Consumer<ReferralProvider>(
+      builder: (context, value, _) {
+        return GestureDetector(
           onTap: () async {
             // Create a temporary copy so we don’t modify while iterating
             final referrals = List.of(value.referrals);
@@ -368,13 +388,16 @@ class SendAllButton extends StatelessWidget {
 
               // Validate name
               if (!validateField(referral.nameController, 'name')) {
-                CustomSnackBar.show('Form ${i + 1}: Enter a valid name', isMobile);
+                CustomSnackBar.showError('Form ${i + 1}: Enter a valid name');
                 return;
               }
 
               // Clean phone number
               String rawNumber = referral.mobileController.text.trim();
-              String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+              String cleanNumber = rawNumber.replaceAll(
+                RegExp(r'[\s\-\(\)]'),
+                '',
+              );
 
               bool isValid = Validator.validatePhoneNumber(
                 cleanNumber,
@@ -382,13 +405,17 @@ class SendAllButton extends StatelessWidget {
               );
 
               if (!isValid) {
-                CustomSnackBar.show('Form ${i + 1}: Enter phone number properly', isMobile);
+                CustomSnackBar.showError(
+                  'Form ${i + 1}: Enter phone number properly',
+                );
                 return;
               }
 
               // Validate email
               if (!validateField(referral.emailController, 'email')) {
-                CustomSnackBar.show('Form ${i + 1}: Enter a valid email', isMobile);
+                CustomSnackBar.showError(
+                  'Form ${i + 1}: Enter a valid email',
+                );
                 return;
               }
 
@@ -403,17 +430,15 @@ class SendAllButton extends StatelessWidget {
               );
 
               // Send each referral
-              final addData = await value.addRestaurantReferralData(data);
-              CustomSnackBar.show(addData, isMobile);
+              await value.addRestaurantReferralData(data);
             }
             value.clearList();
             value.disposeAll();
             Navigator.pop(context);
           },
           child: CustomButton(value: "Send All", color: ColorsClass.primary),
-      );
-    },);
+        );
+      },
+    );
   }
 }
-
-

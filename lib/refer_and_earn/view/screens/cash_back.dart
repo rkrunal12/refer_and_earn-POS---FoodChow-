@@ -10,11 +10,7 @@ import '../widgets/common_widgets.dart';
 class CashBack extends StatefulWidget {
   const CashBack({super.key});
 
-  static Future<void> saveData(
-    TabController tab,
-    BuildContext context,
-    bool isMobile,
-  ) async {
+  static Future<void> saveData(TabController tab, BuildContext context) async {
     final provider = Provider.of<ReferralProvider>(context, listen: false);
     final existingData = provider.allCashback;
 
@@ -30,8 +26,7 @@ class CashBack extends StatefulWidget {
               .toInt(),
     );
 
-    final saveData = await provider.saveCashback(model);
-    CustomSnackBar.show(saveData, isMobile);
+    await provider.saveCashback(model);
   }
 
   @override
@@ -126,7 +121,6 @@ class _CashBackState extends State<CashBack>
                                       CashBack.saveData(
                                         _tabController,
                                         context,
-                                        false,
                                       );
                                     },
                                   ),

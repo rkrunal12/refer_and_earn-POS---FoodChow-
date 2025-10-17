@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:refer_and_earn/refer_and_earn/view/widgets/common_widgets.dart';
 
 import '../../model/campaign_model.dart';
 import '../../model/cashback_model.dart';
@@ -137,7 +138,7 @@ class ReferralProvider with ChangeNotifier {
     }
   }
 
-  Future<String> addCampaign(CampaignModel campaign) async {
+  Future<void> addCampaign(CampaignModel campaign) async {
     try {
       final response = await http.post(
         Uri.parse("$baseUrl/AddCampaign"),
@@ -150,18 +151,28 @@ class ReferralProvider with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decoded = jsonDecode(response.body);
         await fetchData(false);
-        return decoded["message"] ?? "Success";
+        if (decoded["success"]) {
+          CustomSnackBar.showSuccess(
+            "Campaign added successfully: ${decoded["message"]}",
+          );
+        } else {
+          CustomSnackBar.showError(
+            "Failed to add campaign: ${decoded["message"]}",
+          );
+        }
       } else {
-        return "Failed with ${response.statusCode} → ${response.body}";
+        CustomSnackBar.showError(
+          "Failed with ${response.statusCode} => ${response.body}",
+        );
       }
     } catch (e) {
-      return e.toString();
+      CustomSnackBar.showError("Unexpected error: $e");
     } finally {
       notifyListeners();
     }
   }
 
-  Future<String> updateCampaign(
+  Future<void> updateCampaign(
     CampaignModel campaign,
     bool isStateUpdating,
   ) async {
@@ -190,30 +201,30 @@ class ReferralProvider with ChangeNotifier {
 
         // Check for success in response
         if (decoded['success'] == true || decoded['message'] != null) {
-          // Refresh data
           await fetchData(true);
-          return decoded["message"] ?? "Campaign updated successfully";
+          CustomSnackBar.showSuccess(decoded["message"] ?? "Campaign updated successfully");
         } else {
-          return "API returned unsuccessful response";
+          CustomSnackBar.showError("API returned unsuccessful response");
         }
       } else {
         log(
           "Update Campaign Failed: ${response.statusCode} => ${response.body}",
         );
-        return "Failed with status ${response.statusCode}";
+        CustomSnackBar.showError("Failed with status ${response.statusCode}");
       }
     } catch (e) {
       log("Unexpected error: $e");
-      return "Unexpected error: $e";
+      CustomSnackBar.showError("Unexpected error: $e");
     } finally {
       _loadingId = null;
       notifyListeners();
     }
   }
 
-  Future<String> deleteCampaign(int? campaignID, String? shopId) async {
+  Future<void> deleteCampaign(int? campaignID, String? shopId) async {
     if (campaignID == null) {
-      return "Campaign ID cannot be null";
+      CustomSnackBar.showError("Invalid campaign ID");
+      return;
     }
 
     try {
@@ -228,15 +239,15 @@ class ReferralProvider with ChangeNotifier {
         final decoded = jsonDecode(response.body);
         await fetchData(true); // refresh data after deletions
         String message = decoded["message"] ?? "Deleted successfully";
-        return message;
+        CustomSnackBar.showSuccess(message);
       } else {
         final errorMsg =
             "Failed with ${response.statusCode} => ${response.body}";
         log(errorMsg);
-        return errorMsg;
+        CustomSnackBar.showError(errorMsg);
       }
     } catch (e, stackTrace) {
-      return "Error: $e -> $stackTrace";
+      CustomSnackBar.showError("Error: $e -> $stackTrace");
     } finally {
       _loadingId = null;
       notifyListeners();
@@ -302,7 +313,7 @@ class ReferralProvider with ChangeNotifier {
     }
   }
 
-  Future<String> saveCashback(CashbackModel model) async {
+  Future<void> saveCashback(CashbackModel model) async {
     _isCashbackAddLoading = true;
     notifyListeners();
 
@@ -319,13 +330,13 @@ class ReferralProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         await fetchCashbackData(false);
-        return decode["message"] ?? "Success";
+        CustomSnackBar.showSuccess(decode["message"] ?? "Success");
       } else {
         log("Cashback save failed: ${response.statusCode} -> ${response.body}");
-        return "Failed with ${response.statusCode} → ${response.body}";
+        CustomSnackBar.showError("Failed with ${response.statusCode} → ${response.body}");
       }
     } catch (e) {
-      return e.toString();
+      CustomSnackBar.showError(e.toString());
     } finally {
       _isCashbackAddLoading = false;
       notifyListeners();
@@ -379,7 +390,7 @@ class ReferralProvider with ChangeNotifier {
     }
   }
 
-  Future<String> addRestaurantReferralData(
+  Future<void> addRestaurantReferralData(
     ReferredRestaurantsModel model,
   ) async {
     final response = await http.post(
@@ -394,16 +405,16 @@ class ReferralProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         await fetchRestaurantReferralData(true);
-        return decode["message"];
+        CustomSnackBar.showSuccess(decode["message"] ?? "Success");
       } else {
-        return "Failed with code ${response.statusCode} -> ${response.body}";
+        CustomSnackBar.showError("Failed with code ${response.statusCode} -> ${response.body}");
       }
     } on Exception catch (e) {
-      return e.toString();
+      CustomSnackBar.showError(e.toString());
     }
   }
 
-  Future<String> deleteRestaurantReferralData(int? restauranId) async {
+  Future<void> deleteRestaurantReferralData(int? restauranId) async {
     notifyListeners();
     final response = await http.delete(
       Uri.parse(
@@ -414,12 +425,12 @@ class ReferralProvider with ChangeNotifier {
     try {
       if (response.statusCode == 204) {
         await fetchRestaurantReferralData(true);
-        return "Delete Success";
+        CustomSnackBar.showSuccess("Delete Success");
       } else {
-        return "Failed with code ${response.statusCode} -> ${response.body}";
+        CustomSnackBar.showError("Failed with code ${response.statusCode} -> ${response.body}");
       }
     } on Exception catch (e) {
-      return e.toString();
+      CustomSnackBar.showError(e.toString());
     } finally {
       notifyListeners();
     }

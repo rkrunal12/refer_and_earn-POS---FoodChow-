@@ -305,7 +305,7 @@ class BuildCustomTable extends StatelessWidget {
                                     color: Colors.red,
                                   ),
                                   onPressed: () async {
-                                    final deleteData =
+
                                         await Provider.of<ReferralProvider>(
                                           context,
                                           listen: false,
@@ -313,7 +313,6 @@ class BuildCustomTable extends StatelessWidget {
                                           campaign.campaignId,
                                           campaign.shopId,
                                         );
-                                    CustomSnackBar.show(deleteData, false);
                                   },
                                 ),
                               ],
@@ -356,13 +355,12 @@ void buildDialogeBox(BuildContext context, CampaignModel campaignData) {
 /// Expiry container
 class BuildExpiryContainer extends StatelessWidget {
   final ReferralProvider provider;
-  final bool isMobile;
-
   const BuildExpiryContainer({
+    required this.isMobile,
     super.key,
     required this.provider,
-    required this.isMobile,
   });
+  final bool isMobile;
 
   @override
   Widget build(BuildContext context) {
@@ -390,7 +388,7 @@ class BuildExpiryContainer extends StatelessWidget {
             groupValue: provider.expiryOption,
             onChanged: (val) {
               provider.updateExpiryOption(val!);
-              CustomSnackBar.show("Campaign will expire in 72 hours", isMobile);
+              CustomSnackBar.showSuccess("Campaign will expire in 72 hours");
             },
           ),
           CustomRadioListTile(
@@ -399,7 +397,7 @@ class BuildExpiryContainer extends StatelessWidget {
             groupValue: provider.expiryOption,
             onChanged: (val) {
               provider.updateExpiryOption(val!);
-              CustomSnackBar.show("Campaign will expire in 30 Days", isMobile);
+              CustomSnackBar.showSuccess("Campaign will expire in 30 Days");
             },
           ),
         ],

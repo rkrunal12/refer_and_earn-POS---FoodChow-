@@ -26,6 +26,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
       if (provider.referrals.isEmpty) provider.addReferral();
     });
   }
+
   bool validateField(TextEditingController controller, String type) {
     final text = controller.text.trim();
     if (text.isEmpty) return false;
@@ -46,7 +47,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
       backgroundColor: ColorsClass.white,
       body: Consumer<ReferralProvider>(
         builder: (context, provider, _) {
-          if(provider.referrals.isEmpty) {
+          if (provider.referrals.isEmpty) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
@@ -86,9 +87,9 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 20,)
+                    SizedBox(width: 20),
                   ],
-                )
+                ),
               ),
 
               // Conditional part
@@ -110,13 +111,16 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                         const SizedBox(height: 6),
                         const Expanded(child: ReferralList(isMobile: true)),
                         const SizedBox(height: 8),
-                        SizedBox(width : double.infinity,child: SendAllButton(isMobile: true)),
+                        SizedBox(
+                          width: double.infinity,
+                          child: SendAllButton(isMobile: true),
+                        ),
                       ],
                     ),
                   ),
                 )
               else
-              /// Single referral input form
+                /// Single referral input form
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,35 +128,35 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                       provider.referrals.isEmpty
                           ? const Center(child: CircularProgressIndicator())
                           : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFieldColumn(
-                            hint: "Enter Restaurant Name",
-                            label: "Restaurant Name",
-                            controller: referral.nameController,
-                            type: TextInputType.name,
-                          ),
-                          const SizedBox(height: 12),
-                          TextFieldColumn(
-                            isPhone: true,
-                            mobile: true,
-                            hint: "Enter Mobile No.",
-                            label: "Mobile No.",
-                            controller: referral.mobileController,
-                            type: TextInputType.phone,
-                            onIsoCodeChanged: (code) {
-                              referral.isoCode = code ?? "IN";
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          TextFieldColumn(
-                            hint: "Enter Email",
-                            label: "Email",
-                            controller: referral.emailController,
-                            type: TextInputType.emailAddress,
-                          ),
-                        ],
-                      ),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextFieldColumn(
+                                  hint: "Enter Restaurant Name",
+                                  label: "Restaurant Name",
+                                  controller: referral.nameController,
+                                  type: TextInputType.name,
+                                ),
+                                const SizedBox(height: 12),
+                                TextFieldColumn(
+                                  isPhone: true,
+                                  mobile: true,
+                                  hint: "Enter Mobile No.",
+                                  label: "Mobile No.",
+                                  controller: referral.mobileController,
+                                  type: TextInputType.phone,
+                                  onIsoCodeChanged: (code) {
+                                    referral.isoCode = code ?? "IN";
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                TextFieldColumn(
+                                  hint: "Enter Email",
+                                  label: "Email",
+                                  controller: referral.emailController,
+                                  type: TextInputType.emailAddress,
+                                ),
+                              ],
+                            ),
 
                       // Spacer pushes the button to the bottom
                       const Spacer(),
@@ -161,46 +165,61 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                         padding: const EdgeInsets.all(12.0),
                         child: InkWell(
                           onTap: () async {
-                            if (!validateField(referral.nameController, 'name')) {
-                              CustomSnackBar.show('Enter a valid name', true);
+                            if (!validateField(
+                              referral.nameController,
+                              'name',
+                            )) {
+                              CustomSnackBar.showError('Enter a valid name');
                               return;
                             }
 
-                            String rawNumber = referral.mobileController.text.trim();
+                            String rawNumber = referral.mobileController.text
+                                .trim();
 
-                            String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+                            String cleanNumber = rawNumber.replaceAll(
+                              RegExp(r'[\s\-\(\)]'),
+                              '',
+                            );
 
                             bool isValid = Validator.validatePhoneNumber(
                               cleanNumber,
                               referral.isoCode,
                             );
 
-                            if(!isValid){
-                              CustomSnackBar.show("Enter Phone number properly", true);
+                            if (!isValid) {
+                              CustomSnackBar.showError(
+                                "Enter Phone number properly",
+                              );
                               return;
                             }
 
                             if (!isValid) {
-                              CustomSnackBar.show("Invalid mobile number", true);
+                              CustomSnackBar.showError(
+                                "Invalid mobile number",
+                              );
                               return;
                             }
 
-                            if (!validateField(referral.emailController, 'email')) {
-                              CustomSnackBar.show('Enter a valid email', true);
+                            if (!validateField(
+                              referral.emailController,
+                              'email',
+                            )) {
+                              CustomSnackBar.showError('Enter a valid email');
                               return;
                             }
 
-                            ReferredRestaurantsModel data = ReferredRestaurantsModel(
-                              referringRestaurantId: 123,
-                              referredBy: "Gourmet Grill",
-                              mobile: referral.mobileController.text,
-                              claimed: false,
-                              email: referral.emailController.text,
-                              name: referral.nameController.text,
-                            );
+                            ReferredRestaurantsModel data =
+                                ReferredRestaurantsModel(
+                                  referringRestaurantId: 123,
+                                  referredBy: "Gourmet Grill",
+                                  mobile: referral.mobileController.text,
+                                  claimed: false,
+                                  email: referral.emailController.text,
+                                  name: referral.nameController.text,
+                                );
 
-                            final addData = await provider.addRestaurantReferralData(data);
-                            CustomSnackBar.show(addData, true);
+                            await provider
+                                .addRestaurantReferralData(data);
 
                             referral.clear();
                             Navigator.pop(context);
@@ -217,8 +236,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                       ),
                     ],
                   ),
-                )
-
+                ),
             ],
           );
         },

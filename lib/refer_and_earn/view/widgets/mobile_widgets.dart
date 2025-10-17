@@ -28,7 +28,8 @@ class MobileCampaignCard extends StatelessWidget {
       expiryEnable: data.expiryEnable == true ? 1 : 0,
       expiryType: data.expiryType,
       fixedPeriodType: data.fixedPeriodType,
-      endDate: data.endDate!.toString(),
+      endDate:
+          "${data.endDate?.year ?? DateTime.now().year}-${data.endDate?.month ?? DateTime.now().month}-${data.endDate?.day.toString().padLeft(2, '0')}:${data.endDate?.hour.toString().padLeft(2, '0')}:${data.endDate?.minute.toString()}",
       notifyCustomer: data.notifyCustomer == true ? 1 : 0,
       rewardType: data.rewardType,
       shopId: data.shopId,
@@ -150,12 +151,11 @@ class MobileCampaignCard extends StatelessWidget {
                       const SizedBox(width: 10),
                       InkWell(
                         onTap: () async {
-                          final deleteData =
+                          
                               await Provider.of<ReferralProvider>(
                                 context,
                                 listen: false,
                               ).deleteCampaign(data.campaignId, data.shopId);
-                          CustomSnackBar.show(deleteData, true);
                         },
                         child: SizedBox(
                           height: 30,
@@ -447,11 +447,10 @@ class CustomTableRestaurantMobile extends StatelessWidget {
                   )
                 : InkWell(
                     onTap: () async {
-                      final deleteData = await Provider.of<ReferralProvider>(
+                       await Provider.of<ReferralProvider>(
                         context,
                         listen: false,
                       ).deleteRestaurantReferralData(data.restaurantId);
-                      CustomSnackBar.show(deleteData, isMobile ?? false);
                     },
                     child: SizedBox(
                       height: 25,

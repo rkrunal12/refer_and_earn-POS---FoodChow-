@@ -2,59 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
-import '../../../main.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import 'campaign_widgets.dart';
 
 /// Show a Snack bar using Fluttertoast
 class CustomSnackBar {
-  static void show(String message, bool isMobile) {
-    final context = navigatorKey.currentContext!;
-    toastification.show(
-      context: context,
-      type: ToastificationType.success,
-      style: ToastificationStyle.flat,
-      autoCloseDuration: const Duration(seconds: 2),
-      title: Text(
-        message,
-        style: const TextStyle(fontSize: 16),
-      ),
-      description: SizedBox(
-        width: MediaQuery.of(context).size.width,
-      ),
-      alignment: isMobile ? Alignment.topCenter :Alignment.bottomCenter,
-      direction: TextDirection.ltr,
-      animationDuration: const Duration(milliseconds: 300),
-      animationBuilder: (context, animation, alignment, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: isMobile ? const Offset(2.0, 0.0) :const Offset(4.0, 0.0),
-            end: const Offset(0.0, 0.0),
-          ).animate(
-            CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOut,
-              reverseCurve: Curves.easeIn,
-            ),
-          ),
-          child: child,
-        );
-      },
-      showIcon: false,
-      primaryColor: ColorsClass.primary.withOpacity(0.5),
-      backgroundColor: Color(0x0fe6f6f5),
-      foregroundColor: ColorsClass.blackColor,
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(
-        color: ColorsClass.primary,
-        width: 3,
-      ),
-      showProgressBar: false,
-      pauseOnHover: true,
-      dragToClose: true,
-      applyBlurEffect: true,
+  static void showSuccess(String message) {
+    final notification = Toastification().show(
+      title: Text(message),
+      icon: const Icon(Icons.notifications_active),
+      autoCloseDuration: const Duration(seconds: 3),
+      style: ToastificationStyle.flatColored,
+      primaryColor: ColorsClass.primary,
+      alignment: Alignment.topRight,
     );
+    toastification.dismiss(notification);
+  }
+
+  static void showError(String message) {
+    final notification = Toastification().show(
+      title: Text(message),
+      icon: const Icon(Icons.error),
+      autoCloseDuration: const Duration(seconds: 3),
+      style: ToastificationStyle.flatColored,
+      primaryColor: Colors.red,
+      alignment: Alignment.topRight,
+    );
+    toastification.dismiss(notification);
   }
 }
 
@@ -105,7 +80,7 @@ class TextFieldColumn extends StatelessWidget {
     required this.controller,
     required this.type,
     this.isPhone,
-    this.mobile
+    this.mobile,
   });
 
   @override
@@ -120,18 +95,18 @@ class TextFieldColumn extends StatelessWidget {
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
           ),
           const SizedBox(height: 6),
-          if(isPhone ?? false)...[
+          if (isPhone ?? false) ...[
             InternationalPhoneNumberInput(
               onInputChanged: (PhoneNumber number) {
                 onIsoCodeChanged?.call(number.isoCode);
               },
-              spaceBetweenSelectorAndTextField:1,
+              spaceBetweenSelectorAndTextField: 1,
               selectorConfig: const SelectorConfig(
                 selectorType: PhoneInputSelectorType.DROPDOWN,
                 showFlags: true,
                 useBottomSheetSafeArea: true,
                 leadingPadding: 0,
-                trailingSpace: true
+                trailingSpace: true,
               ),
               autoValidateMode: AutovalidateMode.disabled,
               textFieldController: controller,
@@ -148,10 +123,8 @@ class TextFieldColumn extends StatelessWidget {
                 signed: false,
                 decimal: false,
               ),
-            )
-
-            ,]
-          else
+            ),
+          ] else
             TextField(
               controller: controller,
               keyboardType: type,
@@ -198,16 +171,16 @@ class RewardTypeDropdown extends StatelessWidget {
           SizedBox(
             child: DropdownButtonFormField<String>(
               value:
-              selectedValue != null &&
-                  rewardCashbackType.contains(selectedValue)
+                  selectedValue != null &&
+                      rewardCashbackType.contains(selectedValue)
                   ? selectedValue
                   : null, // safely handle null
               hint: const Text("Reward Type"),
               items: rewardCashbackType
                   .map(
                     (value) =>
-                    DropdownMenuItem(value: value, child: Text(value)),
-              )
+                        DropdownMenuItem(value: value, child: Text(value)),
+                  )
                   .toList(),
               onChanged: onChanged,
               decoration: InputDecoration(
@@ -282,9 +255,18 @@ class CustomButton extends StatelessWidget {
       width: 200,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadiusGeometry.all(Radius.circular(6))
+        borderRadius: BorderRadiusGeometry.all(Radius.circular(6)),
       ),
-      child: Center(child: CustomText(text: value, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: ColorsClass.white)),),
+      child: Center(
+        child: CustomText(
+          text: value,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+            color: ColorsClass.white,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -304,12 +286,14 @@ class CustomRadioListTile extends StatelessWidget {
     required this.onChanged,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return RadioListTile(
-        value: value,
-      title: CustomText(text: title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+      value: value,
+      title: CustomText(
+        text: title,
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+      ),
       groupValue: groupValue,
       onChanged: onChanged,
     );
@@ -329,11 +313,6 @@ class CustomCheckBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Checkbox(
-      value: value,
-      onChanged: onChanged,
-    );
+    return Checkbox(value: value, onChanged: onChanged);
   }
 }
-
-

@@ -18,15 +18,9 @@ class CampaignService {
     log("Data come to update: ${data.toJson()}");
     try {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
-      final msg = await provider.updateCampaign(data, isStateUpdating);
-
-      if (msg.contains("Failed") || msg.contains("Error")) {
-        CustomSnackBar.show("Error: $msg", isMobile);
-      } else {
-        CustomSnackBar.show(msg, isMobile);
-      }
+      await provider.updateCampaign(data, isStateUpdating);
     } catch (e) {
-      CustomSnackBar.show("Error updating campaign: $e", isMobile);
+      CustomSnackBar.showError("Error updating campaign: $e");
     }
   }
 
@@ -43,7 +37,7 @@ class CampaignService {
     int? campaignId,
     required isMobile,
   }) async {
-    void showError(String msg) => CustomSnackBar.show(msg, isMobile);
+    void showError(String msg) => CustomSnackBar.showError(msg);
 
     final campaignName = campaignNameText?.trim() ?? "";
     final customerRewardStr = customerRewardText?.trim() ?? "";
@@ -133,7 +127,7 @@ class CampaignService {
           ),
           context,
           isMobile,
-          false
+          false,
         );
       } else {
         await CampaignService.saveCampaign(
@@ -196,9 +190,7 @@ class CampaignService {
 
         if (fixedPeriodType == "Set Specific End Date & Time" &&
             endDate == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please select an expiry date")),
-          );
+          CustomSnackBar.showError("Expiry date is required");
           return;
         } else if (fixedPeriodType == "Based on Days") {
           endDate = DateTime.now().add(const Duration(days: 30));
@@ -233,7 +225,6 @@ class CampaignService {
     );
 
     final provider = Provider.of<ReferralProvider>(context, listen: false);
-    final msg = await provider.addCampaign(campaign);
-    CustomSnackBar.show(msg, isMobile);
+    await provider.addCampaign(campaign);
   }
 }
