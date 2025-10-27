@@ -48,24 +48,24 @@ class _AllCampaignState extends State<AllCampaign> {
 
         // Show error state
         if (provider.error != null && provider.data.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 50),
-                const SizedBox(height: 16),
-                Text(
-                  "Error: ${provider.error}",
-                  style: const TextStyle(color: Colors.red, fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => provider.fetchData(false),
-                  child: const Text("Retry"),
-                ),
-              ],
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${provider.error}",
+                    style: const TextStyle( fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => provider.fetchData(false),
+                    child: const Text("Retry"),
+                  ),
+                ],
+              ),
             ),
           );
         }

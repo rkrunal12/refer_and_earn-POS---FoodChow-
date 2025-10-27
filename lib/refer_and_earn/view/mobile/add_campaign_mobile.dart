@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
@@ -45,17 +46,14 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
 
     if (widget.campaign != null) {
       provider
-        ..campaignExpiry = widget.campaign!.expiryEnable == true ? true : false
+        ..campaignExpiry = widget.campaign!.expiryEnable == 1 ? true : false
         ..campaignType = widget.campaign!.expiryType ?? "Fixed Period"
         ..expiryOption =
             widget.campaign!.fixedPeriodType ?? "Set Specific End Date & Time"
-        ..expiryDate = widget.campaign!.endDate != null
-            ? DateTime.parse(widget.campaign!.endDate!)
-            : null
-        ..notifyCustomers = widget.campaign!.notifyCustomer == true
-            ? true
-            : false
+        ..expiryDate = parseDate(widget.campaign!.endDate)
+        ..notifyCustomers = widget.campaign!.notifyCustomer == 1 ? true : false
         ..rewardType = widget.campaign!.rewardType ?? "Flat";
+      debugPrint(widget.campaign!.endDate.toString());
     } else {
       _clearForm(provider);
     }
@@ -227,5 +225,32 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
         ),
       ),
     );
+  }
+
+  DateTime parseDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) {
+      return DateTime.now();
+    }
+
+    try {
+      // Try standard ISO format first
+      return DateTime.parse(dateString);
+    } catch (_) {
+      try {
+        // Try common custom format: yyyy-MM-dd HH:mm:ss
+        final formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+        return formatter.parse(dateString);
+      } catch (_) {
+        try {
+          // Try fallback format: yyyy/MM/dd HH:mm:ss
+          final fallbackFormatter = DateFormat('yyyy/MM/dd HH:mm:ss');
+          return fallbackFormatter.parse(dateString);
+        } catch (_) {
+          // If all fail, use current time
+          debugPrint('⚠️ Invalid date format: $dateString');
+          return DateTime.now();
+        }
+      }
+    }
   }
 }

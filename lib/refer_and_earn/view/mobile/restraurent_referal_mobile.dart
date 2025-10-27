@@ -31,24 +31,23 @@ class _RestraurentReferalMobileState extends State<RestraurentReferalMobile> {
     return Scaffold(
       backgroundColor: ColorsClass.white,
       appBar: MobileAppBar(title: "Restaurant Referral"),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            MobileHeader(
-              title: "Your Referred Restaurant",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddReferralScreenMobile(),
-                  ),
-                );
-              },
-              mobileTitle: "+ Add Referral",
-            ),
-            Card(
+      body: Column(
+        children: [
+          SizedBox(height: 10),
+          MobileHeader(
+            title: "Your Referred Restaurant",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddReferralScreenMobile(),
+                ),
+              );
+            },
+            mobileTitle: "+ Add Referral",
+          ),
+          Expanded(
+            child: Card(
               color: ColorsClass.white,
               elevation: 2,
               child: Consumer<ReferralProvider>(
@@ -73,8 +72,8 @@ class _RestraurentReferalMobileState extends State<RestraurentReferalMobile> {
                 },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

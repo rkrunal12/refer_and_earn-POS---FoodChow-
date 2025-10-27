@@ -45,37 +45,37 @@ class Data {
     expiryType = json['expiry_type'];
     fixedPeriodType = json['fixed_period_type'];
     endDate = json['end_date'] != null
-        ? new EndDate.fromJson(json['end_date'])
+        ? EndDate.fromJson(json['end_date'])
         : null;
     notifyCustomer = json['notify_customer'];
     status = json['status'];
     createdAt = json['created_at'] != null
-        ? new EndDate.fromJson(json['created_at'])
+        ? EndDate.fromJson(json['created_at'])
         : null;
     updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['campaign_id'] = this.campaignId;
-    data['shop_id'] = this.shopId;
-    data['campaign_name'] = this.campaignName;
-    data['reward_type'] = this.rewardType;
-    data['customer_reward'] = this.customerReward;
-    data['referrer_reward'] = this.referrerReward;
-    data['min_purchase'] = this.minPurchase;
-    data['expiry_enable'] = this.expiryEnable;
-    data['expiry_type'] = this.expiryType;
-    data['fixed_period_type'] = this.fixedPeriodType;
-    if (this.endDate != null) {
-      data['end_date'] = this.endDate!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['campaign_id'] = campaignId;
+    data['shop_id'] = shopId;
+    data['campaign_name'] = campaignName;
+    data['reward_type'] = rewardType;
+    data['customer_reward'] = customerReward;
+    data['referrer_reward'] = referrerReward;
+    data['min_purchase'] = minPurchase;
+    data['expiry_enable'] = expiryEnable;
+    data['expiry_type'] = expiryType;
+    data['fixed_period_type'] = fixedPeriodType;
+    if (endDate != null) {
+      data['end_date'] = endDate!.toJson();
     }
-    data['notify_customer'] = this.notifyCustomer;
-    data['status'] = this.status;
-    if (this.createdAt != null) {
-      data['created_at'] = this.createdAt!.toJson();
+    data['notify_customer'] = notifyCustomer;
+    data['status'] = status;
+    if (createdAt != null) {
+      data['created_at'] = createdAt!.toJson();
     }
-    data['updated_at'] = this.updatedAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }
@@ -122,18 +122,18 @@ class EndDate {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['isValidDateTime'] = this.isValidDateTime;
-    data['year'] = this.year;
-    data['month'] = this.month;
-    data['day'] = this.day;
-    data['hour'] = this.hour;
-    data['minute'] = this.minute;
-    data['second'] = this.second;
-    data['millisecond'] = this.millisecond;
-    data['microsecond'] = this.microsecond;
-    data['isNull'] = this.isNull;
-    data['value'] = this.value;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['isValidDateTime'] = isValidDateTime;
+    data['year'] = year;
+    data['month'] = month;
+    data['day'] = day;
+    data['hour'] = hour;
+    data['minute'] = minute;
+    data['second'] = second;
+    data['millisecond'] = millisecond;
+    data['microsecond'] = microsecond;
+    data['isNull'] = isNull;
+    data['value'] = value;
     return data;
   }
 }

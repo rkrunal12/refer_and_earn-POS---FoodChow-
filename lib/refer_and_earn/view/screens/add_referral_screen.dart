@@ -23,6 +23,8 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 550;
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
@@ -37,7 +39,9 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: isMobile
+            ? const EdgeInsets.all(0)
+            : const EdgeInsets.all(16.0),
         child: Card(
           elevation: 3,
           color: ColorsClass.white,
@@ -55,10 +59,7 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
                 const Divider(color: ColorsClass.deviderColor, thickness: 1),
                 const SizedBox(height: 8),
 
-                // Expandable scrollable list handled internally by ReferralList
-                const Expanded(
-                  child: ReferralList(isMobile: false,),
-                ),
+                const Expanded(child: ReferralList(isMobile: false)),
 
                 const SizedBox(height: 12),
 
@@ -66,7 +67,7 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
                 Consumer<ReferralProvider>(
                   builder: (context, value, child) {
                     if (value.referrals.length > 1) {
-                      return const SendAllButton(isMobile: false,);
+                      return const SendAllButton(isMobile: false);
                     } else {
                       return const SizedBox();
                     }

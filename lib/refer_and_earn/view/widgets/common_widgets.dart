@@ -7,7 +7,7 @@ import '../../controller/provider/refer_provider.dart';
 import 'campaign_widgets.dart';
 
 /// Show a Snack bar using Fluttertoast
-class CustomSnackBar {
+class CustomeToast {
   static void showSuccess(String message) {
     final notification = Toastification().show(
       title: Text(message),
@@ -86,7 +86,7 @@ class TextFieldColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -197,7 +197,7 @@ class RewardTypeDropdown extends StatelessWidget {
   }
 }
 
-/// Size bar
+/// Side bar
 Widget buildSidebar(BuildContext context, int selectedIndex) {
   final form = Provider.of<ReferralProvider>(context, listen: false);
 

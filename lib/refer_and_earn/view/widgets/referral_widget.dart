@@ -79,19 +79,19 @@ class CustomTableRestaurant extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: data.claimed!
+                color: data.claimed == 1
                     ? const Color(0x808DBD90)
                     : const Color(0x80D87E7E),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: data.claimed!
+                  color: data.claimed == 1
                       ? const Color(0xFF007521)
                       : const Color(0xFFFC0005),
                   width: 2,
                 ),
               ),
               child: Text(
-                data.claimed! ? "Completed" : "Pending",
+                data.claimed == 1 ? "Completed" : "Pending",
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
@@ -102,7 +102,7 @@ class CustomTableRestaurant extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () async {
-                 await Provider.of<ReferralProvider>(
+                await Provider.of<ReferralProvider>(
                   context,
                   listen: false,
                 ).deleteRestaurantReferralData(data.restaurantId);
@@ -122,13 +122,17 @@ class ReferralHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ReferralProvider>(context, listen: false);
-
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 550;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const CustomText(
+        CustomText(
           text: "Your Referred Restaurants",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: isMobile ? 14 : 20,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         InkWell(
           onTap: provider.addReferral,
@@ -139,11 +143,11 @@ class ReferralHeader extends StatelessWidget {
               color: ColorsClass.primary,
               borderRadius: BorderRadius.circular(4),
             ),
-            child: const Center(
+            child: Center(
               child: CustomText(
                 text: "+ Add More",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: isMobile ? 12 : 15,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -187,7 +191,7 @@ class ReferralList extends StatelessWidget {
 
             void onSend() async {
               if (!validateField(referral.nameController, 'name')) {
-                CustomSnackBar.showError('Enter a valid name');
+                CustomeToast.showError('Enter a valid name');
                 return;
               }
 
@@ -204,20 +208,21 @@ class ReferralList extends StatelessWidget {
               );
 
               if (!isValid) {
-                CustomSnackBar.showError("Enter Phone number properly");
+                CustomeToast.showError("Enter Phone number properly");
                 return;
               }
 
               if (!validateField(referral.emailController, 'email')) {
-                CustomSnackBar.showError('Enter a valid email');
+                CustomeToast.showError('Enter a valid email');
                 return;
               }
 
               ReferredRestaurantsModel data = ReferredRestaurantsModel(
-                referringRestaurantId: 123,
+                restaurantId: "7866",
+                referringRestaurantId: "123",
                 referredBy: "Gourmet Grill",
                 mobile: referral.mobileController.text,
-                claimed: false,
+                claimed: 0,
                 email: referral.emailController.text,
                 name: referral.nameController.text,
               );
@@ -274,7 +279,7 @@ class ReferralRow extends StatelessWidget {
             onDelete: onDelete,
           );
         }
-        final isSmallScreen = constraints.maxWidth < 850;
+        final isSmallScreen = constraints.maxWidth < 70;
 
         if (isSmallScreen) {
           // Use mobile-specific widget
@@ -284,11 +289,10 @@ class ReferralRow extends StatelessWidget {
             onDelete: onDelete,
           );
         } else {
-          // Desktop/tablet layout
           return Row(
             children: [
               Expanded(
-                flex: 4,
+                flex: 1,
                 child: TextFieldColumn(
                   hint: "Enter Restaurant Name",
                   label: "Restaurant Name",
@@ -296,9 +300,8 @@ class ReferralRow extends StatelessWidget {
                   type: TextInputType.name,
                 ),
               ),
-              const SizedBox(width: 8),
               Expanded(
-                flex: 4,
+                flex: 1,
                 child: TextFieldColumn(
                   isPhone: true,
                   mobile: isMobile,
@@ -312,9 +315,8 @@ class ReferralRow extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(width: 8),
               Expanded(
-                flex: 4,
+                flex: 1,
                 child: TextFieldColumn(
                   hint: "Enter Email",
                   label: "Email",
@@ -322,7 +324,7 @@ class ReferralRow extends StatelessWidget {
                   type: TextInputType.emailAddress,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 5),
               GestureDetector(
                 onTap: onSend,
                 child: Padding(
@@ -333,7 +335,7 @@ class ReferralRow extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               GestureDetector(
                 onTap: onDelete,
                 child: Padding(
@@ -388,7 +390,7 @@ class SendAllButton extends StatelessWidget {
 
               // Validate name
               if (!validateField(referral.nameController, 'name')) {
-                CustomSnackBar.showError('Form ${i + 1}: Enter a valid name');
+                CustomeToast.showError('Form ${i + 1}: Enter a valid name');
                 return;
               }
 
@@ -405,7 +407,7 @@ class SendAllButton extends StatelessWidget {
               );
 
               if (!isValid) {
-                CustomSnackBar.showError(
+                CustomeToast.showError(
                   'Form ${i + 1}: Enter phone number properly',
                 );
                 return;
@@ -413,18 +415,17 @@ class SendAllButton extends StatelessWidget {
 
               // Validate email
               if (!validateField(referral.emailController, 'email')) {
-                CustomSnackBar.showError(
-                  'Form ${i + 1}: Enter a valid email',
-                );
+                CustomeToast.showError('Form ${i + 1}: Enter a valid email');
                 return;
               }
 
               // Prepare model
               ReferredRestaurantsModel data = ReferredRestaurantsModel(
-                referringRestaurantId: 123,
+                restaurantId: "7866",
+                referringRestaurantId: "123",
                 referredBy: "Gourmet Grill",
                 mobile: cleanNumber,
-                claimed: false,
+                claimed: 0,
                 email: referral.emailController.text.trim(),
                 name: referral.nameController.text.trim(),
               );

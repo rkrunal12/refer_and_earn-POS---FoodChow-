@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:refer_and_earn/refer_and_earn/view/widgets/common_widgets.dart';
@@ -13,30 +11,6 @@ import '../../model/referral_row_data.dart';
 import '../../model/referred_restrauant_model.dart';
 
 class ReferralProvider with ChangeNotifier {
-  /// ********************************* restraurent referral screen **************************///
-  List<ReferralRowData> referrals = [];
-
-  void addReferral() {
-    referrals.add(ReferralRowData());
-    notifyListeners();
-  }
-
-  void removeReferral(int index) {
-    referrals.removeAt(index);
-    notifyListeners();
-  }
-
-  void clearList() {
-    referrals = [];
-    notifyListeners();
-  }
-
-  void disposeAll() {
-    for (var data in referrals) {
-      data.dispose();
-    }
-  }
-
   /// ********************************* Main screen **************************///
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
@@ -73,64 +47,41 @@ class ReferralProvider with ChangeNotifier {
     }
 
     try {
+      final fetchUrl = "$baseUrl/CampaignsByShop?shopId=7866";
       final response = await http
-          .get(Uri.parse("$baseUrl/CampaignsByShop?shopId=7866"))
+          .get(Uri.parse(fetchUrl))
           .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        if (response.body.trim().isEmpty) {
-          _error = "No data received from server";
-          _data = [];
-          return;
-        }
-
         try {
           final decoded = jsonDecode(response.body);
-          log("API Response decoded successfully");
 
-          // Direct access to the nested list structure
-          if (decoded is Map<String, dynamic> &&
-              decoded.containsKey('data') &&
-              decoded['data'] is List &&
-              decoded['data'].isNotEmpty &&
-              decoded['data'][0] is List) {
+          if (decoded['data'] != null && decoded['data'].isNotEmpty) {
             final List<dynamic> dataList = decoded['data'][0];
-            log("Extracted ${dataList.length} campaigns from nested structure");
-
             final List<Data> jsonData = [];
             for (var item in dataList) {
               if (item is Map<String, dynamic>) {
-                try {
-                  final data = Data.fromJson(item);
-                  jsonData.add(data);
-                  log("✓ Successfully parsed campaign: ${data.campaignId}");
-                } catch (e) {
-                  log("✗ Error parsing campaign: $e");
-                }
+                final data = Data.fromJson(item);
+                jsonData.add(data);
               }
             }
 
             _data = jsonData;
             _error = null;
-            log("Successfully loaded ${_data.length} campaigns");
-            log("Active campaigns: ${activeCampaigns.length}");
-            log("Inactive campaigns: ${inactiveCampaigns.length}");
           } else {
-            _error = "Unexpected API response structure";
+            _error = "Something went wrong, no data found.";
             _data = [];
           }
-        } catch (e) {
-          _error = "Failed to parse response: $e";
+        } catch (_) {
+          _error = "Unexpected error, no data found.";
           _data = [];
-          log("JSON parsing error: $e");
         }
       } else {
-        _error = "Failed to fetch data (Code: ${response.statusCode})";
+        _error = "Unexpected error, no data found.";
         _data = [];
       }
-    } catch (e) {
-      _error = "Error: $e";
-      log("Unexpected error: $e");
+    } catch (_) {
+      _error = "Unexpected error";
       _data = [];
     } finally {
       _isLoading = false;
@@ -139,35 +90,29 @@ class ReferralProvider with ChangeNotifier {
   }
 
   Future<void> addCampaign(CampaignModel campaign) async {
+    _loadingId = 1;
+    notifyListeners();
+
     try {
+      final addUrl = "$baseUrl/AddCampaign";
+      final addData = jsonEncode(campaign.toAddJson());
+
       final response = await http.post(
-        Uri.parse("$baseUrl/AddCampaign"),
+        Uri.parse(addUrl),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(campaign.toAddJson()),
+        body: addData,
       );
 
-      log(campaign.toAddJson().toString());
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final decoded = jsonDecode(response.body);
         await fetchData(false);
-        if (decoded["success"]) {
-          CustomSnackBar.showSuccess(
-            "Campaign added successfully: ${decoded["message"]}",
-          );
-        } else {
-          CustomSnackBar.showError(
-            "Failed to add campaign: ${decoded["message"]}",
-          );
-        }
+        CustomeToast.showSuccess("Campaign added successfully");
       } else {
-        CustomSnackBar.showError(
-          "Failed with ${response.statusCode} => ${response.body}",
-        );
+        CustomeToast.showError("Something went wrong");
       }
-    } catch (e) {
-      CustomSnackBar.showError("Unexpected error: $e");
+    } catch (_) {
+      CustomeToast.showError("Unexpected error");
     } finally {
+      _loadingId = null;
       notifyListeners();
     }
   }
@@ -176,45 +121,37 @@ class ReferralProvider with ChangeNotifier {
     CampaignModel campaign,
     bool isStateUpdating,
   ) async {
-    // Set loading state
     if (isStateUpdating) {
       _loadingId = campaign.campaignId;
     }
     notifyListeners();
 
-    log("Data come AT provider: ${campaign.toJson()}");
-    log("Updating Campaign: ${campaign.toJson()}");
-
     try {
+      final updateUrl = "$baseUrl/UpdateCampaign";
+      final updateData = jsonEncode(campaign.toJson());
       final response = await http
           .post(
-            Uri.parse("$baseUrl/UpdateCampaign"),
+            Uri.parse(updateUrl),
             headers: {"Content-Type": "application/json"},
-            body: jsonEncode(campaign.toJson()),
+            body: updateData,
           )
           .timeout(const Duration(seconds: 30));
 
-      log("Update API Response: ${response.statusCode} - ${response.body}");
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decoded = jsonDecode(response.body);
-
-        // Check for success in response
         if (decoded['success'] == true || decoded['message'] != null) {
           await fetchData(true);
-          CustomSnackBar.showSuccess(decoded["message"] ?? "Campaign updated successfully");
+          CustomeToast.showSuccess(
+            decoded["message"] ?? "Campaign updated successfully",
+          );
         } else {
-          CustomSnackBar.showError("API returned unsuccessful response");
+          CustomeToast.showError("Something went wrong");
         }
       } else {
-        log(
-          "Update Campaign Failed: ${response.statusCode} => ${response.body}",
-        );
-        CustomSnackBar.showError("Failed with status ${response.statusCode}");
+        CustomeToast.showError("Something went wrong");
       }
-    } catch (e) {
-      log("Unexpected error: $e");
-      CustomSnackBar.showError("Unexpected error: $e");
+    } catch (_) {
+      CustomeToast.showError("Unexpected error");
     } finally {
       _loadingId = null;
       notifyListeners();
@@ -222,32 +159,22 @@ class ReferralProvider with ChangeNotifier {
   }
 
   Future<void> deleteCampaign(int? campaignID, String? shopId) async {
-    if (campaignID == null) {
-      CustomSnackBar.showError("Invalid campaign ID");
-      return;
-    }
-
     try {
+      final deleteUrl =
+          "$baseUrl/DeleteCampaign?campaign_id=$campaignID&shop_id=$shopId";
       final response = await http.delete(
-        Uri.parse(
-          "$baseUrl/DeleteCampaign?campaign_id=$campaignID&shop_id=$shopId",
-        ),
+        Uri.parse(deleteUrl),
         headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final decoded = jsonDecode(response.body);
-        await fetchData(true); // refresh data after deletions
-        String message = decoded["message"] ?? "Deleted successfully";
-        CustomSnackBar.showSuccess(message);
+        await fetchData(true);
+        CustomeToast.showSuccess("Deleted successfully");
       } else {
-        final errorMsg =
-            "Failed with ${response.statusCode} => ${response.body}";
-        log(errorMsg);
-        CustomSnackBar.showError(errorMsg);
+        CustomeToast.showError("Failed with some error");
       }
-    } catch (e, stackTrace) {
-      CustomSnackBar.showError("Error: $e -> $stackTrace");
+    } catch (_) {
+      CustomeToast.showError("Unexpected error");
     } finally {
       _loadingId = null;
       notifyListeners();
@@ -265,29 +192,22 @@ class ReferralProvider with ChangeNotifier {
   String? get cashbackError => _cashbackError;
   CashbackModel? get allCashback => _allCashback;
 
-  /// Fetch cashback
   Future<void> fetchCashbackData(bool isAdd) async {
     if (isAdd) _isCashbackGetLoading = true;
     _cashbackError = null;
     notifyListeners();
 
     try {
-      final response = await http.get(
-        Uri.parse("$baseUrl/GetCashback?shop_id=7866"),
-      );
+      final fetchCashbackUrl = "$baseUrl/GetCashback?shop_id=7866";
+      final response = await http.get(Uri.parse(fetchCashbackUrl));
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
 
-        // Validate API structure
-        if (decoded["data"] != null &&
-            decoded["data"] is List &&
-            decoded["data"].isNotEmpty) {
-          // Take first item
+        if (decoded["data"] != null && decoded["data"].isNotEmpty) {
           final cashbackJson = decoded["data"][0];
           _allCashback = CashbackModel.fromJson(cashbackJson);
 
-          // Sync provider helpers
           _isEnables = _allCashback!.cashbackEnable == 1;
           _rewardCashbackType = _allCashback!.cashbackType ?? "Flat";
           _percentageDiscount = _rewardCashbackType == "Discount"
@@ -298,15 +218,12 @@ class ReferralProvider with ChangeNotifier {
               : 0;
         } else {
           _allCashback = null;
-          log("No cashback data available from API.");
         }
       } else {
-        _cashbackError = "Failed to fetch data (Code: ${response.statusCode})";
-        log(_cashbackError.toString());
+        _cashbackError = "Something went wrong";
       }
-    } catch (e) {
-      _cashbackError = "Error: $e";
-      log(_cashbackError.toString());
+    } catch (_) {
+      _cashbackError = "Unexpected error";
     } finally {
       _isCashbackGetLoading = false;
       notifyListeners();
@@ -319,24 +236,25 @@ class ReferralProvider with ChangeNotifier {
 
     try {
       final isUpdate = model.cashbackId != null;
-      final url = isUpdate ? "$baseUrl/UpdateCashback" : "$baseUrl/AddCashback";
-      log(model.toJson().toString());
+      final saveCashbackUrl = isUpdate
+          ? "$baseUrl/UpdateCashback"
+          : "$baseUrl/AddCashback";
+      final saveCashbackData = jsonEncode(model.toAddJson());
       final response = await http.post(
-        Uri.parse(url),
-        body: jsonEncode(model.toAddJson()),
+        Uri.parse(saveCashbackUrl),
+        body: saveCashbackData,
         headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         await fetchCashbackData(false);
-        CustomSnackBar.showSuccess(decode["message"] ?? "Success");
+        CustomeToast.showSuccess(decode["message"] ?? "Success");
       } else {
-        log("Cashback save failed: ${response.statusCode} -> ${response.body}");
-        CustomSnackBar.showError("Failed with ${response.statusCode} → ${response.body}");
+        CustomeToast.showError("Something went wrong");
       }
-    } catch (e) {
-      CustomSnackBar.showError(e.toString());
+    } catch (_) {
+      CustomeToast.showError("Unexpected error");
     } finally {
       _isCashbackAddLoading = false;
       notifyListeners();
@@ -347,6 +265,7 @@ class ReferralProvider with ChangeNotifier {
   bool _isReferralLoading = false;
   String? _referralError;
   List<ReferredRestaurantsModel> _referralList = [];
+  final basereferralUrl = "https://api.foodchow.com/api/Restaurant_Refer_Earn";
 
   bool get isReferralLoading => _isReferralLoading;
   String? get referralError => _referralError;
@@ -364,11 +283,8 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await http.get(
-        Uri.parse(
-          "https://api.foodchow.com/api/Restaurant_Refer_Earn/GetReferredRestaurants",
-        ),
-      );
+      final getReferralUrl = "$basereferralUrl/GetReferredRestaurants";
+      final response = await http.get(Uri.parse(getReferralUrl));
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         if (decode["data"] != null) {
@@ -379,65 +295,61 @@ class ReferralProvider with ChangeNotifier {
           _referralList = [];
         }
       } else {
-        _referralError =
-            "Failed with ${response.statusCode} -> ${response.body}";
+        _referralError = "Something went wrong";
       }
-    } catch (e) {
-      _referralError = e.toString();
+    } catch (_) {
+      _referralError = "Unexpected error";
     } finally {
       _isReferralLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> addRestaurantReferralData(
-    ReferredRestaurantsModel model,
-  ) async {
+  Future<void> addRestaurantReferralData(ReferredRestaurantsModel model) async {
+    final addreferralUrl = "$basereferralUrl/AddReferredRestaurants";
+    final addReferralData = jsonEncode(model.toJson());
     final response = await http.post(
-      Uri.parse(
-        "https://api.foodchow.com/api/Restaurant_Refer_Earn/AddReferredRestaurants",
-      ),
+      Uri.parse(addreferralUrl),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode(model.toJson()),
+      body: addReferralData,
     );
 
     try {
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         await fetchRestaurantReferralData(true);
-        CustomSnackBar.showSuccess(decode["message"] ?? "Success");
+        CustomeToast.showSuccess(decode["message"] ?? "Success");
       } else {
-        CustomSnackBar.showError("Failed with code ${response.statusCode} -> ${response.body}");
+        CustomeToast.showError("Something went wrong");
       }
-    } on Exception catch (e) {
-      CustomSnackBar.showError(e.toString());
+    } on Exception {
+      CustomeToast.showError("Unexpected error");
+    } finally {
+      notifyListeners();
     }
   }
 
-  Future<void> deleteRestaurantReferralData(int? restauranId) async {
+  Future<void> deleteRestaurantReferralData(String? restaurantId) async {
     notifyListeners();
     final response = await http.delete(
-      Uri.parse(
-        "https://api.foodchow.com/api/Restaurant_Refer_Earn/DeleteReferredRestaurant/$restauranId",
-      ),
+      Uri.parse("$basereferralUrl/DeleteReferredRestaurant/$restaurantId"),
     );
 
     try {
       if (response.statusCode == 204) {
         await fetchRestaurantReferralData(true);
-        CustomSnackBar.showSuccess("Delete Success");
+        CustomeToast.showSuccess("Delete Success");
       } else {
-        CustomSnackBar.showError("Failed with code ${response.statusCode} -> ${response.body}");
+        CustomeToast.showError("Something went wrong");
       }
-    } on Exception catch (e) {
-      CustomSnackBar.showError(e.toString());
+    } on Exception {
+      CustomeToast.showError("Unexpected error");
     } finally {
       notifyListeners();
     }
   }
 
   /// ********************************* Campaign Details **************************///
-
   bool _showInactive = false;
   bool _isTogglingInactive = false;
   bool get isTogglingInactive => _isTogglingInactive;
@@ -502,6 +414,11 @@ class ReferralProvider with ChangeNotifier {
   double _fixedDiscount = 0;
   String _rewardCashbackType = "Flat";
 
+  double get fixedDiscount => _fixedDiscount;
+  double get percentageDiscount => _percentageDiscount;
+  bool get isEnables => _isEnables;
+  String get rewardCashbackType => _rewardCashbackType;
+
   void setIsEnables(bool value) {
     _isEnables = value;
     notifyListeners();
@@ -524,8 +441,27 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  double get fixedDiscount => _fixedDiscount;
-  double get percentageDiscount => _percentageDiscount;
-  bool get isEnables => _isEnables;
-  String get rewardCashbackType => _rewardCashbackType;
+  /// ********************************* Restaurant referral screen **************************///
+  List<ReferralRowData> referrals = [];
+
+  void addReferral() {
+    referrals.add(ReferralRowData());
+    notifyListeners();
+  }
+
+  void removeReferral(int index) {
+    referrals.removeAt(index);
+    notifyListeners();
+  }
+
+  void clearList() {
+    referrals = [];
+    notifyListeners();
+  }
+
+  void disposeAll() {
+    for (var data in referrals) {
+      data.dispose();
+    }
+  }
 }

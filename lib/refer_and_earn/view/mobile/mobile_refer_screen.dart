@@ -35,15 +35,12 @@ class MobileReferenceScreen extends StatelessWidget {
                   height: 24,
                   width: 24,
                   errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.person, size: 24, color: Colors.black),
+                      const Icon(Icons.person, size: 24, color: Colors.black),
                 ),
                 const SizedBox(width: 8),
                 const Text(
                   "Admin",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -66,13 +63,13 @@ class MobileReferenceScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // "Create New Campaign"
               InkWell(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const MobileAllCampaign()),
+                      builder: (context) => const MobileAllCampaign(),
+                    ),
                   );
                 },
                 child: ContentContainerMobile(
@@ -80,7 +77,7 @@ class MobileReferenceScreen extends StatelessWidget {
                     "assets/images/refer_and_earn/add.png",
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.add, size: 30),
+                        const Icon(Icons.add, size: 30),
                   ),
                   title: "Create New Campaign",
                 ),
@@ -93,7 +90,9 @@ class MobileReferenceScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const MobileCashback(isMobile: true,)),
+                      builder: (context) =>
+                          const MobileCashback(isMobile: true),
+                    ),
                   );
                 },
                 child: ContentContainerMobile(
@@ -101,20 +100,20 @@ class MobileReferenceScreen extends StatelessWidget {
                     "assets/images/refer_and_earn/cashback.png",
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.monetization_on, size: 30),
+                        const Icon(Icons.monetization_on, size: 30),
                   ),
                   title: "Cashback",
                 ),
               ),
               const SizedBox(height: 10),
 
-              // "Restaurant Referral"
               InkWell(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const RestraurentReferalMobile()),
+                      builder: (context) => const RestraurentReferalMobile(),
+                    ),
                   );
                 },
                 child: ContentContainerMobile(
@@ -123,7 +122,7 @@ class MobileReferenceScreen extends StatelessWidget {
                     fit: BoxFit.contain,
                     color: ColorsClass.primary,
                     errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.restaurant, size: 30),
+                        const Icon(Icons.restaurant, size: 30),
                   ),
                   title: "Restaurant Referral",
                 ),

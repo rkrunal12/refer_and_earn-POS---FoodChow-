@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
@@ -29,7 +30,12 @@ class MobileCampaignCard extends StatelessWidget {
       expiryType: data.expiryType,
       fixedPeriodType: data.fixedPeriodType,
       endDate:
-          "${data.endDate?.year ?? DateTime.now().year}-${data.endDate?.month ?? DateTime.now().month}-${data.endDate?.day.toString().padLeft(2, '0')}:${data.endDate?.hour.toString().padLeft(2, '0')}:${data.endDate?.minute.toString()}",
+          "${data.endDate?.year ?? DateTime.now().year}-"
+          "${(data.endDate?.month ?? DateTime.now().month).toString().padLeft(2, '0')}-"
+          "${(data.endDate?.day ?? DateTime.now().day).toString().padLeft(2, '0')} "
+          "${(data.endDate?.hour ?? DateTime.now().hour).toString().padLeft(2, '0')}:"
+          "${(data.endDate?.minute ?? DateTime.now().minute).toString().padLeft(2, '0')}:"
+          "${(data.endDate?.second ?? DateTime.now().second).toString().padLeft(2, '0')}",
       notifyCustomer: data.notifyCustomer == true ? 1 : 0,
       rewardType: data.rewardType,
       shopId: data.shopId,
@@ -71,7 +77,7 @@ class MobileCampaignCard extends StatelessWidget {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : Switch(
-                              value: (data.status == 1 || data.status == "1"),
+                              value: (data.status == "1"),
                               onChanged: (val) {
                                 CampaignService.updateCampaigns(
                                   campaignModel..status = val == true ? 1 : 0,
@@ -118,7 +124,8 @@ class MobileCampaignCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: CustomText(
-                      text: "Validity : ${data.endDate ?? "No Expiry"}",
+                      text:
+                          "Validity : ${DateFormat('dd-MM-yyyy HH:mm:ss a').format(DateTime(data.endDate?.year ?? 1970, data.endDate?.month ?? 1, data.endDate?.day ?? 1, data.endDate?.hour ?? 0, data.endDate?.minute ?? 0, data.endDate?.second ?? 0))}",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -151,11 +158,10 @@ class MobileCampaignCard extends StatelessWidget {
                       const SizedBox(width: 10),
                       InkWell(
                         onTap: () async {
-                          
-                              await Provider.of<ReferralProvider>(
-                                context,
-                                listen: false,
-                              ).deleteCampaign(data.campaignId, data.shopId);
+                          await Provider.of<ReferralProvider>(
+                            context,
+                            listen: false,
+                          ).deleteCampaign(data.campaignId, data.shopId);
                         },
                         child: SizedBox(
                           height: 30,
@@ -415,17 +421,19 @@ class CustomTableRestaurantMobile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isCompleted ? const Color(0x808DBD90) : const Color(0x80D87E7E),
+        color: isCompleted == 1
+            ? const Color(0x808DBD90)
+            : const Color(0x80D87E7E),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isCompleted
+          color: isCompleted == 1
               ? const Color(0xFF007521)
               : const Color(0xFFFC0005),
           width: 2,
         ),
       ),
       child: Text(
-        isCompleted ? "Completed" : "Pending",
+        isCompleted == 1 ? "Completed" : "Pending",
         style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 10),
       ),
     );
@@ -447,7 +455,7 @@ class CustomTableRestaurantMobile extends StatelessWidget {
                   )
                 : InkWell(
                     onTap: () async {
-                       await Provider.of<ReferralProvider>(
+                      await Provider.of<ReferralProvider>(
                         context,
                         listen: false,
                       ).deleteRestaurantReferralData(data.restaurantId);

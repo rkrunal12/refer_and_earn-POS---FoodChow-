@@ -1,7 +1,7 @@
 import 'package:device_preview_minus/device_preview_minus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
@@ -25,7 +25,7 @@ void main() async {
       await windowManager.maximize();
       await windowManager.show();
       await windowManager.focus();
-      await windowManager.setMinimumSize(const Size(500, 750));
+      await windowManager.setMinimumSize(const Size(600, 750));
     });
   }
   runApp(
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         title: 'FoodChow',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          fontFamily: "Poppins",
+          fontFamily: GoogleFonts.poppins().fontFamily,
           colorScheme: ColorScheme.fromSeed(seedColor: ColorsClass.primary),
         ),
         home: const ReferScreen(),

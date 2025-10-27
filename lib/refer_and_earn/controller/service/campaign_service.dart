@@ -15,12 +15,11 @@ class CampaignService {
     bool isMobile,
     bool isStateUpdating,
   ) async {
-    log("Data come to update: ${data.toJson()}");
     try {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
       await provider.updateCampaign(data, isStateUpdating);
     } catch (e) {
-      CustomSnackBar.showError("Error updating campaign: $e");
+      CustomeToast.showError("Error updating campaign: $e");
     }
   }
 
@@ -37,7 +36,7 @@ class CampaignService {
     int? campaignId,
     required isMobile,
   }) async {
-    void showError(String msg) => CustomSnackBar.showError(msg);
+    void showError(String msg) => CustomeToast.showError(msg);
 
     final campaignName = campaignNameText?.trim() ?? "";
     final customerRewardStr = customerRewardText?.trim() ?? "";
@@ -190,7 +189,7 @@ class CampaignService {
 
         if (fixedPeriodType == "Set Specific End Date & Time" &&
             endDate == null) {
-          CustomSnackBar.showError("Expiry date is required");
+          CustomeToast.showError("Expiry date is required");
           return;
         } else if (fixedPeriodType == "Based on Days") {
           endDate = DateTime.now().add(const Duration(days: 30));

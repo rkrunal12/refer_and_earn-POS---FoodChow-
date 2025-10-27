@@ -169,7 +169,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                               referral.nameController,
                               'name',
                             )) {
-                              CustomSnackBar.showError('Enter a valid name');
+                              CustomeToast.showError('Enter a valid name');
                               return;
                             }
 
@@ -187,16 +187,14 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                             );
 
                             if (!isValid) {
-                              CustomSnackBar.showError(
+                              CustomeToast.showError(
                                 "Enter Phone number properly",
                               );
                               return;
                             }
 
                             if (!isValid) {
-                              CustomSnackBar.showError(
-                                "Invalid mobile number",
-                              );
+                              CustomeToast.showError("Invalid mobile number");
                               return;
                             }
 
@@ -204,22 +202,22 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                               referral.emailController,
                               'email',
                             )) {
-                              CustomSnackBar.showError('Enter a valid email');
+                              CustomeToast.showError('Enter a valid email');
                               return;
                             }
 
                             ReferredRestaurantsModel data =
                                 ReferredRestaurantsModel(
-                                  referringRestaurantId: 123,
+                                  restaurantId: "7866",
+                                  referringRestaurantId: "123",
                                   referredBy: "Gourmet Grill",
                                   mobile: referral.mobileController.text,
-                                  claimed: false,
+                                  claimed: 0,
                                   email: referral.emailController.text,
                                   name: referral.nameController.text,
                                 );
 
-                            await provider
-                                .addRestaurantReferralData(data);
+                            await provider.addRestaurantReferralData(data);
 
                             referral.clear();
                             Navigator.pop(context);

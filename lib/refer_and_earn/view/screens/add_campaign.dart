@@ -16,8 +16,10 @@ class AddCampaign extends StatefulWidget {
 
 class _AddCampaignState extends State<AddCampaign> {
   final TextEditingController _campaignNameController = TextEditingController();
-  final TextEditingController _customerRewardController = TextEditingController();
-  final TextEditingController _referralRewardController = TextEditingController();
+  final TextEditingController _customerRewardController =
+      TextEditingController();
+  final TextEditingController _referralRewardController =
+      TextEditingController();
   final TextEditingController _minPurchaseController = TextEditingController();
 
   @override
@@ -53,7 +55,7 @@ class _AddCampaignState extends State<AddCampaign> {
           builder: (context, constraints) {
             if (constraints.maxWidth <= 600) {
               // Mobile layout
-              return AddCampaignMobile(isMobile: false,);
+              return AddCampaignMobile(isMobile: false);
             } else {
               // Desktop / Tablet layout
               return SingleChildScrollView(
@@ -65,7 +67,10 @@ class _AddCampaignState extends State<AddCampaign> {
                       padding: EdgeInsets.all(10.0),
                       child: Text(
                         "Create New Campaign",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     Card(
@@ -91,7 +96,9 @@ class _AddCampaignState extends State<AddCampaign> {
                                   child: RewardTypeDropdown(
                                     selectedValue: provider.rewardType,
                                     onChanged: (value) {
-                                      if (value != null) provider.updateRewardType(value);
+                                      if (value != null) {
+                                        provider.updateRewardType(value);
+                                      }
                                     },
                                   ),
                                 ),
@@ -134,7 +141,9 @@ class _AddCampaignState extends State<AddCampaign> {
                               leading: CustomCheckBox(
                                 value: provider.campaignExpiry,
                                 onChanged: (val) {
-                                  if (val != null) provider.updateCampaignExpiry(val);
+                                  if (val != null) {
+                                    provider.updateCampaignExpiry(val);
+                                  }
                                 },
                               ),
                               title: const Text("Set Campaign Expiry"),
@@ -143,19 +152,24 @@ class _AddCampaignState extends State<AddCampaign> {
                             if (provider.campaignExpiry)
                               CampaignExpiryScreen(
                                 isMobile: false,
-                                onChanged: ({
-                                  required String campaignType,
-                                  required String expiryOption,
-                                  DateTime? selectedDate,
-                                  required bool notifyCustomers,
-                                  int? duration,
-                                }) {
-                                  provider
-                                    ..updateCampaignType(campaignType)
-                                    ..updateExpiryOption(expiryOption)
-                                    ..updateExpiryDate(selectedDate ?? DateTime.now())
-                                    ..updateNotifyCustomers(notifyCustomers);
-                                },
+                                onChanged:
+                                    ({
+                                      required String campaignType,
+                                      required String expiryOption,
+                                      DateTime? selectedDate,
+                                      required bool notifyCustomers,
+                                      int? duration,
+                                    }) {
+                                      provider
+                                        ..updateCampaignType(campaignType)
+                                        ..updateExpiryOption(expiryOption)
+                                        ..updateExpiryDate(
+                                          selectedDate ?? DateTime.now(),
+                                        )
+                                        ..updateNotifyCustomers(
+                                          notifyCustomers,
+                                        );
+                                    },
                               ),
                             const SizedBox(height: 16),
                             // Save and Cancel Buttons
@@ -166,23 +180,46 @@ class _AddCampaignState extends State<AddCampaign> {
                                     onTap: provider.isSaving
                                         ? null
                                         : () async {
-                                      provider.setIsSaving(true);
-                                      await CampaignService.validateAndSaveCampaign(
-                                        isMobile: false,
-                                        isUpdate: false,
-                                        provider: provider,
-                                        context: context,
-                                        campaignNameText: _campaignNameController.text,
-                                        customerRewardText: _customerRewardController.text,
-                                        referralRewardText: _referralRewardController.text,
-                                        minPurchaseText: _minPurchaseController.text,
-                                      );
-                                      provider.setIsSaving(false);
-                                    },
-                                    child: CustomButton(
-                                      value: "Save",
-                                      color: ColorsClass.primary,
-                                    ),
+                                            provider.setIsSaving(true);
+                                            await CampaignService.validateAndSaveCampaign(
+                                              isMobile: false,
+                                              isUpdate: false,
+                                              provider: provider,
+                                              context: context,
+                                              campaignNameText:
+                                                  _campaignNameController.text,
+                                              customerRewardText:
+                                                  _customerRewardController
+                                                      .text,
+                                              referralRewardText:
+                                                  _referralRewardController
+                                                      .text,
+                                              minPurchaseText:
+                                                  _minPurchaseController.text,
+                                            );
+                                            provider.setIsSaving(false);
+                                            _clearForm(provider);
+                                          },
+                                    child: provider.loadingId == null
+                                        ? const CustomButton(
+                                            value: "Save",
+                                            color: ColorsClass.primary,
+                                          )
+                                        : Container(
+                                            height: 50,
+                                            width: 200,
+                                            decoration: BoxDecoration(
+                                              color: ColorsClass.primary,
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(6),
+                                              ),
+                                            ),
+                                            child: const Center(
+                                              child: CircularProgressIndicator(
+                                                color: ColorsClass.white,
+                                              ),
+                                            ),
+                                          ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -197,7 +234,7 @@ class _AddCampaignState extends State<AddCampaign> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 100,),
+                            SizedBox(height: 100),
                           ],
                         ),
                       ),

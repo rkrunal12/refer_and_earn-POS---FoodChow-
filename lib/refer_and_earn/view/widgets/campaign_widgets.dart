@@ -245,7 +245,12 @@ class BuildCustomTable extends StatelessWidget {
                         expiryType: campaign.expiryType,
                         fixedPeriodType: campaign.fixedPeriodType,
                         endDate:
-                            "${campaign.endDate?.year ?? DateTime.now().year}-${campaign.endDate?.month ?? DateTime.now().month}-${campaign.endDate?.day ?? DateTime.now().day} ${campaign.endDate?.hour ?? DateTime.now().hour}:${campaign.endDate?.minute ?? DateTime.now().minute}:${campaign.endDate?.second ?? DateTime.now().second}",
+                            "${campaign.endDate?.year ?? DateTime.now().year}-"
+                            "${(campaign.endDate?.month ?? DateTime.now().month).toString().padLeft(2, '0')}-"
+                            "${(campaign.endDate?.day ?? DateTime.now().day).toString().padLeft(2, '0')} "
+                            "${(campaign.endDate?.hour ?? DateTime.now().hour).toString().padLeft(2, '0')}:"
+                            "${(campaign.endDate?.minute ?? DateTime.now().minute).toString().padLeft(2, '0')}:"
+                            "${(campaign.endDate?.second ?? DateTime.now().second).toString().padLeft(2, '0')}",
                         notifyCustomer: campaign.notifyCustomer == true ? 1 : 0,
                         rewardType: campaign.rewardType,
                         shopId: campaign.shopId?.toString(),
@@ -265,7 +270,7 @@ class BuildCustomTable extends StatelessWidget {
                                   : (campaign.expiryType ==
                                         "After Friend's First Order")
                                   ? "Expires After Friend's First Order"
-                                  : "End: ${DateFormat('dd-MM-yyyy HH:mm:ss a').format(DateTime(campaign.endDate?.year ?? 1970, campaign.endDate?.month ?? 1, campaign.endDate?.day ?? 1, campaign.endDate?.hour ?? 0, campaign.endDate?.minute ?? 0, campaign.endDate?.second ?? 0))}",
+                                  : "End: ${DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime(campaign.endDate?.year ?? 1970, campaign.endDate?.month ?? 1, campaign.endDate?.day ?? 1, campaign.endDate?.hour ?? 0, campaign.endDate?.minute ?? 0, campaign.endDate?.second ?? 0))}",
                             ),
                           ),
                           DataCell(
@@ -276,8 +281,9 @@ class BuildCustomTable extends StatelessWidget {
                                     Icons.edit,
                                     color: Colors.teal,
                                   ),
-                                  onPressed: () =>
-                                      buildDialogeBox(context, campaignModel),
+                                  onPressed: () {
+                                    buildDialogeBox(context, campaignModel);
+                                  },
                                 ),
                                 Consumer<ReferralProvider>(
                                   builder: (context, provider, child) {
@@ -287,7 +293,6 @@ class BuildCustomTable extends StatelessWidget {
                                         : Switch.adaptive(
                                             value: campaignModel.status == 1,
                                             onChanged: (val) {
-                                              debugPrint("Status Change: $val");
                                               CampaignService.updateCampaigns(
                                                 campaignModel
                                                   ..status = val ? 1 : 0,
@@ -305,14 +310,13 @@ class BuildCustomTable extends StatelessWidget {
                                     color: Colors.red,
                                   ),
                                   onPressed: () async {
-
-                                        await Provider.of<ReferralProvider>(
-                                          context,
-                                          listen: false,
-                                        ).deleteCampaign(
-                                          campaign.campaignId,
-                                          campaign.shopId,
-                                        );
+                                    await Provider.of<ReferralProvider>(
+                                      context,
+                                      listen: false,
+                                    ).deleteCampaign(
+                                      campaign.campaignId,
+                                      campaign.shopId,
+                                    );
                                   },
                                 ),
                               ],
@@ -388,7 +392,7 @@ class BuildExpiryContainer extends StatelessWidget {
             groupValue: provider.expiryOption,
             onChanged: (val) {
               provider.updateExpiryOption(val!);
-              CustomSnackBar.showSuccess("Campaign will expire in 72 hours");
+              CustomeToast.showSuccess("Campaign will expire in 72 hours");
             },
           ),
           CustomRadioListTile(
@@ -397,7 +401,7 @@ class BuildExpiryContainer extends StatelessWidget {
             groupValue: provider.expiryOption,
             onChanged: (val) {
               provider.updateExpiryOption(val!);
-              CustomSnackBar.showSuccess("Campaign will expire in 30 Days");
+              CustomeToast.showSuccess("Campaign will expire in 30 Days");
             },
           ),
         ],
