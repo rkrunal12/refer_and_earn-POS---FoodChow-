@@ -15,6 +15,7 @@ class CampaignService {
     bool isMobile,
     bool isStateUpdating,
   ) async {
+    log("Data come to update: ${data.toJson()}");
     try {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
       await provider.updateCampaign(data, isStateUpdating);

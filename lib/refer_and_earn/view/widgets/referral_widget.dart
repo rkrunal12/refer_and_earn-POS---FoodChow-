@@ -74,8 +74,8 @@ class CustomTableRestaurant extends StatelessWidget {
         DataCell(
           Center(
             child: Container(
-              height: 30,
-              width: 150,
+              height: 25,
+              width: 100,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               alignment: Alignment.center,
               decoration: BoxDecoration(
@@ -90,9 +90,11 @@ class CustomTableRestaurant extends StatelessWidget {
                   width: 2,
                 ),
               ),
-              child: Text(
-                data.claimed == 1 ? "Completed" : "Pending",
-                style: const TextStyle(fontWeight: FontWeight.w600),
+              child: FittedBox(
+                child: Text(
+                  data.claimed == 1 ? "Completed" : "Pending",
+                  style: const TextStyle(fontWeight: FontWeight.w400),
+                ),
               ),
             ),
           ),
@@ -105,7 +107,7 @@ class CustomTableRestaurant extends StatelessWidget {
                 await Provider.of<ReferralProvider>(
                   context,
                   listen: false,
-                ).deleteRestaurantReferralData(data.restaurantId);
+                ).deleteRestaurantReferralData(data.restaurantId, data.id);
               },
             ),
           ),

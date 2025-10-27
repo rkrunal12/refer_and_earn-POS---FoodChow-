@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:refer_and_earn/refer_and_earn/view/widgets/common_widgets.dart';
@@ -283,7 +284,8 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final getReferralUrl = "$basereferralUrl/GetReferredRestaurants";
+      final getReferralUrl =
+          "$basereferralUrl/GetOwnReferredRestaurantsByShopId?shop_id=7866";
       final response = await http.get(Uri.parse(getReferralUrl));
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
@@ -297,8 +299,8 @@ class ReferralProvider with ChangeNotifier {
       } else {
         _referralError = "Something went wrong";
       }
-    } catch (_) {
-      _referralError = "Unexpected error";
+    } catch (e) {
+      _referralError = "Unexpected error: $e";
     } finally {
       _isReferralLoading = false;
       notifyListeners();
@@ -329,14 +331,20 @@ class ReferralProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteRestaurantReferralData(String? restaurantId) async {
-    notifyListeners();
+  Future<void> deleteRestaurantReferralData(
+    String? restaurantId,
+    int? id,
+  ) async {
+    log(restaurantId ?? "No ID provided");
+    log(id?.toString() ?? "No ID provided");
     final response = await http.delete(
-      Uri.parse("$basereferralUrl/DeleteReferredRestaurant/$restaurantId"),
+      Uri.parse(
+        "$basereferralUrl/DeleteReferredRestaurant?id=$id&restaurant_id=$restaurantId",
+      ),
     );
 
     try {
-      if (response.statusCode == 204) {
+      if (response.statusCode == 204 || response.statusCode == 200) {
         await fetchRestaurantReferralData(true);
         CustomeToast.showSuccess("Delete Success");
       } else {

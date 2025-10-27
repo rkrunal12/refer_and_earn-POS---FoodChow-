@@ -126,10 +126,12 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                 child: Consumer<ReferralProvider>(
                   builder: (context, provider, _) {
                     if (provider.isReferralLoading) {
-                      return CircularProgressIndicator.adaptive();
+                      return const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      );
                     }
                     if (provider.referralError != null) {
-                      return Text(provider.referralError!);
+                      return Center(child: Text(provider.referralError!));
                     }
                     if (provider.referralList.isEmpty) {
                       return const Center(child: Text("NO DATA"));

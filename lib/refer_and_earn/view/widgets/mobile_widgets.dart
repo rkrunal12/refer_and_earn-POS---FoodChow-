@@ -458,7 +458,10 @@ class CustomTableRestaurantMobile extends StatelessWidget {
                       await Provider.of<ReferralProvider>(
                         context,
                         listen: false,
-                      ).deleteRestaurantReferralData(data.restaurantId);
+                      ).deleteRestaurantReferralData(
+                        data.restaurantId,
+                        data.id,
+                      );
                     },
                     child: SizedBox(
                       height: 25,
