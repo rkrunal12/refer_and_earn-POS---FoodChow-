@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:validate_phone_number/validation.dart';
 import '../../color_class.dart';
 
 import '../../controller/provider/refer_provider.dart';
 import '../../model/referred_restrauant_model.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/common_widget.dart';
 import '../widgets/mobile_widgets.dart';
 import '../widgets/referral_widget.dart';
 
@@ -79,7 +80,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                           child: Center(
                             child: Text(
                               "+ Add More",
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: ColorsClass.white,
@@ -88,11 +89,10 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 20),
                     ],
                   ),
                 ),
-            
+
                 // Conditional part
                 if (referrals.length > 1)
                   Expanded(
@@ -110,7 +110,9 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                             thickness: 1,
                           ),
                           const SizedBox(height: 6),
-                          const Expanded(child: ReferralList(isMobile: true)),
+                          const Expanded(
+                            child: ReferralListAddReferral(isMobile: true),
+                          ),
                           const SizedBox(height: 8),
                           SizedBox(
                             width: double.infinity,
@@ -158,10 +160,10 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                                   ),
                                 ],
                               ),
-            
+
                         // Spacer pushes the button to the bottom
                         const Spacer(),
-            
+
                         Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: InkWell(
@@ -173,32 +175,32 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                                 CustomeToast.showError('Enter a valid name');
                                 return;
                               }
-            
+
                               String rawNumber = referral.mobileController.text
                                   .trim();
-            
+
                               String cleanNumber = rawNumber.replaceAll(
                                 RegExp(r'[\s\-\(\)]'),
                                 '',
                               );
-            
+
                               bool isValid = Validator.validatePhoneNumber(
                                 cleanNumber,
                                 referral.isoCode,
                               );
-            
+
                               if (!isValid) {
                                 CustomeToast.showError(
                                   "Enter Phone number properly",
                                 );
                                 return;
                               }
-            
+
                               if (!isValid) {
                                 CustomeToast.showError("Invalid mobile number");
                                 return;
                               }
-            
+
                               if (!validateField(
                                 referral.emailController,
                                 'email',
@@ -206,7 +208,7 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                                 CustomeToast.showError('Enter a valid email');
                                 return;
                               }
-            
+
                               ReferredRestaurantsModel data =
                                   ReferredRestaurantsModel(
                                     restaurantId: "7866",
@@ -217,9 +219,9 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                                     email: referral.emailController.text,
                                     name: referral.nameController.text,
                                   );
-            
+
                               await provider.addRestaurantReferralData(data);
-            
+
                               referral.clear();
                               Navigator.pop(context);
                             },

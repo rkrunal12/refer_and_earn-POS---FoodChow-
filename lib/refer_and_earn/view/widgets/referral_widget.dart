@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/refer_and_earn/view/widgets/common_widget.dart';
 import 'package:validate_phone_number/validation.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../model/referral_row_data.dart';
 import '../../model/referred_restrauant_model.dart';
-import 'common_widgets.dart';
 import 'mobile_widgets.dart';
 
 /// Table showing restaurant referrals
-class CustomTableRestaurant extends StatelessWidget {
+class CustomReferralTableRestaurant extends StatelessWidget {
   final List<ReferredRestaurantsModel>? list;
 
-  const CustomTableRestaurant({super.key, required this.list});
+  const CustomReferralTableRestaurant({super.key, required this.list});
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 650) {
-          return CustomTableRestaurantMobile(list: list);
+          return CustomTableRestaurantMobileReferral(list: list);
         } else {
           // Large screen: keep DataTable
           return SingleChildScrollView(
@@ -31,7 +33,7 @@ class CustomTableRestaurant extends StatelessWidget {
                 headingRowColor: MaterialStateProperty.all(
                   const Color(0x550AA89E),
                 ),
-                headingTextStyle: const TextStyle(
+                headingTextStyle: GoogleFonts.poppins(
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
                 ),
@@ -62,7 +64,7 @@ class CustomTableRestaurant extends StatelessWidget {
   }
 
   DataRow _buildDataRow(ReferredRestaurantsModel data, BuildContext context) {
-    const cellStyle = TextStyle(fontWeight: FontWeight.w400, fontSize: 14);
+    const cellStyle = TextStyle(fontWeight: FontWeight.w400);
 
     return DataRow(
       cells: [
@@ -93,7 +95,7 @@ class CustomTableRestaurant extends StatelessWidget {
               child: FittedBox(
                 child: Text(
                   data.claimed == 1 ? "Completed" : "Pending",
-                  style: const TextStyle(fontWeight: FontWeight.w400),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w400),
                 ),
               ),
             ),
@@ -131,7 +133,7 @@ class ReferralHeader extends StatelessWidget {
       children: [
         CustomText(
           text: "Your Referred Restaurants",
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontSize: isMobile ? 14 : 20,
             fontWeight: FontWeight.w500,
           ),
@@ -148,7 +150,7 @@ class ReferralHeader extends StatelessWidget {
             child: Center(
               child: CustomText(
                 text: "+ Add More",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: isMobile ? 12 : 15,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -163,8 +165,8 @@ class ReferralHeader extends StatelessWidget {
 }
 
 /// List of referral rows
-class ReferralList extends StatelessWidget {
-  const ReferralList({super.key, required this.isMobile});
+class ReferralListAddReferral extends StatelessWidget {
+  const ReferralListAddReferral({super.key, required this.isMobile});
 
   final bool isMobile;
 
@@ -345,9 +347,7 @@ class ReferralRow extends StatelessWidget {
                   child: SizedBox(
                     height: 45,
                     width: 45,
-                    child: Image.asset(
-                      "assets/images/refer_and_earn/mobile_delete.png",
-                    ),
+                    child: SvgPicture.asset("assets/svg/mobile_delete.svg"),
                   ),
                 ),
               ),

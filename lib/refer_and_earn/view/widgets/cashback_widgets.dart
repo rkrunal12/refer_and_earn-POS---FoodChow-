@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import 'common_widgets.dart';
+import 'common_widget.dart';
 
 /// Build slider for cashback
 class CashbackSlider extends StatelessWidget {
@@ -35,8 +36,11 @@ class CashbackSlider extends StatelessWidget {
                 const SizedBox(width: 2),
                 Text(
                   maxValue == 50 ? "${value.toInt()}%" : "₹${value.toInt()}",
-                  style: TextStyle(color: ColorsClass.primary),
-                ),
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: ColorsClass.primary,
+                ),)
               ],
             );
           },
@@ -77,11 +81,11 @@ class CashbackRulesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 10.0),
             child: Text(
               "Cash Back Rules",
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+              style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w500),
             ),
           ),
           TabBar(
@@ -157,13 +161,13 @@ class ToggleCard extends StatelessWidget {
     return Card(
       elevation: 2,
       child: ListTile(
-        title: const CustomText(
+        title: CustomText(
           text: "Authorised FoodChow Cash",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
         ),
-        subtitle: const CustomText(
+        subtitle: CustomText(
           text: "Enable this to start accepting FoodChow Cash",
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
@@ -174,7 +178,7 @@ class ToggleCard extends StatelessWidget {
           children: [
             CustomText(
               text: isEnable ? "Enabled" : "Disabled",
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
             ),
             const SizedBox(width: 5),
             Switch(value: isEnable, onChanged: onChanged),

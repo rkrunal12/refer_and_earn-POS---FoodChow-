@@ -1,164 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/view/widgets/update_campaign.dart';
-
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
-import '../../model/fetch_data_model.dart';
-import '../screens/cash_back.dart';
-import '../screens/restraurent_referal.dart';
-import 'common_widgets.dart';
-import '../screens/add_campaign.dart';
-import '../screens/all_campaign.dart';
+import 'common_widget.dart';
 
-/// Image widget with fixed size
+/// App baar action
 class ImageAssets extends StatelessWidget {
+  const ImageAssets({super.key, required this.path});
+
   final String path;
-  final double height;
-  final double width;
-
-  const ImageAssets(this.path, {super.key, this.height = 45, this.width = 45});
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: height, width: width, child: Image.asset(path));
-  }
-}
-
-/// Container with icon and text
-class ContentContainer extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final bool isSelected;
-
-  const ContentContainer({
-    super.key,
-    required this.icon,
-    required this.title,
-    this.isSelected = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isSelected ? ColorsClass.primary : ColorsClass.white,
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontFamily: "Poppins",
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
-              ),
-              overflow: TextOverflow
-                  .ellipsis, // optional: shows "..." if text is too long
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Container with image and text
-class ContentContainerImage extends StatelessWidget {
-  final String imagePath;
-  final String title;
-  final bool isSelected;
-
-  const ContentContainerImage({
-    super.key,
-    required this.imagePath,
-    required this.title,
-    this.isSelected = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isSelected ? ColorsClass.primary : ColorsClass.white,
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            height: 30,
-            child: Image.asset(
-              imagePath,
-              color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontFamily: "Poppins",
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// IndexedStack content
-class BuildContent extends StatelessWidget {
-  final int selectedIndex;
-
-  const BuildContent({super.key, required this.selectedIndex});
-
-  @override
-  Widget build(BuildContext context) {
-    return IndexedStack(
-      index: selectedIndex,
-      children: const [
-        AddCampaign(),
-        AllCampaign(),
-        CashBack(),
-        RestraurentReferal(),
-      ],
-    );
+    return SvgPicture.asset(path);
   }
 }
 
 /// Campaign detailed card for summary
-class CampaignDetailed extends StatelessWidget {
+class CampaignDetailedCampaignInfo extends StatelessWidget {
   final String title;
   final String number;
 
-  const CampaignDetailed({
+  const CampaignDetailedCampaignInfo({
     super.key,
     required this.title,
     required this.number,
@@ -177,7 +45,7 @@ class CampaignDetailed extends StatelessWidget {
               FittedBox(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
                   ),
@@ -186,7 +54,7 @@ class CampaignDetailed extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 number,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w500,
                   fontSize: 29,
                   color: ColorsClass.primary,
@@ -200,11 +68,69 @@ class CampaignDetailed extends StatelessWidget {
   }
 }
 
-/// Build campaign DataTable (desktop/tablet)
-class BuildCustomTable extends StatelessWidget {
-  final List<Data> data;
+/// Campaign info headers
+class CampaignInfoHeadersAllCampaign extends StatelessWidget {
+  const CampaignInfoHeadersAllCampaign({super.key});
 
-  const BuildCustomTable({super.key, required this.data});
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<ReferralProvider>(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 650;
+
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: isMobile
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CampaignDetailedCampaignInfo(
+                  title: "Total Campaigns",
+                  number: provider.data.length.toString(),
+                ),
+                CampaignDetailedCampaignInfo(
+                  title: "Active Campaigns",
+                  number: provider.activeCampaigns.length.toString(),
+                ),
+                CampaignDetailedCampaignInfo(
+                  title: "Total referrals",
+                  number: provider.totalReferrals.toString(),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: CampaignDetailedCampaignInfo(
+                    title: "Total Campaigns",
+                    number: provider.data.length.toString(),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: CampaignDetailedCampaignInfo(
+                    title: "Active Campaigns",
+                    number: provider.activeCampaigns.length.toString(),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: CampaignDetailedCampaignInfo(
+                    title: "Total referrals",
+                    number: provider.totalReferrals.toString(),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+/// Build campaign DataTable (desktop/tablet)
+class BuildCustomTableAllCampaign extends StatelessWidget {
+  final List<CampaignModel> data;
+
+  const BuildCustomTableAllCampaign({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -241,20 +167,23 @@ class BuildCustomTable extends StatelessWidget {
                         customerReward: campaign.customerReward,
                         referrerReward: campaign.referrerReward,
                         minPurchase: campaign.minPurchase,
-                        expiryEnable: campaign.expiryEnable == true ? 1 : 0,
+                        expiryEnableInt: campaign.expiryEnableInt,
                         expiryType: campaign.expiryType,
                         fixedPeriodType: campaign.fixedPeriodType,
                         endDate:
-                            "${campaign.endDate?.year ?? DateTime.now().year}-"
-                            "${(campaign.endDate?.month ?? DateTime.now().month).toString().padLeft(2, '0')}-"
-                            "${(campaign.endDate?.day ?? DateTime.now().day).toString().padLeft(2, '0')} "
-                            "${(campaign.endDate?.hour ?? DateTime.now().hour).toString().padLeft(2, '0')}:"
-                            "${(campaign.endDate?.minute ?? DateTime.now().minute).toString().padLeft(2, '0')}:"
-                            "${(campaign.endDate?.second ?? DateTime.now().second).toString().padLeft(2, '0')}",
-                        notifyCustomer: campaign.notifyCustomer == true ? 1 : 0,
+                            "${campaign.endDateFetch?.year ?? DateTime.now().year}-"
+                            "${(campaign.endDateFetch?.month ?? DateTime.now().month).toString().padLeft(2, '0')}-"
+                            "${(campaign.endDateFetch?.day ?? DateTime.now().day).toString().padLeft(2, '0')} "
+                            "${(campaign.endDateFetch?.hour ?? DateTime.now().hour).toString().padLeft(2, '0')}:"
+                            "${(campaign.endDateFetch?.minute ?? DateTime.now().minute).toString().padLeft(2, '0')}:"
+                            "${(campaign.endDateFetch?.second ?? DateTime.now().second).toString().padLeft(2, '0')}",
+                        notifyCustomerInt: campaign.notifyCustomerInt,
                         rewardType: campaign.rewardType,
                         shopId: campaign.shopId?.toString(),
-                        status: campaign.status == "1" ? 1 : 0,
+                        statusInt: campaign.statusInt,
+                        statusStr: campaign.statusStr,
+                        expiryEnableBool: campaign.expiryEnableBool,
+                        notifyCustomerBool: campaign.notifyCustomerBool,
                       );
 
                       return DataRow(
@@ -265,12 +194,12 @@ class BuildCustomTable extends StatelessWidget {
                           DataCell(Text("${campaign.referrerReward}%")),
                           DataCell(
                             Text(
-                              campaign.expiryEnable == false
+                              campaign.expiryEnableBool == false
                                   ? "No Expiry"
                                   : (campaign.expiryType ==
                                         "After Friend's First Order")
                                   ? "Expires After Friend's First Order"
-                                  : "End: ${DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime(campaign.endDate?.year ?? 1970, campaign.endDate?.month ?? 1, campaign.endDate?.day ?? 1, campaign.endDate?.hour ?? 0, campaign.endDate?.minute ?? 0, campaign.endDate?.second ?? 0))}",
+                                  : "End: ${DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime(campaign.endDateFetch?.year ?? 1970, campaign.endDateFetch?.month ?? 1, campaign.endDateFetch?.day ?? 1, campaign.endDateFetch?.hour ?? 0, campaign.endDateFetch?.minute ?? 0, campaign.endDateFetch?.second ?? 0))}",
                             ),
                           ),
                           DataCell(
@@ -282,7 +211,10 @@ class BuildCustomTable extends StatelessWidget {
                                     color: Colors.teal,
                                   ),
                                   onPressed: () {
-                                    buildDialogeBox(context, campaignModel);
+                                    buildDialogeBoxUpdateCampaign(
+                                      context,
+                                      campaignModel,
+                                    );
                                   },
                                 ),
                                 Consumer<ReferralProvider>(
@@ -291,11 +223,42 @@ class BuildCustomTable extends StatelessWidget {
                                             campaign.campaignId
                                         ? const CircularProgressIndicator()
                                         : Switch.adaptive(
-                                            value: campaignModel.status == 1,
+                                            value:
+                                                campaignModel.statusStr == "1",
                                             onChanged: (val) {
                                               CampaignService.updateCampaigns(
-                                                campaignModel
-                                                  ..status = val ? 1 : 0,
+                                                CampaignModel(
+                                                  campaignId:
+                                                      campaignModel.campaignId,
+                                                  shopId: campaignModel.shopId,
+                                                  campaignName: campaignModel
+                                                      .campaignName,
+                                                  rewardType:
+                                                      campaignModel.rewardType,
+                                                  customerReward: campaignModel
+                                                      .customerReward,
+                                                  referrerReward: campaignModel
+                                                      .referrerReward,
+                                                  expiryEnableInt:
+                                                      campaignModel
+                                                          .expiryEnableBool!
+                                                      ? 1
+                                                      : 0,
+                                                  minPurchase:
+                                                      campaignModel.minPurchase,
+                                                  expiryType:
+                                                      campaignModel.expiryType,
+                                                  fixedPeriodType: campaignModel
+                                                      .fixedPeriodType,
+                                                  endDate:
+                                                      campaignModel.endDate,
+                                                  notifyCustomerInt:
+                                                      campaignModel
+                                                          .notifyCustomerBool!
+                                                      ? 1
+                                                      : 0,
+                                                  statusInt: val ? 1 : 0,
+                                                ),
                                                 context,
                                                 false,
                                                 true,
@@ -334,7 +297,10 @@ class BuildCustomTable extends StatelessWidget {
 }
 
 /// Update Campaign Dialog
-void buildDialogeBox(BuildContext context, CampaignModel campaignData) {
+void buildDialogeBoxUpdateCampaign(
+  BuildContext context,
+  CampaignModel campaignData,
+) {
   showDialog(
     context: context,
     builder: (BuildContext dialogContext) {
@@ -357,9 +323,9 @@ void buildDialogeBox(BuildContext context, CampaignModel campaignData) {
 }
 
 /// Expiry container
-class BuildExpiryContainer extends StatelessWidget {
+class BuildExpiryContainerAllCampaign extends StatelessWidget {
   final ReferralProvider provider;
-  const BuildExpiryContainer({
+  const BuildExpiryContainerAllCampaign({
     required this.isMobile,
     super.key,
     required this.provider,
@@ -406,6 +372,54 @@ class BuildExpiryContainer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Show inactive campaigns toggle
+class ShowInactiveCampaignsAllCampaign extends StatelessWidget {
+  const ShowInactiveCampaignsAllCampaign({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ReferralProvider>(
+      builder: (context, provider, _) {
+        return Column(
+          children: [
+            InkWell(
+              onTap: () async {
+                provider.setTogglingInactive(true);
+                if (provider.inactiveCampaigns.length >= 10) {
+                  await Future.delayed(const Duration(milliseconds: 500));
+                }
+                await provider.updateInactive();
+                provider.setTogglingInactive(false);
+              },
+              child: Container(
+                width: double.infinity,
+                height: 45,
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFFCFCFCF)),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Center(
+                  child: provider.isTogglingInactive
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          "${provider.showInactive ? "Hide" : "View"} ${provider.inactiveCampaigns.length} inactive campaign${provider.inactiveCampaigns.length == 1 ? '' : 's'}",
+                          style: GoogleFonts.poppins(fontSize: 15),
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        );
+      },
     );
   }
 }

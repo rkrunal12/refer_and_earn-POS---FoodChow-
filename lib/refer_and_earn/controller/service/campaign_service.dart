@@ -1,10 +1,9 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/campaign_model.dart';
-import '../../view/widgets/common_widgets.dart';
+import '../../view/widgets/common_widget.dart';
 import '../provider/refer_provider.dart';
 
 class CampaignService {
@@ -15,7 +14,6 @@ class CampaignService {
     bool isMobile,
     bool isStateUpdating,
   ) async {
-    log("Data come to update: ${data.toJson()}");
     try {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
       await provider.updateCampaign(data, isStateUpdating);
@@ -108,16 +106,16 @@ class CampaignService {
     try {
       if (isUpdate) {
         await CampaignService.updateCampaigns(
-          CampaignModel(
-            status: status == "1" ? 1 : 0,
+          CampaignModel.update(
+            statusInt: status == "1" ? 1 : 0,
             shopId: shopId,
             rewardType: provider.rewardType,
             referrerReward: referralReward,
-            notifyCustomer: provider.notifyCustomers ? 1 : 0,
+            notifyCustomerInt: provider.notifyCustomers ? 1 : 0,
             minPurchase: minPurchase,
             fixedPeriodType: provider.expiryOption,
             expiryType: provider.campaignType,
-            expiryEnable: provider.campaignExpiry ? 1 : 0,
+            expiryEnableInt: provider.campaignExpiry ? 1 : 0,
             endDate:
                 expiryEndDate?.toIso8601String() ??
                 DateTime(1970, 1, 1).toIso8601String(),
@@ -216,12 +214,12 @@ class CampaignService {
       customerReward: customerReward,
       referrerReward: referrerReward,
       minPurchase: minPurchase,
-      expiryEnable: expiryEnable == true ? 1 : 0,
+      expiryEnableInt: expiryEnable == true ? 1 : 0,
       expiryType: expiryType,
       fixedPeriodType: fixedPeriodType,
       endDate: endDate?.toString(),
-      notifyCustomer: notifyCustomer == true ? 1 : 0,
-      status: status == "1" ? 1 : 0,
+      notifyCustomerInt: notifyCustomer == true ? 1 : 0,
+      statusInt: status == "1" ? 1 : 0,
     );
 
     final provider = Provider.of<ReferralProvider>(context, listen: false);

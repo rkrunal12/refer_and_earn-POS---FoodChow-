@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/view/mobile/mobile_cashback.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../model/cashback_model.dart';
 import '../widgets/cashback_widgets.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/common_widget.dart';
 
 class CashBack extends StatefulWidget {
   const CashBack({super.key});
@@ -74,12 +75,11 @@ class _CashBackState extends State<CashBack>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
+                          Text(
                             "Cash Back",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              fontFamily: "Poppins",
                             ),
                           ),
                           const SizedBox(height: 15),

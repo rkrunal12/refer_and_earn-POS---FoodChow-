@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/campaign_widgets.dart';
@@ -32,7 +33,7 @@ class _AllCampaignState extends State<AllCampaign> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 550;
+    final isMobile = screenWidth <= 650;
 
     return Consumer<ReferralProvider>(
       builder: (context, provider, _) {
@@ -46,7 +47,6 @@ class _AllCampaignState extends State<AllCampaign> {
           );
         }
 
-        // Show error state
         if (provider.error != null && provider.data.isEmpty) {
           return Center(
             child: Padding(
@@ -56,7 +56,7 @@ class _AllCampaignState extends State<AllCampaign> {
                 children: [
                   Text(
                     "${provider.error}",
-                    style: const TextStyle( fontSize: 16),
+                    style: GoogleFonts.poppins(fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
@@ -81,131 +81,54 @@ class _AllCampaignState extends State<AllCampaign> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Show loading indicator during refresh
                   if (provider.isLoading && provider.data.isNotEmpty)
                     const Padding(
                       padding: EdgeInsets.only(bottom: 16),
                       child: Center(child: CircularProgressIndicator()),
                     ),
 
-                  /// Totals row
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: isMobile
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CampaignDetailed(
-                                title: "Total Campaigns",
-                                number: provider.data.length.toString(),
-                              ),
-                              CampaignDetailed(
-                                title: "Active Campaigns",
-                                number: provider.activeCampaigns.length
-                                    .toString(),
-                              ),
-                              CampaignDetailed(
-                                title: "Total referrals",
-                                number: provider.totalReferrals.toString(),
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              Expanded(
-                                child: CampaignDetailed(
-                                  title: "Total Campaigns",
-                                  number: provider.data.length.toString(),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: CampaignDetailed(
-                                  title: "Active Campaigns",
-                                  number: provider.activeCampaigns.length
-                                      .toString(),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: CampaignDetailed(
-                                  title: "Total referrals",
-                                  number: provider.totalReferrals.toString(),
-                                ),
-                              ),
-                            ],
-                          ),
-                  ),
+                  const CampaignInfoHeadersAllCampaign(),
                   const SizedBox(height: 20),
 
                   /// Active campaigns title
-                  const Text(
+                  Text(
                     "Active Campaigns",
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                    style: GoogleFonts.poppins(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 10),
 
                   /// Active campaigns
                   if (provider.activeCampaigns.isEmpty)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
                       child: Text(
                         "No active campaigns",
-                        style: TextStyle(color: Colors.grey),
+                        style: GoogleFonts.poppins(color: Colors.grey),
                       ),
                     )
                   else
                     isMobile
                         ? Column(
                             children: provider.activeCampaigns
-                                .map((data) => MobileCampaignCard(data: data))
+                                .map(
+                                  (data) => MobileCampaignCardMobileAllCampaign(
+                                    data: data,
+                                  ),
+                                )
                                 .toList(),
                           )
-                        : BuildCustomTable(data: provider.activeCampaigns),
+                        : BuildCustomTableAllCampaign(
+                            data: provider.activeCampaigns,
+                          ),
 
                   const SizedBox(height: 20),
 
                   /// Toggle inactive campaigns button - only show if there are inactive campaigns
                   if (provider.inactiveCampaigns.isNotEmpty)
-                    Column(
-                      children: [
-                        InkWell(
-                          onTap: () async {
-                            provider.setTogglingInactive(true);
-                            await Future.delayed(
-                              const Duration(milliseconds: 500),
-                            );
-                            await provider.updateInactive();
-                            provider.setTogglingInactive(false);
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFCFCFCF),
-                              ),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: Center(
-                              child: provider.isTogglingInactive
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(
-                                      "${provider.showInactive ? "Hide" : "View"} ${provider.inactiveCampaigns.length} inactive campaign${provider.inactiveCampaigns.length == 1 ? '' : 's'}",
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                    const ShowInactiveCampaignsAllCampaign(),
 
                   /// Inactive campaigns
                   if (provider.showInactive &&
@@ -213,32 +136,16 @@ class _AllCampaignState extends State<AllCampaign> {
                     isMobile
                         ? Column(
                             children: provider.inactiveCampaigns
-                                .map((data) => MobileCampaignCard(data: data))
+                                .map(
+                                  (data) => MobileCampaignCardMobileAllCampaign(
+                                    data: data,
+                                  ),
+                                )
                                 .toList(),
                           )
-                        : BuildCustomTable(data: provider.inactiveCampaigns),
-
-                  // Show message if no data at all
-                  if (provider.data.isEmpty &&
-                      !provider.isLoading &&
-                      provider.error == null)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.campaign_outlined,
-                            size: 60,
-                            color: Colors.grey,
+                        : BuildCustomTableAllCampaign(
+                            data: provider.inactiveCampaigns,
                           ),
-                          SizedBox(height: 16),
-                          Text(
-                            "No campaigns available",
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
                 ],
               ),
             ),

@@ -33,35 +33,4 @@ class CashbackModel {
     };
   }
 
-  Map<String, dynamic> toAddJson() {
-    return {
-      'cashback_id': cashbackId,
-      'shop_id': shopId,
-      'cashback_enable': cashbackEnable,
-      'cashback_type': cashbackType,
-      'cashback_value': cashbackValue,
-    };
-  }
-
-  Map<String, dynamic> toDeleteJson() {
-    return {
-      'cashback_id': cashbackId,
-    };
-  }
-
-  CashbackModel copyWith({
-    int? cashbackId,
-    String? shopId,
-    int? cashbackEnable,
-    String? cashbackType,
-    int? cashbackValue,
-  }) {
-    return CashbackModel(
-      cashbackId: cashbackId ?? this.cashbackId,
-      shopId: shopId ?? this.shopId,
-      cashbackEnable: cashbackEnable ?? this.cashbackEnable,
-      cashbackType: cashbackType ?? this.cashbackType,
-      cashbackValue: cashbackValue ?? this.cashbackValue,
-    );
-  }
 }

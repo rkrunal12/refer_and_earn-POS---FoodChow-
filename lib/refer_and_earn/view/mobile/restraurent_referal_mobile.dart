@@ -65,7 +65,7 @@ class _RestraurentReferalMobileState extends State<RestraurentReferalMobile> {
                       child: Text("No Referred Restaurant added"),
                     );
                   }
-                  return CustomTableRestaurantMobile(
+                  return CustomTableRestaurantMobileReferral(
                     list: provider.referralList,
                     isMobile: true,
                   );
@@ -75,6 +75,7 @@ class _RestraurentReferalMobileState extends State<RestraurentReferalMobile> {
           ),
         ],
       ),
+      
     );
   }
 }

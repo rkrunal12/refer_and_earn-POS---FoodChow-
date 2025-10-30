@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../color_class.dart';
+import '../screens/chat_boat/chatboat_fullscree.dart';
 import '../widgets/mobile_widgets.dart';
 import 'mobile_all_campaign.dart';
 import 'mobile_cashback.dart';
@@ -16,13 +19,12 @@ class MobileReferenceScreen extends StatelessWidget {
         backgroundColor: ColorsClass.white,
         leading: const Icon(Icons.menu, color: Colors.black),
         elevation: 1,
-        title: const Text(
+        title: Text(
           "Refer & Earn",
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: Colors.black,
             fontWeight: FontWeight.w500,
             fontSize: 18,
-            fontFamily: "Poppins",
           ),
         ),
         actions: [
@@ -38,9 +40,12 @@ class MobileReferenceScreen extends StatelessWidget {
                       const Icon(Icons.person, size: 24, color: Colors.black),
                 ),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   "Admin",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -53,12 +58,11 @@ class MobileReferenceScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Refer and Earn",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  fontFamily: "Poppins",
                 ),
               ),
               const SizedBox(height: 16),
@@ -73,8 +77,9 @@ class MobileReferenceScreen extends StatelessWidget {
                   );
                 },
                 child: ContentContainerMobile(
-                  leading: Image.asset(
-                    "assets/images/refer_and_earn/add.png",
+                  leading: SvgPicture.asset(
+                    "assets/svg/add.svg",
+                    color: ColorsClass.primary,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.add, size: 30),
@@ -96,11 +101,10 @@ class MobileReferenceScreen extends StatelessWidget {
                   );
                 },
                 child: ContentContainerMobile(
-                  leading: Image.asset(
-                    "assets/images/refer_and_earn/cashback.png",
+                  leading: SvgPicture.asset(
+                    "assets/svg/cashback.svg",
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.monetization_on, size: 30),
+                    color: ColorsClass.primary,
                   ),
                   title: "Cashback",
                 ),
@@ -117,8 +121,8 @@ class MobileReferenceScreen extends StatelessWidget {
                   );
                 },
                 child: ContentContainerMobile(
-                  leading: Image.asset(
-                    "assets/images/refer_and_earn/restaurant.png",
+                  leading: SvgPicture.asset(
+                    "assets/svg/restaurant.svg",
                     fit: BoxFit.contain,
                     color: ColorsClass.primary,
                     errorBuilder: (context, error, stackTrace) =>
@@ -130,6 +134,17 @@ class MobileReferenceScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        backgroundColor: ColorsClass.primary,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChatboatFullscreen()),
+          );
+        },
+        child: Image.asset("assets/images/charboat.png"),
       ),
     );
   }

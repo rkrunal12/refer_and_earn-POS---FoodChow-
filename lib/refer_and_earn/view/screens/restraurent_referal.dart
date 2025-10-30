@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/campaign_widgets.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/common_widget.dart';
 import '../widgets/referral_widget.dart';
 import 'add_referral_screen.dart';
 
@@ -38,9 +39,12 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const CustomText(
+              CustomText(
                 text: "Dashboard",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               InkWell(
                 onTap: () => Navigator.push(
@@ -56,10 +60,10 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                     color: ColorsClass.primary,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: CustomText(
                       text: "+ Add",
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: ColorsClass.white,
@@ -75,17 +79,17 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
               ? Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CampaignDetailed(
+                    CampaignDetailedCampaignInfo(
                       title: "Total Referrals ",
                       number: referProvider.referralList.length.toString(),
                     ),
                     const SizedBox(height: 10),
-                    CampaignDetailed(
+                    CampaignDetailedCampaignInfo(
                       title: "Successfully Referrals",
                       number: referProvider.activeRefer.length.toString(),
                     ),
                     const SizedBox(height: 10),
-                    CampaignDetailed(
+                    CampaignDetailedCampaignInfo(
                       title: "Pending Referrals",
                       number: referProvider.inactiveRefer.length.toString(),
                     ),
@@ -95,21 +99,21 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: CampaignDetailed(
+                      child: CampaignDetailedCampaignInfo(
                         title: "Total Referrals ",
                         number: referProvider.referralList.length.toString(),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: CampaignDetailed(
+                      child: CampaignDetailedCampaignInfo(
                         title: "Successfully Referrals",
                         number: referProvider.activeRefer.length.toString(),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: CampaignDetailed(
+                      child: CampaignDetailedCampaignInfo(
                         title: "Pending Referrals",
                         number: referProvider.inactiveRefer.length.toString(),
                       ),
@@ -137,7 +141,11 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                       return const Center(child: Text("NO DATA"));
                     }
                     return SingleChildScrollView(
-                      child: CustomTableRestaurant(list: provider.referralList),
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      child: CustomReferralTableRestaurant(
+                        list: provider.referralList,
+                      ),
                     );
                   },
                 ),

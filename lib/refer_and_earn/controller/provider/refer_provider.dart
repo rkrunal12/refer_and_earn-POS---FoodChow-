@@ -2,17 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:refer_and_earn/refer_and_earn/view/widgets/common_widgets.dart';
 
 import '../../model/campaign_model.dart';
 import '../../model/cashback_model.dart';
-import '../../model/fetch_data_model.dart';
+import '../../model/chatboat_model/message_data.dart';
+import '../../model/chatboat_model/message_model.dart';
 import '../../model/referral_row_data.dart';
 import '../../model/referred_restrauant_model.dart';
+import '../../view/widgets/common_widget.dart';
 
 class ReferralProvider with ChangeNotifier {
-  /// ********************************* Main screen **************************///
+  /// ********************************* Campaign API **************************///
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
   void setSelectedIndex(int value) {
@@ -23,19 +25,19 @@ class ReferralProvider with ChangeNotifier {
   String baseUrl = "https://api.foodchow.com/api/Refer_and_earn";
   bool _isLoading = false;
   String? _error;
-  int? _loadingId;
-  List<Data> _data = [];
+  dynamic _loadingId;
+  List<CampaignModel> _data = [];
 
   bool get isLoading => _isLoading;
   String? get error => _error;
-  int? get loadingId => _loadingId;
-  List<Data> get data => _data;
+  dynamic get loadingId => _loadingId;
+  List<CampaignModel> get data => _data;
 
-  List<Data> get activeCampaigns =>
-      _data.where((c) => c.status == "1").toList();
+  List<CampaignModel> get activeCampaigns =>
+      _data.where((c) => c.statusStr == "1").toList();
 
-  List<Data> get inactiveCampaigns =>
-      _data.where((c) => c.status != "1").toList();
+  List<CampaignModel> get inactiveCampaigns =>
+      _data.where((c) => c.statusStr == "0").toList();
 
   int get totalReferrals =>
       _data.fold(0, (sum, c) => sum + (c.referrerReward ?? 0));
@@ -59,10 +61,10 @@ class ReferralProvider with ChangeNotifier {
 
           if (decoded['data'] != null && decoded['data'].isNotEmpty) {
             final List<dynamic> dataList = decoded['data'][0];
-            final List<Data> jsonData = [];
+            final List<CampaignModel> jsonData = [];
             for (var item in dataList) {
               if (item is Map<String, dynamic>) {
-                final data = Data.fromJson(item);
+                final data = CampaignModel.fromJson(item);
                 jsonData.add(data);
               }
             }
@@ -73,7 +75,8 @@ class ReferralProvider with ChangeNotifier {
             _error = "Something went wrong, no data found.";
             _data = [];
           }
-        } catch (_) {
+        } catch (e) {
+          log("error parsing data: $e");
           _error = "Unexpected error, no data found.";
           _data = [];
         }
@@ -81,7 +84,8 @@ class ReferralProvider with ChangeNotifier {
         _error = "Unexpected error, no data found.";
         _data = [];
       }
-    } catch (_) {
+    } catch (e) {
+      log(e.toString());
       _error = "Unexpected error";
       _data = [];
     } finally {
@@ -122,6 +126,7 @@ class ReferralProvider with ChangeNotifier {
     CampaignModel campaign,
     bool isStateUpdating,
   ) async {
+    log("Campaign to update ${campaign.toJson()}");
     if (isStateUpdating) {
       _loadingId = campaign.campaignId;
     }
@@ -240,7 +245,7 @@ class ReferralProvider with ChangeNotifier {
       final saveCashbackUrl = isUpdate
           ? "$baseUrl/UpdateCashback"
           : "$baseUrl/AddCashback";
-      final saveCashbackData = jsonEncode(model.toAddJson());
+      final saveCashbackData = jsonEncode(model.toJson());
       final response = await http.post(
         Uri.parse(saveCashbackUrl),
         body: saveCashbackData,
@@ -273,10 +278,13 @@ class ReferralProvider with ChangeNotifier {
   List<ReferredRestaurantsModel> get referralList => _referralList;
 
   List<ReferredRestaurantsModel> get activeRefer =>
-      _referralList.where((c) => c.claimed == true).toList();
+      _referralList.where((c) => c.claimed == 1).toList();
 
   List<ReferredRestaurantsModel> get inactiveRefer =>
-      _referralList.where((c) => c.claimed != true).toList();
+      _referralList.where((c) => c.claimed == 1).toList();
+
+  List<ReferredRestaurantsModel> get pendingRefer =>
+      _referralList.where((c) => c.claimed == 0).toList();
 
   Future<void> fetchRestaurantReferralData(bool isUpdate) async {
     if (!isUpdate) _isReferralLoading = true;
@@ -470,6 +478,94 @@ class ReferralProvider with ChangeNotifier {
   void disposeAll() {
     for (var data in referrals) {
       data.dispose();
+    }
+  }
+
+  ///******************** Chat bost *********************///
+  int chatIndex = 0;
+  bool showPopUp = false;
+  bool chatPopupPage = false;
+  int? chatId;
+  bool isChatUiExpanded = false;
+
+  final List<MessageModel> chatItems = [];
+  late Box<MessageModel> _chatBox;
+
+  /// Initialize and load from Hive
+  Future<void> init() async {
+    _chatBox = Hive.box<MessageModel>('messages');
+    chatItems.clear();
+    chatItems.addAll(_chatBox.values);
+    notifyListeners();
+  }
+
+  void setIndex(int index) {
+    chatIndex = index;
+    if (index == 0) {
+      chatPopupPage = false;
+    }
+    notifyListeners();
+  }
+
+  void setChatUiExpand() {
+    isChatUiExpanded = !isChatUiExpanded;
+    notifyListeners();
+  }
+
+  void setPopUp() {
+    showPopUp = !showPopUp;
+    isChatUiExpanded = false;
+    notifyListeners();
+  }
+
+  void setChatPopupPage(int? id) {
+    chatPopupPage = true;
+    chatId = id;
+    notifyListeners();
+  }
+
+  void newChat() {
+    chatPopupPage = true;
+    chatId = chatItems.length + 1;
+    notifyListeners();
+  }
+
+  void backToList() {
+    chatPopupPage = false;
+    chatId = null;
+    notifyListeners();
+  }
+
+  /// Add new chat
+  Future<void> addChat({required String title}) async {
+    final newChat = MessageModel(
+      id: chatItems.length + 1,
+      data: MessageData(title: [title], time: DateTime.now()),
+    );
+
+    await _chatBox.put(newChat.id, newChat);
+    chatItems.add(newChat);
+    notifyListeners();
+  }
+
+  /// Add message to existing chat
+  Future<void> addMessageToChat({required String message}) async {
+    if (chatId == null) return;
+
+    final chat = chatItems.firstWhere(
+      (c) => c.id == chatId,
+      orElse: () => MessageModel(
+        id: -1,
+        data: MessageData(title: [], time: DateTime.now()),
+      ),
+    );
+
+    if (chat.id != -1) {
+      chat.data.title.add(message);
+      chat.data.time = DateTime.now();
+
+      await chat.save(); // Saves changes to Hive automatically
+      notifyListeners();
     }
   }
 }

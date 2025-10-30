@@ -45,7 +45,8 @@ class _MobileAllCampaignState extends State<MobileAllCampaign> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AddCampaignMobile(isMobile: true,),
+                          builder: (context) =>
+                              const AddCampaignMobile(isMobile: true),
                         ),
                       );
                     },
@@ -60,11 +61,14 @@ class _MobileAllCampaignState extends State<MobileAllCampaign> {
           return ListView.builder(
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: data.length + 1, // +1 for the header
+            itemCount: data.length + 1,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 10,
+                  ),
                   child: MobileHeader(
                     title: "Campaign Details",
                     mobileTitle: "+ Add Campaign",
@@ -72,7 +76,8 @@ class _MobileAllCampaignState extends State<MobileAllCampaign> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AddCampaignMobile(isMobile: true),
+                          builder: (context) =>
+                              const AddCampaignMobile(isMobile: true),
                         ),
                       );
                     },
@@ -80,8 +85,8 @@ class _MobileAllCampaignState extends State<MobileAllCampaign> {
                 );
               }
 
-              final campaign = data[index - 1]; // subtract 1 because of header
-              return MobileCampaignCard(data: campaign);
+              final campaign = data[index - 1];
+              return MobileCampaignCardMobileAllCampaign(data: campaign);
             },
           );
         },

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/campaign_widgets.dart';
-import '../widgets/common_widgets.dart';
+import '../widgets/common_widget.dart';
 
 class CampaignExpiryScreen extends StatelessWidget {
   final Function({
@@ -16,7 +17,11 @@ class CampaignExpiryScreen extends StatelessWidget {
   onChanged;
   final bool isMobile;
 
-  CampaignExpiryScreen({super.key, required this.onChanged, required this.isMobile});
+  CampaignExpiryScreen({
+    super.key,
+    required this.onChanged,
+    required this.isMobile,
+  });
 
   final TextEditingController _dateController = TextEditingController();
 
@@ -150,7 +155,10 @@ class CampaignExpiryScreen extends StatelessWidget {
               const SizedBox(height: 10),
 
               if (provider.campaignType == "Fixed Period") ...[
-                BuildExpiryContainer(provider: provider, isMobile: isMobile,),
+                BuildExpiryContainerAllCampaign(
+                  provider: provider,
+                  isMobile: isMobile,
+                ),
                 const SizedBox(height: 20),
 
                 if (provider.expiryOption == "Set Specific End Date & Time")
@@ -173,21 +181,19 @@ class CampaignExpiryScreen extends StatelessWidget {
                     ),
                   ),
               ],
-              const SizedBox(height: 20),
-
-              SizedBox(
-                width: double.infinity,
-                child: ListTile(
-                  leading: CustomCheckBox(
-                    value: provider.notifyCustomers,
-                    onChanged: (val) {
-                      provider.updateNotifyCustomers(val ?? false);
-                      _notifyParent(provider);
-                    },
-                  ),
-                  title: const Text(
-                    "Notify customer before expiry",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ListTile(
+                leading: CustomCheckBox(
+                  value: provider.notifyCustomers,
+                  onChanged: (val) {
+                    provider.updateNotifyCustomers(val ?? false);
+                    _notifyParent(provider);
+                  },
+                ),
+                title: Text(
+                  "Notify customer before expiry",
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/refer_and_earn/view/screens/add_campaign.dart';
+import 'package:refer_and_earn/refer_and_earn/view/screens/all_campaign.dart';
+import 'package:refer_and_earn/refer_and_earn/view/screens/cash_back.dart';
 import 'package:toastification/toastification.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import 'campaign_widgets.dart';
+import '../screens/restraurent_referal.dart';
 
 /// Show a Snack bar using Fluttertoast
 class CustomeToast {
@@ -159,7 +163,7 @@ class RewardTypeDropdown extends StatelessWidget {
     const rewardCashbackType = ["Flat", "Percentage"];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -197,6 +201,130 @@ class RewardTypeDropdown extends StatelessWidget {
   }
 }
 
+//content container
+class ContentContainer extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool isSelected;
+
+  const ContentContainer({
+    super.key,
+    required this.icon,
+    required this.title,
+    this.isSelected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isSelected ? ColorsClass.primary : ColorsClass.white,
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
+              ),
+              overflow: TextOverflow
+                  .ellipsis, // optional: shows "..." if text is too long
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Container with image and text
+class ContentContainerImage extends StatelessWidget {
+  final String imagePath;
+  final String title;
+  final bool isSelected;
+
+  const ContentContainerImage({
+    super.key,
+    required this.imagePath,
+    required this.title,
+    this.isSelected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isSelected ? ColorsClass.primary : ColorsClass.white,
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+        ],
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            height: 30,
+            child: SvgPicture.asset(
+              imagePath,
+              color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// IndexedStack content
+class BuildContent extends StatelessWidget {
+  final int selectedIndex;
+
+  const BuildContent({super.key, required this.selectedIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return IndexedStack(
+      index: selectedIndex,
+      children: const [
+        AddCampaign(),
+        AllCampaign(),
+        CashBack(),
+        RestraurentReferal(),
+      ],
+    );
+  }
+}
+
 /// Side bar
 Widget buildSidebar(BuildContext context, int selectedIndex) {
   final form = Provider.of<ReferralProvider>(context, listen: false);
@@ -224,7 +352,7 @@ Widget buildSidebar(BuildContext context, int selectedIndex) {
       GestureDetector(
         onTap: () => form.setSelectedIndex(2),
         child: ContentContainerImage(
-          imagePath: "assets/images/refer_and_earn/cashback.png",
+          imagePath: "assets/svg/cashback.svg",
           title: "Cash Back",
           isSelected: selectedIndex == 2,
         ),
@@ -232,7 +360,7 @@ Widget buildSidebar(BuildContext context, int selectedIndex) {
       GestureDetector(
         onTap: () => form.setSelectedIndex(3),
         child: ContentContainerImage(
-          imagePath: "assets/images/refer_and_earn/restaurant.png",
+          imagePath: "assets/svg/restaurant.svg",
           title: "Restaurant Referral",
           isSelected: selectedIndex == 3,
         ),
