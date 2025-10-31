@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
 
-import '../../../color_class.dart';
+import '../../color_class.dart';
 
 class ChatboatChat extends StatelessWidget {
   const ChatboatChat({super.key, this.isMobile});

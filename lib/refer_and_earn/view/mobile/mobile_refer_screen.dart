@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../color_class.dart';
-import '../screens/chat_boat/chatboat_fullscree.dart';
+import '../chat_boat/chatboat_fullscree.dart';
 import '../widgets/mobile_widgets.dart';
 import 'mobile_all_campaign.dart';
 import 'mobile_cashback.dart';

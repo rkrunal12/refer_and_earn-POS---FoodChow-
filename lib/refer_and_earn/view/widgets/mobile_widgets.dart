@@ -180,7 +180,7 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                           height: 36,
                           width: 36,
                           child: SvgPicture.asset(
-                            "svg/mobile_edit.svg",
+                            "assets/svg/mobile_edit.svg",
                             color: ColorsClass.primary,
                           ),
                         ),

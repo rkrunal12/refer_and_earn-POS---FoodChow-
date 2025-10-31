@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart' show Provider;
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
+
+import '../../controller/provider/refer_provider.dart';
 
 class ChatboastHome extends StatelessWidget {
   const ChatboastHome({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ReferralProvider>(context, listen: false);
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: SizedBox(
@@ -63,17 +67,24 @@ class ChatboastHome extends StatelessWidget {
                   child: Column(
                     children: [
                       Image.asset("assets/images/refer_and_earn/demo.png"),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: ColorsClass.primary,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Text(
-                              "Book A Demo With A Coach",
-                              style: GoogleFonts.poppins(color: Colors.white),
+                      InkWell(
+                        onTap: () async {
+                          provider.urlLaunch(
+                            "https://www.foodchow.com/free-demo",
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: ColorsClass.primary,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                "Book A Demo With A Coach",
+                                style: GoogleFonts.poppins(color: Colors.white),
+                              ),
                             ),
                           ),
                         ),
@@ -102,27 +113,39 @@ class ChatboastHome extends StatelessWidget {
                       const SizedBox(height: 8),
                       Container(height: 2, color: ColorsClass.deviderColor),
                       const SizedBox(height: 10),
-                      _FoodchowAboutContainer(
-                        title: "Getting Started For Free",
-                        subtitle:
-                            "Register your restaurant and try it for free",
+                      InkWell(
+                        onTap: () {
+                          provider.urlLaunch(
+                            "https://foodchow.gitbook.io/getting-started/quickstart-to-foodchow",
+                          );
+                        },
+                        child: _FoodchowAboutContainer(
+                          title: "Getting Started For Free",
+                          subtitle:
+                              "Register your restaurant and try it for free",
+                        ),
                       ),
                       _FoodchowAboutContainer(
                         title: "Partner Success Program",
                         subtitle:
                             "Join our partner program to help restaurant succeed",
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: ColorsClass.primary,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Text(
-                              "See All FAQs",
-                              style: GoogleFonts.poppins(color: Colors.white),
+                      InkWell(
+                        onTap: () {
+                          provider.urlLaunch("https://www.foodchow.com/faqs");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: ColorsClass.primary,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                "See All FAQs",
+                                style: GoogleFonts.poppins(color: Colors.white),
+                              ),
                             ),
                           ),
                         ),

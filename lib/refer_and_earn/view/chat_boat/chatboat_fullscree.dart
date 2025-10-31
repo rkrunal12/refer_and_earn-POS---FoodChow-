@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chat_ui.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chatboat_chat.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chatboat_chat_fullscreen.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chatboat_home.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chat_ui.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatboat_chat.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatboat_chat_fullscreen.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatboat_home.dart';
 
-import '../../../controller/provider/refer_provider.dart';
+import '../../controller/provider/refer_provider.dart';
 
 class ChatboatFullscreen extends StatefulWidget {
   const ChatboatFullscreen({super.key});

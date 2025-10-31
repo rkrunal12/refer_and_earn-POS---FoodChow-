@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/view/mobile/mobile_refer_screen.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chat_ui.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chatbost_popup.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chat_ui.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatbost_popup.dart';
 import 'package:refer_and_earn/refer_and_earn/view/widgets/campaign_widgets.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/common_widget.dart';
-import 'chat_boat/chatboat_fullscree.dart';
+import '../chat_boat/chatboat_fullscree.dart';
 
 class ReferScreen extends StatelessWidget {
   const ReferScreen({super.key});
@@ -111,16 +111,16 @@ class ReferScreen extends StatelessWidget {
                 shape: const CircleBorder(),
                 backgroundColor: ColorsClass.primary,
                 onPressed: () {
-                  // Provider.of<ReferralProvider>(
-                  //   context,
-                  //   listen: false,
-                  // ).setPopUp();
-                  Navigator.push(
+                  Provider.of<ReferralProvider>(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const ChatboatFullscreen(),
-                    ),
-                  );
+                    listen: false,
+                  ).setPopUp();
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const ChatboatFullscreen(),
+                  //   ),
+                  // );
                 },
                 child: Image.asset("assets/images/charboat.png"),
               ),
@@ -132,12 +132,7 @@ class ReferScreen extends StatelessWidget {
         Consumer<ReferralProvider>(
           builder: (context, value, _) {
             if (!value.showPopUp) return const SizedBox();
-
-            return Stack(
-              children: [
-                value.chatPopupPage ? const ChatUi() : const ChatbostPopup(),
-              ],
-            );
+            return value.chatPopupPage ? const ChatUi() : const ChatbostPopup();
           },
         ),
       ],

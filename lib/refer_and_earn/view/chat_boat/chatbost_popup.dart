@@ -3,8 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chatboat_chat.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/chat_boat/chatboat_home.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatboat_chat.dart';
+import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatboat_home.dart';
 
 class ChatbostPopup extends StatefulWidget {
   const ChatbostPopup({super.key});

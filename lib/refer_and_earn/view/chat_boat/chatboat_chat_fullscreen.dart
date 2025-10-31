@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../color_class.dart';
-import '../../../controller/provider/refer_provider.dart';
-import '../../../model/chatboat_model/message_model.dart';
+import '../../color_class.dart';
+import '../../controller/provider/refer_provider.dart';
+import '../../model/chatboat_model/message_model.dart';
 import 'chat_ui.dart';
 
 class ChatboatChatFullScreen extends StatefulWidget {
@@ -174,9 +174,7 @@ class _ChatboatChatFullScreenState extends State<ChatboatChatFullScreen> {
                                       ),
                                       margin: const EdgeInsets.only(top: 8),
                                       decoration: BoxDecoration(
-                                        color: ColorsClass.primary.withOpacity(
-                                          0.2,
-                                        ),
+                                        color: ColorsClass.white,
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
@@ -225,6 +223,20 @@ class _ChatboatChatFullScreenState extends State<ChatboatChatFullScreen> {
                               Expanded(
                                 child: TextField(
                                   controller: firstMsgController,
+                                  textInputAction: TextInputAction.send,
+                                  onSubmitted: (value) {
+                                    final text = firstMsgController.text.trim();
+                                    if (text.isEmpty) return;
+
+                                    if (provider.chatId == null) {
+                                      provider.addChat(title: text);
+                                      provider.newChat();
+                                    } else {
+                                      provider.addMessageToChat(message: text);
+                                    }
+
+                                    firstMsgController.clear();
+                                  },
                                   decoration: const InputDecoration(
                                     hintText: "Ask a question...",
                                     border: InputBorder.none,

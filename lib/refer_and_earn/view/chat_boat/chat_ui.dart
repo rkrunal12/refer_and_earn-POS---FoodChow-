@@ -1,12 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
-import '../../../model/chatboat_model/message_model.dart';
+import '../../model/chatboat_model/message_model.dart';
 
 class ChatUi extends StatefulWidget {
   const ChatUi({super.key, this.isMobile = false});
@@ -19,6 +20,22 @@ class ChatUi extends StatefulWidget {
 class _ChatUiState extends State<ChatUi> {
   final TextEditingController firstMsgController = TextEditingController();
 
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   void dispose() {
     firstMsgController.dispose();
@@ -29,7 +46,6 @@ class _ChatUiState extends State<ChatUi> {
   Widget build(BuildContext context) {
     final provider = Provider.of<ReferralProvider>(context, listen: true);
 
-    // ✅ safely fetch chat
     final MessageModel? currentChat = provider.chatItems
         .cast<MessageModel?>()
         .firstWhere((item) => item?.id == provider.chatId, orElse: () => null);
@@ -38,6 +54,48 @@ class _ChatUiState extends State<ChatUi> {
         ? currentChat.data.title
         : <String>[];
 
+    log(widget.isMobile.toString());
+
+    return widget.isMobile
+        ? ChatUIMain(
+            widget: widget,
+            provider: provider,
+            chatMessages: chatMessages,
+            firstMsgController: firstMsgController,
+            scrollController: _scrollController,
+          )
+        : Positioned(
+            right: 20,
+            bottom: 80,
+            child: ChatUIMain(
+              widget: widget,
+              provider: provider,
+              chatMessages: chatMessages,
+              firstMsgController: firstMsgController,
+              scrollController: _scrollController,
+            ),
+          );
+  }
+}
+
+class ChatUIMain extends StatelessWidget {
+  const ChatUIMain({
+    super.key,
+    required this.widget,
+    required this.provider,
+    required this.chatMessages,
+    required this.firstMsgController,
+    required this.scrollController,
+  });
+
+  final ChatUi widget;
+  final ReferralProvider provider;
+  final List<String> chatMessages;
+  final TextEditingController firstMsgController;
+  final ScrollController scrollController;
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: widget.isMobile
           ? double.infinity
@@ -108,6 +166,7 @@ class _ChatUiState extends State<ChatUi> {
               // 🔹 Chat Body
               Expanded(
                 child: SingleChildScrollView(
+                  controller: scrollController,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
@@ -116,7 +175,11 @@ class _ChatUiState extends State<ChatUi> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       InChatDefaultMsg(
-                        imgWidth: provider.isChatUiExpanded ? 600 : 400,
+                        imgWidth: widget.isMobile
+                            ? double.infinity
+                            : provider.isChatUiExpanded
+                            ? 600
+                            : 400,
                       ),
                       if (chatMessages.isNotEmpty)
                         ...chatMessages.map((message) {
@@ -129,7 +192,7 @@ class _ChatUiState extends State<ChatUi> {
                               ),
                               margin: const EdgeInsets.only(top: 8),
                               decoration: BoxDecoration(
-                                color: ColorsClass.primary.withOpacity(0.2),
+                                color: ColorsClass.white,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -165,6 +228,20 @@ class _ChatUiState extends State<ChatUi> {
                         Expanded(
                           child: TextField(
                             controller: firstMsgController,
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (value) {
+                              final text = firstMsgController.text.trim();
+                              if (text.isEmpty) return;
+
+                              if (provider.chatId == null) {
+                                provider.addChat(title: text);
+                                provider.newChat();
+                              } else {
+                                provider.addMessageToChat(message: text);
+                              }
+
+                              firstMsgController.clear();
+                            },
                             decoration: const InputDecoration(
                               hintText: "Ask a question...",
                               border: InputBorder.none,
@@ -205,7 +282,6 @@ class _ChatUiState extends State<ChatUi> {
   }
 }
 
-/// 🔹 Default AI Greeting + YouTube Section
 class InChatDefaultMsg extends StatefulWidget {
   const InChatDefaultMsg({super.key, this.imgWidth = 400});
   final double imgWidth;
@@ -342,16 +418,13 @@ class _InChatDefaultMsgState extends State<InChatDefaultMsg> {
                           )
                         : const Center(child: CircularProgressIndicator()))
                   : InkWell(
-                      onTap: () async {
-                        final videoUrl = Uri.parse(
-                          'https://www.youtube.com/watch?v=cK7gv-gik9s',
+                      onTap: () {
+                        Provider.of<ReferralProvider>(
+                          context,
+                          listen: false,
+                        ).urlLaunch(
+                          "https://www.youtube.com/watch?v=cK7gv-gik9s",
                         );
-                        if (await canLaunchUrl(videoUrl)) {
-                          await launchUrl(
-                            videoUrl,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        }
                       },
                       child: Stack(
                         alignment: Alignment.center,

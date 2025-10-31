@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../model/campaign_model.dart';
 import '../../model/cashback_model.dart';
@@ -515,6 +516,7 @@ class ReferralProvider with ChangeNotifier {
   void setPopUp() {
     showPopUp = !showPopUp;
     isChatUiExpanded = false;
+    chatPopupPage = false;
     notifyListeners();
   }
 
@@ -536,7 +538,6 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Add new chat
   Future<void> addChat({required String title}) async {
     final newChat = MessageModel(
       id: chatItems.length + 1,
@@ -548,7 +549,6 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Add message to existing chat
   Future<void> addMessageToChat({required String message}) async {
     if (chatId == null) return;
 
@@ -564,8 +564,17 @@ class ReferralProvider with ChangeNotifier {
       chat.data.title.add(message);
       chat.data.time = DateTime.now();
 
-      await chat.save(); // Saves changes to Hive automatically
+      await chat.save();
       notifyListeners();
+    }
+  }
+
+  //// for launching
+  void urlLaunch(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 }
