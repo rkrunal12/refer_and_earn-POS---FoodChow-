@@ -1,11 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
 
-import '../../color_class.dart';
+import '../../refer_and_earn/color_class.dart';
+import '../controller/chat_boat_controller.dart';
 
 class ChatboatChat extends StatelessWidget {
   const ChatboatChat({super.key, this.isMobile});
@@ -33,7 +31,6 @@ class ChatboatChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log(MediaQuery.of(context).size.width.toString());
     return SizedBox(
       width: double.infinity,
       height: isMobile == true ? double.infinity : 250,
@@ -42,12 +39,10 @@ class ChatboatChat extends StatelessWidget {
         child: Stack(
           children: [
             SingleChildScrollView(
-              child: Consumer<ReferralProvider>(
+              child: Consumer<ChatBoatProvider>(
                 builder: (context, provider, _) {
                   return provider.chatItems.isEmpty
-                      ? const Center(
-                          child: Text("Get start with your first query"),
-                        )
+                      ? Text("Get start with your first query")
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -69,7 +64,7 @@ class ChatboatChat extends StatelessWidget {
                                   color: Colors.white,
                                   child: InkWell(
                                     onTap: () {
-                                      Provider.of<ReferralProvider>(
+                                      Provider.of<ChatBoatProvider>(
                                         context,
                                         listen: false,
                                       ).setChatPopupPage(item.id);
@@ -88,7 +83,7 @@ class ChatboatChat extends StatelessWidget {
                                         ),
                                       ),
                                       title: Text(
-                                        item.data.title[0],
+                                        item.data.chatHistory[0].message,
                                         style: GoogleFonts.poppins(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
@@ -119,7 +114,7 @@ class ChatboatChat extends StatelessWidget {
               right: 50,
               child: FloatingActionButton.small(
                 onPressed: () {
-                  Provider.of<ReferralProvider>(
+                  Provider.of<ChatBoatProvider>(
                     context,
                     listen: false,
                   ).setChatPopupPage(null);
@@ -128,7 +123,12 @@ class ChatboatChat extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.message_sharp, color: Colors.white),
+                    Image.asset(
+                      "assets/images/chat.png",
+                      height: 30,
+                      width: 30,
+                      color: Colors.white,
+                    ),
                     const SizedBox(width: 5),
                     Text(
                       "New Conversation",

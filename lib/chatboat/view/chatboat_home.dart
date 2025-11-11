@@ -3,13 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart' show Provider;
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 
-import '../../controller/provider/refer_provider.dart';
+import '../controller/chat_boat_controller.dart';
+
 
 class ChatboastHome extends StatelessWidget {
   const ChatboastHome({super.key});
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ReferralProvider>(context, listen: false);
+    final provider = Provider.of<ChatBoatProvider>(context, listen: false);
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -23,14 +24,19 @@ class ChatboastHome extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 10),
-              Text(
-                "Hello 👋👋",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.orangeAccent,
-                ),
-                textAlign: TextAlign.start,
+              Row(
+                children: [
+                  Text(
+                    "Hello",
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.orangeAccent,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                  Image.asset("assets/images/emoji.png", height: 30, width: 30),
+                ],
               ),
               const SizedBox(height: 8),
               Container(
@@ -66,7 +72,7 @@ class ChatboastHome extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      Image.asset("assets/images/refer_and_earn/demo.png"),
+                      Image.asset("assets/images/demo.png"),
                       InkWell(
                         onTap: () async {
                           provider.urlLaunch(

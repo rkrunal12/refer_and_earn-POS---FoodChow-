@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
-import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatboat_chat.dart';
-import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatboat_home.dart';
+
+import '../controller/chat_boat_controller.dart';
+import 'chatboat_chat.dart';
+import 'chatboat_home.dart';
 
 class ChatbostPopup extends StatefulWidget {
   const ChatbostPopup({super.key});
@@ -18,19 +19,19 @@ class _ChatbostPopupState extends State<ChatbostPopup> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Provider.of<ReferralProvider>(context, listen: false).init();
+      await Provider.of<ChatBoatProvider>(context, listen: false).init();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ReferralProvider>(context, listen: false);
+    final provider = Provider.of<ChatBoatProvider>(context, listen: false);
 
     return Positioned(
       bottom: 80,
       right: 20,
       child: SizedBox(
-        width: provider.isChatUiExpanded ? 600 : 400,
+        width: provider.isChatboatPopUpExpand ? 600 : 400,
         height: 650,
         child: Card(
           elevation: 8,
@@ -63,7 +64,7 @@ class _ChatbostPopupState extends State<ChatbostPopup> {
                     IconButton(
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
-                      onPressed: () => provider.setPopUp(),
+                      onPressed: () => provider.setShowChatBoatPopup(),
                       icon: const Icon(
                         Icons.cancel,
                         color: Colors.white,
@@ -75,32 +76,46 @@ class _ChatbostPopupState extends State<ChatbostPopup> {
               ),
 
               Expanded(
-                child: Consumer<ReferralProvider>(
+                child: Consumer<ChatBoatProvider>(
                   builder: (context, value, _) {
-                    return value.chatIndex == 0
+                    return value.chatBoatPupupIndex == 0
                         ? ChatboastHome()
                         : ChatboatChat();
                   },
                 ),
               ),
 
-              Consumer<ReferralProvider>(
+              Consumer<ChatBoatProvider>(
                 builder: (context, value, _) {
                   return BottomNavigationBar(
                     useLegacyColorScheme: false,
                     enableFeedback: false,
-                    currentIndex: value.chatIndex,
-                    onTap: (index) => provider.setIndex(index),
+                    currentIndex: value.chatBoatPupupIndex,
+                    onTap: (index) => provider.setChatBoatPopupIndex(index),
                     backgroundColor: Colors.white,
                     selectedItemColor: ColorsClass.primary,
                     unselectedItemColor: Colors.grey,
-                    items: const [
+                    items: [
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.home_outlined, size: 20),
+                        icon: SvgPicture.asset(
+                          "assets/svg/home_new.svg",
+                          height: 25,
+                          width: 25,
+                          color: value.chatBoatPupupIndex == 0
+                              ? ColorsClass.primary
+                              : Colors.grey,
+                        ),
                         label: "Home",
                       ),
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.message_sharp, size: 20),
+                        icon: Image.asset(
+                          "assets/images/chat.png",
+                          height: 25,
+                          width: 25,
+                          color: value.chatBoatPupupIndex == 1
+                              ? ColorsClass.primary
+                              : Colors.grey,
+                        ),
                         label: "Chat",
                       ),
                     ],

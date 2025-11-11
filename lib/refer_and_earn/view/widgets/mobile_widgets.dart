@@ -342,11 +342,7 @@ class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              "assets/images/refer_and_earn/user.png",
-              height: 24,
-              width: 24,
-            ),
+            Image.asset("assets/images/user.png", height: 24, width: 24),
             const SizedBox(width: 10),
             Text("Admin", style: GoogleFonts.poppins(fontSize: 17)),
             const SizedBox(width: 10),

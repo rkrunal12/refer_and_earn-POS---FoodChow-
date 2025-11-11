@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/chatboat/controller/chat_boat_controller.dart';
 import 'package:refer_and_earn/refer_and_earn/view/mobile/mobile_refer_screen.dart';
-import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chat_ui.dart';
-import 'package:refer_and_earn/refer_and_earn/view/chat_boat/chatbost_popup.dart';
 import 'package:refer_and_earn/refer_and_earn/view/widgets/campaign_widgets.dart';
+import '../../../chatboat/view/chat_ui.dart';
+import '../../../chatboat/view/chatbost_popup.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/common_widget.dart';
@@ -108,12 +109,13 @@ class ReferScreen extends StatelessWidget {
 
               floatingActionButton: FloatingActionButton(
                 shape: const CircleBorder(),
+                tooltip: "Talk To AI",
                 backgroundColor: ColorsClass.primary,
                 onPressed: () {
-                  Provider.of<ReferralProvider>(
+                  Provider.of<ChatBoatProvider>(
                     context,
                     listen: false,
-                  ).setPopUp();
+                  ).setShowChatBoatPopup();
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(
@@ -127,10 +129,9 @@ class ReferScreen extends StatelessWidget {
           },
         ),
 
-        /// Chat Popup Layer
-        Consumer<ReferralProvider>(
+        Consumer<ChatBoatProvider>(
           builder: (context, value, _) {
-            if (!value.showPopUp) return const SizedBox();
+            if (!value.showChatBoatPopup) return const SizedBox();
             return value.chatPopupPage ? const ChatUi() : const ChatbostPopup();
           },
         ),

@@ -1,15 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
-import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
-
 import '../../model/campaign_model.dart';
 import '../../model/cashback_model.dart';
-import '../../model/chatboat_model/message_data.dart';
-import '../../model/chatboat_model/message_model.dart';
 import '../../model/referral_row_data.dart';
 import '../../model/referred_restrauant_model.dart';
 import '../../view/widgets/common_widget.dart';
@@ -77,7 +71,7 @@ class ReferralProvider with ChangeNotifier {
             _data = [];
           }
         } catch (e) {
-          log("error parsing data: $e");
+          debugPrint("error parsing data: $e");
           _error = "Unexpected error, no data found.";
           _data = [];
         }
@@ -86,7 +80,7 @@ class ReferralProvider with ChangeNotifier {
         _data = [];
       }
     } catch (e) {
-      log(e.toString());
+      debugPrint(e.toString());
       _error = "Unexpected error";
       _data = [];
     } finally {
@@ -127,7 +121,6 @@ class ReferralProvider with ChangeNotifier {
     CampaignModel campaign,
     bool isStateUpdating,
   ) async {
-    log("Campaign to update ${campaign.toJson()}");
     if (isStateUpdating) {
       _loadingId = campaign.campaignId;
     }
@@ -344,8 +337,6 @@ class ReferralProvider with ChangeNotifier {
     String? restaurantId,
     int? id,
   ) async {
-    log(restaurantId ?? "No ID provided");
-    log(id?.toString() ?? "No ID provided");
     final response = await http.delete(
       Uri.parse(
         "$basereferralUrl/DeleteReferredRestaurant?id=$id&restaurant_id=$restaurantId",
@@ -482,99 +473,4 @@ class ReferralProvider with ChangeNotifier {
     }
   }
 
-  ///******************** Chat bost *********************///
-  int chatIndex = 0;
-  bool showPopUp = false;
-  bool chatPopupPage = false;
-  int? chatId;
-  bool isChatUiExpanded = false;
-
-  final List<MessageModel> chatItems = [];
-  late Box<MessageModel> _chatBox;
-
-  /// Initialize and load from Hive
-  Future<void> init() async {
-    _chatBox = Hive.box<MessageModel>('messages');
-    chatItems.clear();
-    chatItems.addAll(_chatBox.values);
-    notifyListeners();
-  }
-
-  void setIndex(int index) {
-    chatIndex = index;
-    if (index == 0) {
-      chatPopupPage = false;
-    }
-    notifyListeners();
-  }
-
-  void setChatUiExpand() {
-    isChatUiExpanded = !isChatUiExpanded;
-    notifyListeners();
-  }
-
-  void setPopUp() {
-    showPopUp = !showPopUp;
-    isChatUiExpanded = false;
-    chatPopupPage = false;
-    notifyListeners();
-  }
-
-  void setChatPopupPage(int? id) {
-    chatPopupPage = true;
-    chatId = id;
-    notifyListeners();
-  }
-
-  void newChat() {
-    chatPopupPage = true;
-    chatId = chatItems.length + 1;
-    notifyListeners();
-  }
-
-  void backToList() {
-    chatPopupPage = false;
-    chatId = null;
-    notifyListeners();
-  }
-
-  Future<void> addChat({required String title}) async {
-    final newChat = MessageModel(
-      id: chatItems.length + 1,
-      data: MessageData(title: [title], time: DateTime.now()),
-    );
-
-    await _chatBox.put(newChat.id, newChat);
-    chatItems.add(newChat);
-    notifyListeners();
-  }
-
-  Future<void> addMessageToChat({required String message}) async {
-    if (chatId == null) return;
-
-    final chat = chatItems.firstWhere(
-      (c) => c.id == chatId,
-      orElse: () => MessageModel(
-        id: -1,
-        data: MessageData(title: [], time: DateTime.now()),
-      ),
-    );
-
-    if (chat.id != -1) {
-      chat.data.title.add(message);
-      chat.data.time = DateTime.now();
-
-      await chat.save();
-      notifyListeners();
-    }
-  }
-
-  //// for launching
-  void urlLaunch(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
 }

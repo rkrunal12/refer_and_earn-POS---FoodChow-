@@ -1,27 +1,39 @@
+import 'dart:io';
+
 import 'package:device_preview_minus/device_preview_minus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:path_provider/path_provider.dart'
+    show getApplicationDocumentsDirectory;
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/chatboat/controller/chat_boat_controller.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 import 'package:refer_and_earn/refer_and_earn/controller/provider/refer_provider.dart';
-import 'package:refer_and_earn/refer_and_earn/model/chatboat_model/message_data.dart' show MessageDataAdapter;
-import 'package:refer_and_earn/refer_and_earn/model/chatboat_model/message_model.dart' show MessageModelAdapter, MessageModel;
 import 'package:refer_and_earn/refer_and_earn/view/screens/refer_screen.dart';
 import 'package:toastification/toastification.dart';
 import 'package:window_manager/window_manager.dart';
+
+import 'chatboat/model/message_data.dart';
+import 'chatboat/model/message_model.dart';
+import 'chatboat/model/title_item.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Hive.initFlutter();
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    final appDocumentDir = await getApplicationDocumentsDirectory();
+    Hive.init(appDocumentDir.path);
+  } else {
+    await Hive.initFlutter(); // For mobile and web
+  }
+
   Hive.registerAdapter(MessageDataAdapter());
   Hive.registerAdapter(MessageModelAdapter());
-
+  Hive.registerAdapter(TitleItemAdapter());
   await Hive.openBox<MessageModel>('messages');
-  
 
   // Initialize window manager for desktop platforms
   if (!kIsWeb &&
@@ -58,8 +70,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ReferralProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ReferralProvider()),
+        ChangeNotifierProvider(create: (_) => ChatBoatProvider()),
+      ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
         title: 'FoodChow',

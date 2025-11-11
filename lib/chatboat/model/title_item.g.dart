@@ -1,35 +1,35 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'message_data.dart';
+part of 'title_item.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class MessageDataAdapter extends TypeAdapter<MessageData> {
+class TitleItemAdapter extends TypeAdapter<TitleItem> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
-  MessageData read(BinaryReader reader) {
+  TitleItem read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return MessageData(
-      title: (fields[0] as List).cast<String>(),
-      time: fields[1] as DateTime,
+    return TitleItem(
+      message: fields[0] as String,
+      replyFromBot: (fields[1] as Map).cast<String, dynamic>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, MessageData obj) {
+  void write(BinaryWriter writer, TitleItem obj) {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.title)
+      ..write(obj.message)
       ..writeByte(1)
-      ..write(obj.time);
+      ..write(obj.replyFromBot);
   }
 
   @override
@@ -38,7 +38,7 @@ class MessageDataAdapter extends TypeAdapter<MessageData> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MessageDataAdapter &&
+      other is TitleItemAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

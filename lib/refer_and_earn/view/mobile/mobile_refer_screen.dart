@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../chatboat/view/chatboat_fullscree.dart';
 import '../../color_class.dart';
-import '../chat_boat/chatboat_fullscree.dart';
 import '../widgets/mobile_widgets.dart';
 import 'mobile_all_campaign.dart';
 import 'mobile_cashback.dart';
@@ -32,13 +32,7 @@ class MobileReferenceScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
-                Image.asset(
-                  "assets/images/refer_and_earn/user.png",
-                  height: 24,
-                  width: 24,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.person, size: 24, color: Colors.black),
-                ),
+                Image.asset("assets/images/user.png", height: 24, width: 24),
                 const SizedBox(width: 8),
                 Text(
                   "Admin",
