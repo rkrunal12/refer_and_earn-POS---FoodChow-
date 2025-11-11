@@ -8,7 +8,6 @@ import 'package:refer_and_earn/refer_and_earn/view/widgets/campaign_widgets.dart
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/common_widget.dart';
-import '../chat_boat/chatboat_fullscree.dart';
 
 class ReferScreen extends StatelessWidget {
   const ReferScreen({super.key});
