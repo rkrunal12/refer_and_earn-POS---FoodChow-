@@ -6,7 +6,6 @@ class SendQuestionModel {
 
   SendQuestionModel({this.question, this.answer});
 
-  // Convert the object to a JSON map
   Map<String, dynamic> toJson() {
     return {'agent_id': agentId, 'question': question, 'top_k': topK};
   }

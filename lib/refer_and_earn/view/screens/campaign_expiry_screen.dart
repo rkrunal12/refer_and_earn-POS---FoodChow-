@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import '../widgets/campaign_widgets.dart';
 import '../widgets/common_widget.dart';
 
 class CampaignExpiryScreen extends StatelessWidget {
@@ -15,13 +14,8 @@ class CampaignExpiryScreen extends StatelessWidget {
     int? duration,
   })
   onChanged;
-  final bool isMobile;
 
-  CampaignExpiryScreen({
-    super.key,
-    required this.onChanged,
-    required this.isMobile,
-  });
+  CampaignExpiryScreen({super.key, required this.onChanged});
 
   final TextEditingController _dateController = TextEditingController();
 
@@ -155,10 +149,7 @@ class CampaignExpiryScreen extends StatelessWidget {
               const SizedBox(height: 10),
 
               if (provider.campaignType == "Fixed Period") ...[
-                BuildExpiryContainerAllCampaign(
-                  provider: provider,
-                  isMobile: isMobile,
-                ),
+                BuildExpiryContainerAllCampaign(provider: provider),
                 const SizedBox(height: 20),
 
                 if (provider.expiryOption == "Set Specific End Date & Time")
@@ -201,6 +192,55 @@ class CampaignExpiryScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Expiry container
+class BuildExpiryContainerAllCampaign extends StatelessWidget {
+  final ReferralProvider provider;
+  const BuildExpiryContainerAllCampaign({super.key, required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomRadioListTile(
+            value: "Set Specific End Date & Time",
+            title: "Set Specific End Date & Time",
+            groupValue: provider.expiryOption,
+            onChanged: (val) {
+              provider.updateExpiryOption(val!);
+              provider.updateExpiryDate(DateTime.now());
+            },
+          ),
+          CustomRadioListTile(
+            value: "Based on Hours",
+            title: "Based on Hours",
+            groupValue: provider.expiryOption,
+            onChanged: (val) {
+              provider.updateExpiryOption(val!);
+              CustomeToast.showSuccess("Campaign will expire in 72 hours");
+            },
+          ),
+          CustomRadioListTile(
+            value: "Based on Days",
+            title: "Based on Days",
+            groupValue: provider.expiryOption,
+            onChanged: (val) {
+              provider.updateExpiryOption(val!);
+              CustomeToast.showSuccess("Campaign will expire in 30 Days");
+            },
+          ),
+        ],
+      ),
     );
   }
 }

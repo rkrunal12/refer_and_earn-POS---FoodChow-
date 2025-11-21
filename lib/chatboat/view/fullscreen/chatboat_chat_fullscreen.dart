@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../refer_and_earn/color_class.dart';
-import '../controller/chat_boat_controller.dart';
-import '../model/message_model.dart';
+import '../../../refer_and_earn/color_class.dart';
+import '../../controller/chat_boat_controller.dart';
+import '../../model/message_model.dart';
 
-import 'widgets.dart';
+import '../widgets/in_chat_default_msg.dart';
+import '../widgets/chat_history_existing_chat.dart';
+import '../widgets/chat_sidebaar.dart';
+import '../widgets/input_to_agent.dart';
 
 class ChatboatChatFullScreen extends StatefulWidget {
   const ChatboatChatFullScreen({super.key});
@@ -16,9 +19,8 @@ class ChatboatChatFullScreen extends StatefulWidget {
 class _ChatboatChatFullScreenState extends State<ChatboatChatFullScreen> {
   final TextEditingController firstMsgController = TextEditingController();
   final ScrollController _scrollController =
-      ScrollController(); // Add ScrollController
+      ScrollController(); 
 
-  // Helper function to scroll to bottom
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -34,7 +36,7 @@ class _ChatboatChatFullScreenState extends State<ChatboatChatFullScreen> {
   @override
   void dispose() {
     firstMsgController.dispose();
-    _scrollController.dispose(); // Dispose ScrollController
+    _scrollController.dispose(); 
     super.dispose();
   }
 
@@ -83,7 +85,7 @@ class _ChatboatChatFullScreenState extends State<ChatboatChatFullScreen> {
       children: [
         Expanded(
           child: SingleChildScrollView(
-            controller: _scrollController, // Assign ScrollController
+            controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +110,7 @@ class _ChatboatChatFullScreenState extends State<ChatboatChatFullScreen> {
         InputToTheAgent(
           provider: provider,
           firstMsgController: firstMsgController,
-          onMessageSent: _scrollToBottom, // Pass scroll function
+          onMessageSent: _scrollToBottom, 
         ),
       ],
     );

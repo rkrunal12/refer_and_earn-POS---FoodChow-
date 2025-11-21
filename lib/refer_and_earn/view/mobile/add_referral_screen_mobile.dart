@@ -93,7 +93,6 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                   ),
                 ),
 
-                // Conditional part
                 if (referrals.length > 1)
                   Expanded(
                     child: Card(
@@ -111,19 +110,18 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                           ),
                           const SizedBox(height: 6),
                           const Expanded(
-                            child: ReferralListAddReferral(isMobile: true),
+                            child: ReferralListAddReferral(),
                           ),
                           const SizedBox(height: 8),
                           SizedBox(
                             width: double.infinity,
-                            child: SendAllButton(isMobile: true),
+                            child: SendAllButton(),
                           ),
                         ],
                       ),
                     ),
                   )
                 else
-                  /// Single referral input form
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +159,6 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                                 ],
                               ),
 
-                        // Spacer pushes the button to the bottom
                         const Spacer(),
 
                         Padding(
@@ -211,11 +208,8 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
 
                               ReferredRestaurantsModel data =
                                   ReferredRestaurantsModel(
-                                    restaurantId: "7866",
-                                    referringRestaurantId: "123",
-                                    referredBy: "Gourmet Grill",
+                                    referringRestaurantId: "7866",
                                     mobile: referral.mobileController.text,
-                                    claimed: 0,
                                     email: referral.emailController.text,
                                     name: referral.nameController.text,
                                   );

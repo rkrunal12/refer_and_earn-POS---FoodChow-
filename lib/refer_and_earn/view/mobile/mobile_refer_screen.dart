@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../chatboat/view/chatboat_fullscree.dart';
+import 'package:refer_and_earn/refer_and_earn/view/widgets/common_widget.dart';
+import '../../../chatboat/view/fullscreen/chatboat_fullscree.dart';
 import '../../color_class.dart';
-import '../widgets/mobile_widgets.dart';
 import 'mobile_all_campaign.dart';
 import 'mobile_cashback.dart';
 import 'restraurent_referal_mobile.dart';
@@ -89,8 +89,7 @@ class MobileReferenceScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          const MobileCashback(isMobile: true),
+                      builder: (context) => const MobileCashback(),
                     ),
                   );
                 },
@@ -139,6 +138,35 @@ class MobileReferenceScreen extends StatelessWidget {
           );
         },
         child: Image.asset("assets/images/charboat.png"),
+      ),
+    );
+  }
+}
+
+/// Content container card
+class ContentContainerMobile extends StatelessWidget {
+  final Widget leading;
+  final String title;
+
+  const ContentContainerMobile({
+    super.key,
+    required this.leading,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      color: ColorsClass.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      child: ListTile(
+        leading: SizedBox(height: 30, width: 30, child: leading),
+        title: CustomText(
+          text: title,
+          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios),
       ),
     );
   }

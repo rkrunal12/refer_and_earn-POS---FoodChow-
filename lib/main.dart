@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:device_preview_minus/device_preview_minus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:path_provider/path_provider.dart'
-    show getApplicationDocumentsDirectory;
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/chatboat/controller/chat_boat_controller.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
@@ -23,19 +19,13 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-    final appDocumentDir = await getApplicationDocumentsDirectory();
-    Hive.init(appDocumentDir.path);
-  } else {
-    await Hive.initFlutter(); // For mobile and web
-  }
+  await Hive.initFlutter();
 
   Hive.registerAdapter(MessageDataAdapter());
   Hive.registerAdapter(MessageModelAdapter());
   Hive.registerAdapter(TitleItemAdapter());
   await Hive.openBox<MessageModel>('messages');
 
-  // Initialize window manager for desktop platforms
   if (!kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.windows ||
           defaultTargetPlatform == TargetPlatform.macOS ||
@@ -50,7 +40,6 @@ Future<void> main() async {
     });
   }
 
-  // Set the WebView platform to use webview_windows on Windows
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
     await windowManager.ensureInitialized();
   }
@@ -81,6 +70,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: ColorsClass.primary),
+          scaffoldBackgroundColor: ColorsClass.white,
         ),
         home: const ReferScreen(),
       ),

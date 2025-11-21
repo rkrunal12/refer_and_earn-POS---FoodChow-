@@ -50,22 +50,6 @@ class CustomText extends StatelessWidget {
   }
 }
 
-/// Custom fitted text
-class CustomFittedText extends StatelessWidget {
-  final String text;
-  const CustomFittedText({super.key, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      "",
-      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-      softWrap: true,
-      maxLines: null,
-    );
-  }
-}
-
 /// Generic text field widget
 class TextFieldColumn extends StatelessWidget {
   final String hint;
@@ -75,6 +59,7 @@ class TextFieldColumn extends StatelessWidget {
   final bool? isPhone;
   final bool? mobile;
   final ValueChanged<String?>? onIsoCodeChanged;
+  final bool isTag;
 
   const TextFieldColumn({
     super.key,
@@ -85,6 +70,7 @@ class TextFieldColumn extends StatelessWidget {
     required this.type,
     this.isPhone,
     this.mobile,
+    this.isTag = true,
   });
 
   @override
@@ -94,10 +80,15 @@ class TextFieldColumn extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-          ),
+          isTag
+              ? Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              : SizedBox(),
           const SizedBox(height: 6),
           if (isPhone ?? false) ...[
             InternationalPhoneNumberInput(
@@ -178,7 +169,7 @@ class RewardTypeDropdown extends StatelessWidget {
                   selectedValue != null &&
                       rewardCashbackType.contains(selectedValue)
                   ? selectedValue
-                  : null, // safely handle null
+                  : null,
               hint: const Text("Reward Type"),
               items: rewardCashbackType
                   .map(
@@ -242,8 +233,7 @@ class ContentContainer extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
               ),
-              overflow: TextOverflow
-                  .ellipsis, // optional: shows "..." if text is too long
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -404,7 +394,7 @@ class CustomRadioListTile extends StatelessWidget {
   final String title;
   final String value;
   final String groupValue;
-  final ValueChanged<String?> onChanged; // Proper type for onChanged callback
+  final ValueChanged<String?> onChanged;
 
   const CustomRadioListTile({
     super.key,

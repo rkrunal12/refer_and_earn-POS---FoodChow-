@@ -3,7 +3,6 @@ import "dart:math";
 import "package:flutter/material.dart";
 import "package:hive/hive.dart";
 import "package:http/http.dart" as http;
-import "package:refer_and_earn/refer_and_earn/view/widgets/common_widget.dart";
 import "package:url_launcher/url_launcher.dart";
 
 import "../model/get_conversation_data_model.dart";
@@ -132,7 +131,6 @@ class ChatBoatProvider with ChangeNotifier {
 
     final tempMessageId = "temp_msg_${DateTime.now().millisecondsSinceEpoch}";
 
-    // 2. Create temporary message
     final tempMessage = TitleItem(
       message: question,
       replyFromBot: {
@@ -201,7 +199,7 @@ class ChatBoatProvider with ChangeNotifier {
       notifyListeners();
     } else {
       _isEmojiVisible = isOpen;
-      inputFocusNode.unfocus(); // hide keyboard
+      inputFocusNode.unfocus();
       notifyListeners();
     }
   }
@@ -235,11 +233,9 @@ class ChatBoatProvider with ChangeNotifier {
           question: question ?? "",
           answer: ans ?? "",
         );
-        CustomeToast.showSuccess("Answer : $ans");
 
         return getAnswer;
       } else {
-        // CustomeToast.showError("${response.statusCode} -> ${response.body}");
         debugPrint("${response.statusCode} -> ${response.body}");
         debugPrint("Url : $url");
         debugPrint("Post Data -> ${data.toJson()}");
@@ -274,8 +270,6 @@ class ChatBoatProvider with ChangeNotifier {
         final data = GetConversationDataModel.fromJson(decoded);
         return data;
       } else {
-        CustomeToast.showError("${response.statusCode} -> ${response.body}");
-        debugPrint("${response.statusCode} -> ${response.body}");
         return GetConversationDataModel();
       }
     } catch (e) {
@@ -322,11 +316,9 @@ class ChatBoatProvider with ChangeNotifier {
           debugPrint(
             "Feedback error: ${response.statusCode} -> ${response.body}",
           );
-          // Optionally revert the local state if the API call fails
         }
       } catch (e) {
         debugPrint("Feedback error: $e");
-        // Optionally revert the local state if the API call fails
       }
     }
   }

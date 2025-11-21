@@ -22,7 +22,9 @@ class CashbackSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ValueNotifier<double> localValue = ValueNotifier<double>(currentValue);
+    final ValueNotifier<double> localValue = ValueNotifier<double>(
+      currentValue,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +42,8 @@ class CashbackSlider extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: ColorsClass.primary,
-                ),)
+                  ),
+                ),
               ],
             );
           },
@@ -54,10 +57,10 @@ class CashbackSlider extends StatelessWidget {
               max: maxValue,
               value: value.clamp(0, maxValue),
               onChanged: (val) {
-                localValue.value = val; // update local UI instantly
+                localValue.value = val;
               },
               onChangeEnd: (val) {
-                onChanged(val); // only commit to provider/SPI at end
+                onChanged(val);
               },
             );
           },
@@ -66,7 +69,6 @@ class CashbackSlider extends StatelessWidget {
     );
   }
 }
-
 
 /// Cashback rules card with tabs
 class CashbackRulesCard extends StatelessWidget {
@@ -77,15 +79,18 @@ class CashbackRulesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.only(top: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
+            padding: EdgeInsets.only(top: 10.0),
             child: Text(
               "Cash Back Rules",
-              style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w500),
+              style: GoogleFonts.poppins(
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           TabBar(
@@ -159,6 +164,7 @@ class ToggleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: ColorsClass.white,
       elevation: 2,
       child: ListTile(
         title: CustomText(
@@ -178,7 +184,10 @@ class ToggleCard extends StatelessWidget {
           children: [
             CustomText(
               text: isEnable ? "Enabled" : "Disabled",
-              style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(width: 5),
             Switch(value: isEnable, onChanged: onChanged),

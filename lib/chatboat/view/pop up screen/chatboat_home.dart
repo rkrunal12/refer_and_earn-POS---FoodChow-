@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart' show Provider;
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 
-import '../controller/chat_boat_controller.dart';
+import '../../controller/chat_boat_controller.dart';
 
 
 class ChatboastHome extends StatelessWidget {

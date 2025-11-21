@@ -7,10 +7,8 @@ import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
-import '../../model/referral_row_data.dart';
 import '../../model/referred_restrauant_model.dart';
 import '../mobile/add_campaign_mobile.dart';
-import 'cashback_widgets.dart';
 import 'common_widget.dart';
 
 /// Campaign Layout
@@ -58,7 +56,6 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Header Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -107,7 +104,6 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                                     statusInt: val ? 1 : 0,
                                   ),
                                   context,
-                                  true,
                                   true,
                                 );
                               },
@@ -171,7 +167,6 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (context) => AddCampaignMobile(
                                 campaign: campaignModel,
-                                isMobile: true,
                               ),
                             ),
                           );
@@ -213,117 +208,6 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
   }
 }
 
-/// Foodchow cash toggle
-class MobileToggleCardCashback extends StatelessWidget {
-  final bool isEnable;
-  final ValueChanged<bool> onChanged;
-
-  const MobileToggleCardCashback({
-    super.key,
-    required this.isEnable,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        "Authorised FoodChow Cash",
-        style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600),
-      ),
-      subtitle: Text(
-        "Enable this to start accepting FoodChow Cash",
-        style: GoogleFonts.poppins(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          color: Colors.grey,
-        ),
-      ),
-      trailing: Switch(value: isEnable, onChanged: onChanged),
-    );
-  }
-}
-
-/// Mobile cashback rules with slider
-class MobileRulesCardCashback extends StatelessWidget {
-  final TabController tabController;
-
-  const MobileRulesCardCashback({super.key, required this.tabController});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
-            child: Text(
-              "Cash Back Rules",
-              style: GoogleFonts.poppins(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          TabBar(
-            controller: tabController,
-            isScrollable: false,
-            labelColor: Colors.teal,
-            unselectedLabelColor: Colors.black,
-            indicatorColor: Colors.teal,
-            labelPadding: const EdgeInsets.only(left: 5),
-            tabs: const [
-              Tab(text: "Percentage Discount"),
-              Tab(text: "Fixed Amount"),
-            ],
-          ),
-          SizedBox(
-            height: 100,
-            child: Consumer<ReferralProvider>(
-              builder: (context, data, _) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final newIndex = data.rewardCashbackType == "Flat" ? 1 : 0;
-                  if (tabController.index != newIndex &&
-                      !tabController.indexIsChanging &&
-                      newIndex < tabController.length) {
-                    tabController.index = newIndex;
-                  }
-                });
-
-                return TabBarView(
-                  controller: tabController,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: CashbackSlider(
-                        currentValue: data.percentageDiscount,
-                        maxValue: 50,
-                        labelPrefix: "Allow up to",
-                        onChanged: data.setPercentageDiscount,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: CashbackSlider(
-                        currentValue: data.fixedDiscount,
-                        maxValue: 500,
-                        labelPrefix: "Allow fixed amount of",
-                        onChanged: data.setFixedDiscount,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Custom appBar
 class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -359,12 +243,10 @@ class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
 /// Mobile RestRestaurant Referral Table
 class CustomTableRestaurantMobileReferral extends StatelessWidget {
   final List<ReferredRestaurantsModel>? list;
-  final bool? isMobile;
 
   const CustomTableRestaurantMobileReferral({
     super.key,
     required this.list,
-    this.isMobile,
   });
 
   @override
@@ -507,182 +389,6 @@ class CustomTableRestaurantMobileReferral extends StatelessWidget {
           },
         ),
       ],
-    );
-  }
-}
-
-/// referral row mobile
-class ReferralRowMobile extends StatelessWidget {
-  final ReferralRowData referral;
-  final VoidCallback onSend;
-  final VoidCallback onDelete;
-
-  const ReferralRowMobile({
-    super.key,
-    required this.referral,
-    required this.onSend,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TextFieldColumn(
-          hint: "Enter Restaurant Name",
-          label: "Restaurant Name",
-          controller: referral.nameController,
-          type: TextInputType.name,
-        ),
-        TextFieldColumn(
-          mobile: true,
-          isPhone: true,
-          hint: "Enter Mobile No.",
-          label: "Mobile No.",
-          controller: referral.mobileController,
-          type: TextInputType.phone,
-          onIsoCodeChanged: (code) {
-            referral.isoCode = code ?? "IN";
-          },
-        ),
-        TextFieldColumn(
-          hint: "Enter Email",
-          label: "Email",
-          controller: referral.emailController,
-          type: TextInputType.emailAddress,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: InkWell(
-                  onTap: onDelete,
-                  child: Container(
-                    height: 50,
-                    width: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Color(0xFFFC0005)),
-                      borderRadius: BorderRadiusGeometry.all(
-                        Radius.circular(6),
-                      ),
-                    ),
-                    child: Center(
-                      child: CustomText(
-                        text: "Delete",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                          color: Color(0xFFFC0005),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    onSend();
-                  },
-                  child: CustomButton(
-                    value: "Send",
-                    color: ColorsClass.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-      ],
-    );
-  }
-}
-
-/// mobile header
-class MobileHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback onTap;
-  final String mobileTitle;
-  const MobileHeader({
-    super.key,
-    required this.title,
-    required this.onTap,
-    required this.mobileTitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12.0,
-      ), // adjusted for mobile
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          CustomText(
-            text: title, // use the passed title
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w400,
-              fontSize: 14,
-            ),
-          ),
-          InkWell(
-            onTap: onTap,
-            child: Container(
-              height: 36,
-              width: 130,
-              decoration: BoxDecoration(
-                color: ColorsClass.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                child: Text(
-                  mobileTitle,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: ColorsClass.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Content container card
-class ContentContainerMobile extends StatelessWidget {
-  final Widget leading;
-  final String title;
-
-  const ContentContainerMobile({
-    super.key,
-    required this.leading,
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      color: ColorsClass.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      child: ListTile(
-        leading: SizedBox(height: 30, width: 30, child: leading),
-        title: CustomText(
-          text: title,
-          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios),
-      ),
     );
   }
 }

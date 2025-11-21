@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../refer_and_earn/color_class.dart';
-import '../controller/chat_boat_controller.dart';
+import '../../../refer_and_earn/color_class.dart';
+import '../../controller/chat_boat_controller.dart';
 
 class ChatboatChat extends StatelessWidget {
   const ChatboatChat({super.key, this.isMobile});
@@ -24,7 +24,6 @@ class ChatboatChat extends StatelessWidget {
         return '${diff.inDays}d ago';
       }
     } catch (e) {
-      // In case the time string isn’t in DateTime format
       return timeString;
     }
   }

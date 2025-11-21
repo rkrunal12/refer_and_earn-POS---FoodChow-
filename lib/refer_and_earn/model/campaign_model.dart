@@ -106,8 +106,7 @@ class CampaignModel {
     );
   }
 
-  /// To JSON
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toUpdateJson() {
     return {
       'campaign_id': campaignId,
       'shop_id': shopId,

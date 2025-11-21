@@ -1,11 +1,12 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/chatboat/controller/chat_boat_controller.dart';
 import 'package:refer_and_earn/refer_and_earn/view/mobile/mobile_refer_screen.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/campaign_widgets.dart';
-import '../../../chatboat/view/chat_ui.dart';
-import '../../../chatboat/view/chatbost_popup.dart';
+import '../../../chatboat/view/pop up screen/chat_ui.dart';
+import '../../../chatboat/view/pop up screen/chatbost_popup.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/common_widget.dart';
@@ -137,5 +138,15 @@ class ReferScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class ImageAssets extends StatelessWidget {
+  const ImageAssets({super.key, required this.path});
+
+  final String path;
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(path);
   }
 }

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
-import '../controller/chat_boat_controller.dart';
-import 'chat_ui.dart';
-import 'chatboat_chat.dart';
+import '../../controller/chat_boat_controller.dart';
+import '../pop up screen/chat_ui.dart';
+import '../pop up screen/chatboat_chat.dart';
+import '../widgets/chat_sidebaar.dart';
 import 'chatboat_chat_fullscreen.dart';
-import 'chatboat_home.dart';
-import 'widgets.dart';
+import '../pop up screen/chatboat_home.dart';
 
 class ChatboatFullscreen extends StatefulWidget {
   const ChatboatFullscreen({super.key});

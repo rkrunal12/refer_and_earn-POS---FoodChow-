@@ -155,7 +155,6 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
 
                 if (provider.campaignExpiry)
                   CampaignExpiryScreen(
-                    isMobile: false,
                     onChanged:
                         ({
                           required String campaignType,
@@ -182,7 +181,6 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
 
                           final result =
                               await CampaignService.validateAndSaveCampaign(
-                                isMobile: false,
                                 isUpdate: true,
                                 provider: provider,
                                 context: context,

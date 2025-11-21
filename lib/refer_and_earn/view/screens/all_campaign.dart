@@ -33,7 +33,7 @@ class _AllCampaignState extends State<AllCampaign> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 650;
+    final smallScreen = screenWidth <= 650;
 
     return Consumer<ReferralProvider>(
       builder: (context, provider, _) {
@@ -43,29 +43,6 @@ class _AllCampaignState extends State<AllCampaign> {
             child: Padding(
               padding: EdgeInsets.all(20),
               child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
-        if (provider.error != null && provider.data.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${provider.error}",
-                    style: GoogleFonts.poppins(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => provider.fetchData(false),
-                    child: const Text("Retry"),
-                  ),
-                ],
-              ),
             ),
           );
         }
@@ -110,7 +87,7 @@ class _AllCampaignState extends State<AllCampaign> {
                       ),
                     )
                   else
-                    isMobile
+                    smallScreen
                         ? Column(
                             children: provider.activeCampaigns
                                 .map(
@@ -133,7 +110,7 @@ class _AllCampaignState extends State<AllCampaign> {
                   /// Inactive campaigns
                   if (provider.showInactive &&
                       provider.inactiveCampaigns.isNotEmpty)
-                    isMobile
+                    smallScreen
                         ? Column(
                             children: provider.inactiveCampaigns
                                 .map(
@@ -150,6 +127,54 @@ class _AllCampaignState extends State<AllCampaign> {
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+/// Show inactive campaigns toggle
+class ShowInactiveCampaignsAllCampaign extends StatelessWidget {
+  const ShowInactiveCampaignsAllCampaign({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ReferralProvider>(
+      builder: (context, provider, _) {
+        return Column(
+          children: [
+            InkWell(
+              onTap: () async {
+                provider.setTogglingInactive(true);
+                if (provider.inactiveCampaigns.length >= 10) {
+                  await Future.delayed(const Duration(milliseconds: 500));
+                }
+                await provider.updateInactive();
+                provider.setTogglingInactive(false);
+              },
+              child: Container(
+                width: double.infinity,
+                height: 45,
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFFCFCFCF)),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Center(
+                  child: provider.isTogglingInactive
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          "${provider.showInactive ? "Hide" : "View"} ${provider.inactiveCampaigns.length} inactive campaign${provider.inactiveCampaigns.length == 1 ? '' : 's'}",
+                          style: GoogleFonts.poppins(fontSize: 15),
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
         );
       },
     );

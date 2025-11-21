@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,11 +6,9 @@ import '../../view/widgets/common_widget.dart';
 import '../provider/refer_provider.dart';
 
 class CampaignService {
-  /// Update campaign status
   static Future<void> updateCampaigns(
     CampaignModel data,
     BuildContext context,
-    bool isMobile,
     bool isStateUpdating,
   ) async {
     try {
@@ -33,7 +30,6 @@ class CampaignService {
     String? status,
     String? shopId,
     int? campaignId,
-    required isMobile,
   }) async {
     void showError(String msg) => CustomeToast.showError(msg);
 
@@ -124,7 +120,6 @@ class CampaignService {
             campaignId: campaignId,
           ),
           context,
-          isMobile,
           false,
         );
       } else {
@@ -141,7 +136,6 @@ class CampaignService {
           provider.notifyCustomers,
           "1",
           context,
-          isMobile,
         );
       }
       return true;
@@ -153,7 +147,6 @@ class CampaignService {
     }
   }
 
-  /// Save campaign (create)
   static Future<void> saveCampaign(
     String? campaignName,
     String? rewardType,
@@ -167,7 +160,6 @@ class CampaignService {
     bool? notifyCustomer,
     String? status,
     BuildContext context,
-    bool isMobile,
   ) async {
     // Validation / defaults for expiry
     if (expiryEnable == true) {
@@ -199,14 +191,12 @@ class CampaignService {
         endDate = DateTime(9999, 12, 31, 0, 0, 0);
       }
     } else {
-      // Expiry not set → reset
       expiryEnable = false;
       expiryType = "";
       fixedPeriodType = "";
       endDate = DateTime(9999, 12, 31, 0, 0, 0);
     }
 
-    // Build campaign object
     final campaign = CampaignModel.add(
       shopId: "7866",
       campaignName: campaignName,

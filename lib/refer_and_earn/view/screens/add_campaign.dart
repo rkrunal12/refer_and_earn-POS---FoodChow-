@@ -55,7 +55,7 @@ class _AddCampaignState extends State<AddCampaign> {
       builder: (context, constraints) {
         if (constraints.maxWidth <= 650) {
           // Mobile layout
-          return AddCampaignMobile(isMobile: false);
+          return AddCampaignMobile();
         } else {
           // Desktop / Tablet layout
           return SingleChildScrollView(
@@ -149,7 +149,6 @@ class _AddCampaignState extends State<AddCampaign> {
                         // Campaign Expiry Screen
                         if (provider.campaignExpiry)
                           CampaignExpiryScreen(
-                            isMobile: false,
                             onChanged:
                                 ({
                                   required String campaignType,
@@ -177,7 +176,6 @@ class _AddCampaignState extends State<AddCampaign> {
                                     : () async {
                                         provider.setIsSaving(true);
                                         await CampaignService.validateAndSaveCampaign(
-                                          isMobile: false,
                                           isUpdate: false,
                                           provider: provider,
                                           context: context,

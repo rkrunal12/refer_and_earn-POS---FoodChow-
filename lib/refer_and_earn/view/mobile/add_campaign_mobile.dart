@@ -11,9 +11,8 @@ import '../widgets/mobile_widgets.dart';
 
 class AddCampaignMobile extends StatefulWidget {
   final CampaignModel? campaign;
-  final bool isMobile;
 
-  const AddCampaignMobile({super.key, this.campaign, required this.isMobile});
+  const AddCampaignMobile({super.key, this.campaign});
 
   @override
   State<AddCampaignMobile> createState() => _AddCampaignMobileState();
@@ -90,13 +89,9 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ReferralProvider>(context, listen: false);
-
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: widget.isMobile
-          ? const MobileAppBar(title: "Refer and Earn")
-          : null,
+      appBar: const MobileAppBar(title: "Refer and Earn"),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
@@ -104,14 +99,12 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Campaign Name
               TextFieldColumn(
                 hint: "Enter campaign name",
                 label: "Campaign Name*",
                 controller: _campaignNameController,
                 type: TextInputType.text,
               ),
-              // Reward Type Dropdown wrapped in Consumer
               Consumer<ReferralProvider>(
                 builder: (context, provider, _) {
                   return RewardTypeDropdown(
@@ -122,21 +115,18 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
                   );
                 },
               ),
-              // Customer Reward
               TextFieldColumn(
                 hint: "Enter Customer Reward",
                 label: "New Customer Reward (Friend)*",
                 controller: _customerRewardController,
                 type: TextInputType.number,
               ),
-              // Referral Reward
               TextFieldColumn(
                 hint: "Enter Referral Reward",
                 label: "Referral Reward (You)*",
                 controller: _referralRewardController,
                 type: TextInputType.number,
               ),
-              // Minimum Purchase
               TextFieldColumn(
                 hint: "Enter Minimum Purchase",
                 label: "Minimum Purchase (Optional)*",
@@ -144,7 +134,6 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
                 type: TextInputType.number,
               ),
 
-              // Campaign Expiry Checkbox wrapped in Consumer
               Consumer<ReferralProvider>(
                 builder: (context, provider, _) {
                   return Padding(
@@ -169,7 +158,6 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
                 builder: (context, provider, _) {
                   if (!provider.campaignExpiry) return const SizedBox.shrink();
                   return CampaignExpiryScreen(
-                    isMobile: widget.isMobile,
                     onChanged:
                         ({
                           required String campaignType,
@@ -190,44 +178,40 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
 
               const SizedBox(height: 10),
 
-              GestureDetector(
-                onTap: provider.isSaving
-                    ? null
-                    : () async {
-                        final success =
-                            await CampaignService.validateAndSaveCampaign(
-                              isUpdate: widget.campaign != null,
-                              provider: provider,
-                              context: context,
-                              campaignNameText: _campaignNameController.text,
-                              customerRewardText:
-                                  _customerRewardController.text,
-                              referralRewardText:
-                                  _referralRewardController.text,
-                              minPurchaseText: _minPurchaseController.text,
-                              campaignId: widget.campaign?.campaignId,
-                              shopId: widget.campaign?.shopId,
-                              status: widget.campaign?.statusStr,
-                              isMobile: widget.isMobile,
-                            );
-
-                        if (success && widget.isMobile) {
-                          Navigator.pop(context);
-                        }
-                        _clearForm(provider);
-                      },
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: CustomButton(
-                    value: widget.campaign == null ? "Save" : "Update",
-                    color: ColorsClass.primary,
-                  ),
-                ),
-              ),
               const SizedBox(height: 10),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: Consumer<ReferralProvider>(
+        builder: (context, provider, _) {
+          return GestureDetector(
+            onTap: provider.isSaving
+                ? null
+                : () async {
+                    await CampaignService.validateAndSaveCampaign(
+                      isUpdate: widget.campaign != null,
+                      provider: provider,
+                      context: context,
+                      campaignNameText: _campaignNameController.text,
+                      customerRewardText: _customerRewardController.text,
+                      referralRewardText: _referralRewardController.text,
+                      minPurchaseText: _minPurchaseController.text,
+                      campaignId: widget.campaign?.campaignId,
+                      shopId: widget.campaign?.shopId,
+                      status: widget.campaign?.statusStr,
+                    );
+                    _clearForm(provider);
+                  },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CustomButton(
+                value: widget.campaign == null ? "Save" : "Update",
+                color: ColorsClass.primary,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

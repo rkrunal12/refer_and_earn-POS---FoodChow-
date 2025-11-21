@@ -16,18 +16,15 @@ class ReferralRowData {
        mobileController = TextEditingController(text: mobile),
        emailController = TextEditingController(text: email);
 
-  /// Clear all the text fields
   void clear() {
     nameController.clear();
     mobileController.clear();
     emailController.clear();
   }
 
-  /// Dispose all controllers
   void dispose() {
     nameController.dispose();
     mobileController.dispose();
     emailController.dispose();
   }
-
 }

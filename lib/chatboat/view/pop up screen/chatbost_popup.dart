@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/color_class.dart';
 
-import '../controller/chat_boat_controller.dart';
+import '../../controller/chat_boat_controller.dart';
 import 'chatboat_chat.dart';
 import 'chatboat_home.dart';
 

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
+import '../widgets/common_widget.dart';
 import '../widgets/referral_widget.dart';
 
 class AddReferralScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 550;
+    final smallScreen = screenWidth <= 700;
     return Scaffold(
       appBar: AppBar(
         elevation: 2,
@@ -36,7 +37,7 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
         ),
       ),
       body: Padding(
-        padding: isMobile
+        padding: smallScreen
             ? const EdgeInsets.all(0)
             : const EdgeInsets.all(16.0),
         child: Card(
@@ -50,17 +51,16 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Static header and divider
                 const ReferralHeader(),
                 const SizedBox(height: 8),
                 const Divider(color: ColorsClass.deviderColor, thickness: 1),
                 const SizedBox(height: 8),
-                const Expanded(child: ReferralListAddReferral(isMobile: false)),
+                const Expanded(child: ReferralListAddReferral()),
                 const SizedBox(height: 12),
                 Consumer<ReferralProvider>(
                   builder: (context, value, child) {
                     if (value.referrals.length > 1) {
-                      return const SendAllButton(isMobile: false);
+                      return const SendAllButton();
                     } else {
                       return const SizedBox();
                     }
@@ -71,6 +71,51 @@ class _AddReferralScreenState extends State<AddReferralScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Header with title and Add button
+class ReferralHeader extends StatelessWidget {
+  const ReferralHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<ReferralProvider>(context, listen: false);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final smallScreen = screenWidth <= 550;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        CustomText(
+          text: "Your Referred Restaurants",
+          style: GoogleFonts.poppins(
+            fontSize: smallScreen ? 14 : 20,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        InkWell(
+          onTap: provider.addReferral,
+          child: Container(
+            height: 40,
+            width: 100,
+            decoration: BoxDecoration(
+              color: ColorsClass.primary,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Center(
+              child: CustomText(
+                text: "+ Add More",
+                style: GoogleFonts.poppins(
+                  fontSize: smallScreen ? 12 : 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
