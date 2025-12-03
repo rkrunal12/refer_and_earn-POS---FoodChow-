@@ -40,10 +40,7 @@ class _AllCampaignState extends State<AllCampaign> {
         // Show loading state
         if (provider.isLoading && provider.data.isEmpty) {
           return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: CircularProgressIndicator(),
-            ),
+            child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()),
           );
         }
 
@@ -67,62 +64,28 @@ class _AllCampaignState extends State<AllCampaign> {
                   const CampaignInfoHeadersAllCampaign(),
                   const SizedBox(height: 20),
 
-                  /// Active campaigns title
-                  Text(
-                    "Active Campaigns",
-                    style: GoogleFonts.poppins(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  Text("Active Campaigns", style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 10),
 
                   /// Active campaigns
                   if (provider.activeCampaigns.isEmpty)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Text(
-                        "No active campaigns",
-                        style: GoogleFonts.poppins(color: Colors.grey),
-                      ),
+                      child: Text("No active campaigns", style: GoogleFonts.poppins(color: Colors.grey)),
                     )
                   else
                     smallScreen
-                        ? Column(
-                            children: provider.activeCampaigns
-                                .map(
-                                  (data) => MobileCampaignCardMobileAllCampaign(
-                                    data: data,
-                                  ),
-                                )
-                                .toList(),
-                          )
-                        : BuildCustomTableAllCampaign(
-                            data: provider.activeCampaigns,
-                          ),
+                        ? Column(children: provider.activeCampaigns.map((data) => MobileCampaignCardMobileAllCampaign(data: data)).toList())
+                        : BuildCustomTableAllCampaign(data: provider.activeCampaigns),
 
                   const SizedBox(height: 20),
 
-                  /// Toggle inactive campaigns button - only show if there are inactive campaigns
-                  if (provider.inactiveCampaigns.isNotEmpty)
-                    const ShowInactiveCampaignsAllCampaign(),
+                  if (provider.inactiveCampaigns.isNotEmpty) const ShowInactiveCampaignsAllCampaign(),
 
-                  /// Inactive campaigns
-                  if (provider.showInactive &&
-                      provider.inactiveCampaigns.isNotEmpty)
+                  if (provider.showInactive && provider.inactiveCampaigns.isNotEmpty)
                     smallScreen
-                        ? Column(
-                            children: provider.inactiveCampaigns
-                                .map(
-                                  (data) => MobileCampaignCardMobileAllCampaign(
-                                    data: data,
-                                  ),
-                                )
-                                .toList(),
-                          )
-                        : BuildCustomTableAllCampaign(
-                            data: provider.inactiveCampaigns,
-                          ),
+                        ? Column(children: provider.inactiveCampaigns.map((data) => MobileCampaignCardMobileAllCampaign(data: data)).toList())
+                        : BuildCustomTableAllCampaign(data: provider.inactiveCampaigns),
                 ],
               ),
             ),
@@ -133,7 +96,6 @@ class _AllCampaignState extends State<AllCampaign> {
   }
 }
 
-/// Show inactive campaigns toggle
 class ShowInactiveCampaignsAllCampaign extends StatelessWidget {
   const ShowInactiveCampaignsAllCampaign({super.key});
 
@@ -161,11 +123,7 @@ class ShowInactiveCampaignsAllCampaign extends StatelessWidget {
                 ),
                 child: Center(
                   child: provider.isTogglingInactive
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                       : Text(
                           "${provider.showInactive ? "Hide" : "View"} ${provider.inactiveCampaigns.length} inactive campaign${provider.inactiveCampaigns.length == 1 ? '' : 's'}",
                           style: GoogleFonts.poppins(fontSize: 15),

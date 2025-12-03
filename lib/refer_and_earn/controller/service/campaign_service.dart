@@ -6,11 +6,7 @@ import '../../view/widgets/common_widget.dart';
 import '../provider/refer_provider.dart';
 
 class CampaignService {
-  static Future<void> updateCampaigns(
-    CampaignModel data,
-    BuildContext context,
-    bool isStateUpdating,
-  ) async {
+  static Future<void> updateCampaigns(CampaignModel data, BuildContext context, bool isStateUpdating) async {
     try {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
       await provider.updateCampaign(data, isStateUpdating);
@@ -84,8 +80,7 @@ class CampaignService {
           return false;
         }
 
-        if (provider.expiryOption == "Set Specific End Date & Time" &&
-            provider.expiryDate == null) {
+        if (provider.expiryOption == "Set Specific End Date & Time" && provider.expiryDate == null) {
           showError("Expiry date is required");
           return false;
         }
@@ -112,9 +107,7 @@ class CampaignService {
             fixedPeriodType: provider.expiryOption,
             expiryType: provider.campaignType,
             expiryEnableInt: provider.campaignExpiry ? 1 : 0,
-            endDate:
-                expiryEndDate?.toIso8601String() ??
-                DateTime(1970, 1, 1).toIso8601String(),
+            endDate: expiryEndDate?.toIso8601String() ?? DateTime(1970, 1, 1).toIso8601String(),
             customerReward: customerReward,
             campaignName: campaignName,
             campaignId: campaignId,
@@ -164,22 +157,17 @@ class CampaignService {
     // Validation / defaults for expiry
     if (expiryEnable == true) {
       if (expiryType == null || expiryType.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Expiry type is required")),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Expiry type is required")));
         return;
       }
 
       if (expiryType == "Fixed Period") {
         if (fixedPeriodType == null || fixedPeriodType.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Expiry option is required")),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Expiry option is required")));
           return;
         }
 
-        if (fixedPeriodType == "Set Specific End Date & Time" &&
-            endDate == null) {
+        if (fixedPeriodType == "Set Specific End Date & Time" && endDate == null) {
           CustomeToast.showError("Expiry date is required");
           return;
         } else if (fixedPeriodType == "Based on Days") {
@@ -209,7 +197,7 @@ class CampaignService {
       fixedPeriodType: fixedPeriodType,
       endDate: endDate?.toString(),
       notifyCustomerInt: notifyCustomer == true ? 1 : 0,
-      statusInt: status == "1" ? 1 : 0,
+      statusInt: 0,
     );
 
     final provider = Provider.of<ReferralProvider>(context, listen: false);

@@ -45,7 +45,7 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
     );
 
     const gap = SizedBox(height: 8);
-
+    final activeCount = Provider.of<ReferralProvider>(context).activeCampaigns.length;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8),
       child: Card(
@@ -80,32 +80,29 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                           : Switch(
                               value: (data.statusStr == "1"),
                               onChanged: (val) {
-                                CampaignService.updateCampaigns(
-                                  CampaignModel(
-                                    campaignId: campaignModel.campaignId,
-                                    shopId: campaignModel.shopId,
-                                    campaignName: campaignModel.campaignName,
-                                    rewardType: campaignModel.rewardType,
-                                    customerReward:
-                                        campaignModel.customerReward,
-                                    referrerReward:
-                                        campaignModel.referrerReward,
-                                    expiryEnableInt:
-                                        campaignModel.expiryEnableBool! ? 1 : 0,
-                                    minPurchase: campaignModel.minPurchase,
-                                    expiryType: campaignModel.expiryType,
-                                    fixedPeriodType:
-                                        campaignModel.fixedPeriodType,
-                                    endDate: campaignModel.endDate,
-                                    notifyCustomerInt:
-                                        campaignModel.notifyCustomerBool!
-                                        ? 1
-                                        : 0,
-                                    statusInt: val ? 1 : 0,
-                                  ),
-                                  context,
-                                  true,
-                                );
+                                if (val && (activeCount) >= 1) {
+                                                CustomeToast.showError("Only 1 campaign active at a time");
+                                              } else {
+                                                CampaignService.updateCampaigns(
+                                                  CampaignModel(
+                                                    campaignId: campaignModel.campaignId,
+                                                    shopId: campaignModel.shopId,
+                                                    campaignName: campaignModel.campaignName,
+                                                    rewardType: campaignModel.rewardType,
+                                                    customerReward: campaignModel.customerReward,
+                                                    referrerReward: campaignModel.referrerReward,
+                                                    expiryEnableInt: campaignModel.expiryEnableBool! ? 1 : 0,
+                                                    minPurchase: campaignModel.minPurchase,
+                                                    expiryType: campaignModel.expiryType,
+                                                    fixedPeriodType: campaignModel.fixedPeriodType,
+                                                    endDate: campaignModel.endDate,
+                                                    notifyCustomerInt: campaignModel.notifyCustomerBool! ? 1 : 0,
+                                                    statusInt: val ? 1 : 0,
+                                                  ),
+                                                  context,
+                                                  true,
+                                                );
+                                              }
                               },
                             );
                     },
