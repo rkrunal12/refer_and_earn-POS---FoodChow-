@@ -16,15 +16,6 @@ class _AllCampaignState extends State<AllCampaign> {
   final FocusNode _focusNode = FocusNode();
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<ReferralProvider>(context, listen: false);
-      provider.fetchData(false);
-    });
-  }
-
-  @override
   void dispose() {
     _focusNode.dispose();
     super.dispose();

@@ -6,10 +6,10 @@ import '../../view/widgets/common_widget.dart';
 import '../provider/refer_provider.dart';
 
 class CampaignService {
-  static Future<void> updateCampaigns(CampaignModel data, BuildContext context, bool isStateUpdating) async {
+  static Future<void> updateCampaigns(CampaignModel data, BuildContext context, bool isStateUpdating, {bool isExpired = false}) async {
     try {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
-      await provider.updateCampaign(data, isStateUpdating);
+      await provider.updateCampaign(data, isStateUpdating, isExpired: isExpired);
     } catch (e) {
       CustomeToast.showError("Error updating campaign: $e");
     }
@@ -186,7 +186,7 @@ class CampaignService {
     }
 
     final campaign = CampaignModel.add(
-      shopId: "7866",
+      shopId: "7872",
       campaignName: campaignName,
       rewardType: rewardType,
       customerReward: customerReward,

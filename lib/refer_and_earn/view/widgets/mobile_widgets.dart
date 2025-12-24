@@ -28,13 +28,8 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
       expiryEnableInt: data.expiryEnableInt,
       expiryType: data.expiryType,
       fixedPeriodType: data.fixedPeriodType,
-      endDate:
-          "${data.endDateFetch?.year ?? DateTime.now().year}-"
-          "${(data.endDateFetch?.month ?? DateTime.now().month).toString().padLeft(2, '0')}-"
-          "${(data.endDateFetch?.day ?? DateTime.now().day).toString().padLeft(2, '0')} "
-          "${(data.endDateFetch?.hour ?? DateTime.now().hour).toString().padLeft(2, '0')}:"
-          "${(data.endDateFetch?.minute ?? DateTime.now().minute).toString().padLeft(2, '0')}:"
-          "${(data.endDateFetch?.second ?? DateTime.now().second).toString().padLeft(2, '0')}",
+      endDate: data.endDate,
+
       notifyCustomerInt: data.notifyCustomerInt,
       rewardType: data.rewardType,
       shopId: data.shopId,
@@ -62,47 +57,40 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                   Expanded(
                     child: Text(
                       data.campaignName ?? "Name",
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Consumer<ReferralProvider>(
                     builder: (context, value, child) {
                       return value.loadingId == data.campaignId
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
+                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
                           : Switch(
                               value: (data.statusStr == "1"),
                               onChanged: (val) {
                                 if (val && (activeCount) >= 1) {
-                                                CustomeToast.showError("Only 1 campaign active at a time");
-                                              } else {
-                                                CampaignService.updateCampaigns(
-                                                  CampaignModel(
-                                                    campaignId: campaignModel.campaignId,
-                                                    shopId: campaignModel.shopId,
-                                                    campaignName: campaignModel.campaignName,
-                                                    rewardType: campaignModel.rewardType,
-                                                    customerReward: campaignModel.customerReward,
-                                                    referrerReward: campaignModel.referrerReward,
-                                                    expiryEnableInt: campaignModel.expiryEnableBool! ? 1 : 0,
-                                                    minPurchase: campaignModel.minPurchase,
-                                                    expiryType: campaignModel.expiryType,
-                                                    fixedPeriodType: campaignModel.fixedPeriodType,
-                                                    endDate: campaignModel.endDate,
-                                                    notifyCustomerInt: campaignModel.notifyCustomerBool! ? 1 : 0,
-                                                    statusInt: val ? 1 : 0,
-                                                  ),
-                                                  context,
-                                                  true,
-                                                );
-                                              }
+                                  CustomeToast.showError("Only 1 campaign active at a time");
+                                } else {
+                                  CampaignService.updateCampaigns(
+                                    CampaignModel(
+                                      campaignId: campaignModel.campaignId,
+                                      shopId: campaignModel.shopId,
+                                      campaignName: campaignModel.campaignName,
+                                      rewardType: campaignModel.rewardType,
+                                      customerReward: campaignModel.customerReward,
+                                      referrerReward: campaignModel.referrerReward,
+                                      expiryEnableInt: campaignModel.expiryEnableBool! ? 1 : 0,
+                                      minPurchase: campaignModel.minPurchase,
+                                      expiryType: campaignModel.expiryType,
+                                      fixedPeriodType: campaignModel.fixedPeriodType,
+                                      endDate: campaignModel.endDate,
+                                      notifyCustomerInt: campaignModel.notifyCustomerBool! ? 1 : 0,
+                                      statusInt: val ? 1 : 0,
+                                    ),
+                                    context,
+                                    true,
+                                  );
+                                }
                               },
                             );
                     },
@@ -114,26 +102,17 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
               gap,
               CustomText(
                 text: "Reward Type: ${data.rewardType}",
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
               ),
               gap,
               CustomText(
                 text: "Friend's Reward: ${data.customerReward}",
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
               ),
               gap,
               CustomText(
                 text: "Your Reward: ${data.referrerReward}",
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
               ),
               gap,
               Row(
@@ -145,12 +124,9 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                           ? "Validity: No Expiry"
                           : (data.expiryType == "After Friend's First Order")
                           ? "Validity: Expires After Friend's First Order"
-                          : "Validity: ${DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime(data.endDateFetch?.year ?? 1970, data.endDateFetch?.month ?? 1, data.endDateFetch?.day ?? 1, data.endDateFetch?.hour ?? 0, data.endDateFetch?.minute ?? 0, data.endDateFetch?.second ?? 0))}",
+                          : "Validity: ${DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime.tryParse(data.endDate ?? "") ?? DateTime.now())}",
 
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -159,39 +135,16 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                     children: [
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddCampaignMobile(
-                                campaign: campaignModel,
-                              ),
-                            ),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => AddCampaignMobile(campaign: campaignModel)));
                         },
-                        child: SizedBox(
-                          height: 36,
-                          width: 36,
-                          child: SvgPicture.asset(
-                            "assets/svg/mobile_edit.svg",
-                            color: ColorsClass.primary,
-                          ),
-                        ),
+                        child: SizedBox(height: 36, width: 36, child: SvgPicture.asset("assets/svg/mobile_edit.svg", color: ColorsClass.primary)),
                       ),
                       const SizedBox(width: 10),
                       InkWell(
                         onTap: () async {
-                          await Provider.of<ReferralProvider>(
-                            context,
-                            listen: false,
-                          ).deleteCampaign(data.campaignId, data.shopId);
+                          await Provider.of<ReferralProvider>(context, listen: false).deleteCampaign(data.campaignId, data.shopId);
                         },
-                        child: SizedBox(
-                          height: 30,
-                          width: 30,
-                          child: SvgPicture.asset(
-                            "assets/svg/mobile_delete.svg",
-                          ),
-                        ),
+                        child: SizedBox(height: 30, width: 30, child: SvgPicture.asset("assets/svg/mobile_delete.svg")),
                       ),
                     ],
                   ),
@@ -214,10 +167,7 @@ class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(
-        title,
-        style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600),
-      ),
+      title: Text(title, style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600)),
       backgroundColor: ColorsClass.white,
       actions: [
         Row(
@@ -241,10 +191,7 @@ class MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
 class CustomTableRestaurantMobileReferral extends StatelessWidget {
   final List<ReferredRestaurantsModel>? list;
 
-  const CustomTableRestaurantMobileReferral({
-    super.key,
-    required this.list,
-  });
+  const CustomTableRestaurantMobileReferral({super.key, required this.list});
 
   @override
   Widget build(BuildContext context) {
@@ -263,9 +210,7 @@ class CustomTableRestaurantMobileReferral extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Card(
             elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -277,19 +222,11 @@ class CustomTableRestaurantMobileReferral extends StatelessWidget {
                       Expanded(
                         child: Text(
                           data.name ?? "-",
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
+                          style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      _buildActions(
-                        context,
-                        data.id,
-                        data.restaurantId,
-                        data.claimed,
-                      ),
+                      _buildActions(context, data.id, data.restaurantId, data.claimed),
                     ],
                   ),
 
@@ -312,20 +249,10 @@ class CustomTableRestaurantMobileReferral extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Text(
-            "$title:",
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w400,
-              fontSize: 14,
-            ),
-          ),
+          Text("$title:", style: GoogleFonts.poppins(fontWeight: FontWeight.w400, fontSize: 14)),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              value,
-              style: GoogleFonts.poppins(fontSize: 14),
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: Text(value, style: GoogleFonts.poppins(fontSize: 14), overflow: TextOverflow.ellipsis),
           ),
         ],
       ),
@@ -339,30 +266,16 @@ class CustomTableRestaurantMobileReferral extends StatelessWidget {
       decoration: BoxDecoration(
         color: isCompleted ? const Color(0x808DBD90) : const Color(0x80D87E7E),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isCompleted
-              ? const Color(0xFF007521)
-              : const Color(0xFFFC0005),
-          width: 2,
-        ),
+        border: Border.all(color: isCompleted ? const Color(0xFF007521) : const Color(0xFFFC0005), width: 2),
       ),
       child: Text(
         isCompleted ? "Completed" : "Pending",
-        style: GoogleFonts.poppins(
-          fontWeight: FontWeight.w700,
-          fontSize: 11,
-          color: ColorsClass.blackColor,
-        ),
+        style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 11, color: ColorsClass.blackColor),
       ),
     );
   }
 
-  Widget _buildActions(
-    BuildContext context,
-    int? id,
-    String? restaurantId,
-    int? claimed,
-  ) {
+  Widget _buildActions(BuildContext context, int? id, String? restaurantId, int? claimed) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -372,16 +285,9 @@ class CustomTableRestaurantMobileReferral extends StatelessWidget {
           builder: (context, provider, _) {
             return InkWell(
               onTap: () async {
-                await Provider.of<ReferralProvider>(
-                  context,
-                  listen: false,
-                ).deleteRestaurantReferralData(restaurantId, id);
+                await Provider.of<ReferralProvider>(context, listen: false).deleteRestaurantReferralData(restaurantId, id);
               },
-              child: SizedBox(
-                height: 25,
-                width: 25,
-                child: SvgPicture.asset("assets/svg/mobile_delete.svg"),
-              ),
+              child: SizedBox(height: 25, width: 25, child: SvgPicture.asset("assets/svg/mobile_delete.svg")),
             );
           },
         ),

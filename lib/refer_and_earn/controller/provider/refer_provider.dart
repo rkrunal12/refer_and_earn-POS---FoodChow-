@@ -14,7 +14,7 @@ class ReferralProvider with ChangeNotifier {
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
 
-  String baseUrl = "https://api.foodchow.com/api/Refer_and_earn";
+  String baseUrl = "https://api.foodchow.com/api/ReferAndEarn";
   final contentTypeHeader = {"Content-Type": "application/json"};
   bool _isLoading = false;
   dynamic _loadingId;
@@ -41,7 +41,7 @@ class ReferralProvider with ChangeNotifier {
     }
 
     try {
-      final fetchUrl = Uri.parse("$baseUrl/CampaignsByShop?shopId=7866");
+      final fetchUrl = Uri.parse("$baseUrl/CampaignsByShop?shopId=7872");
       final response = await http.get(fetchUrl).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
@@ -67,6 +67,7 @@ class ReferralProvider with ChangeNotifier {
         }
       } else {
         CustomeToast.showError("Something went wrong");
+        debugPrint(response.body);
         _data = [];
       }
     } catch (e) {
@@ -80,7 +81,7 @@ class ReferralProvider with ChangeNotifier {
   }
 
   Future<void> addCampaign(CampaignModel campaign) async {
-    _loadingId = 1;
+    _isLoading = true;
     notifyListeners();
 
     try {
@@ -99,12 +100,12 @@ class ReferralProvider with ChangeNotifier {
     } catch (_) {
       CustomeToast.showError("Unexpected error");
     } finally {
-      _loadingId = null;
+      _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> updateCampaign(CampaignModel campaign, bool isStateUpdating) async {
+  Future<void> updateCampaign(CampaignModel campaign, bool isStateUpdating, {bool isExpired = false}) async {
     if (isStateUpdating) {
       _loadingId = campaign.campaignId;
     }
@@ -119,7 +120,9 @@ class ReferralProvider with ChangeNotifier {
         final decoded = jsonDecode(response.body);
         if (decoded['success'] == true || decoded['message'] != null) {
           await fetchData(true);
-          CustomeToast.showSuccess(decoded["message"] ?? "Campaign updated successfully");
+          if (!isExpired) {
+            CustomeToast.showSuccess(decoded["message"] ?? "Campaign updated successfully");
+          }
         } else {
           CustomeToast.showError("Something went wrong");
         }
@@ -149,7 +152,6 @@ class ReferralProvider with ChangeNotifier {
     } catch (_) {
       CustomeToast.showError("Unexpected error");
     } finally {
-      _loadingId = null;
       notifyListeners();
     }
   }
@@ -163,12 +165,12 @@ class ReferralProvider with ChangeNotifier {
   bool get isCashbackAddLoading => _isCashbackAddLoading;
   CashbackModel? get allCashback => _allCashback;
 
-  Future<void> fetchCashbackData(bool isAdd) async {
+  Future<bool?> fetchCashbackData(bool isAdd) async {
     if (isAdd) _isCashbackGetLoading = true;
     notifyListeners();
 
     try {
-      final fetchCashbackUrl = Uri.parse("$baseUrl/GetCashback?shop_id=7866");
+      final fetchCashbackUrl = Uri.parse("$baseUrl/GetCashback?shop_id=7872");
       final response = await http.get(fetchCashbackUrl);
 
       if (response.statusCode == 200) {
@@ -182,8 +184,11 @@ class ReferralProvider with ChangeNotifier {
           _rewardCashbackType = _allCashback!.cashbackType ?? "Flat";
           _percentageDiscount = _rewardCashbackType == "Discount" ? (_allCashback!.cashbackValue?.toDouble() ?? 0) : 0;
           _fixedDiscount = _rewardCashbackType == "Flat" ? (_allCashback!.cashbackValue?.toDouble() ?? 0) : 0;
+
+          return true;
         } else {
           _allCashback = null;
+          return false;
         }
       } else {
         CustomeToast.showError("Something went wrong");
@@ -194,6 +199,7 @@ class ReferralProvider with ChangeNotifier {
       _isCashbackGetLoading = false;
       notifyListeners();
     }
+    return null;
   }
 
   Future<void> saveCashback(CashbackModel model) async {
@@ -201,11 +207,11 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final isUpdate = model.cashbackId != null;
+      final isUpdate = await fetchCashbackData(false) ?? false;
       final saveCashbackUrl = Uri.parse(isUpdate ? "$baseUrl/UpdateCashback" : "$baseUrl/AddCashback");
       final saveCashbackData = jsonEncode(model.toJson());
       final response = await http.post(saveCashbackUrl, body: saveCashbackData, headers: contentTypeHeader);
-
+      log(saveCashbackUrl.toString());
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         await fetchCashbackData(false);
@@ -240,7 +246,7 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final getReferralUrl = Uri.parse("$basereferralUrl/GetReferredRestaurantsByShopId?shop_id=7866");
+      final getReferralUrl = Uri.parse("$basereferralUrl/GetReferredRestaurantsByShopId?shop_id=7872");
       final response = await http.get(getReferralUrl);
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
@@ -288,6 +294,7 @@ class ReferralProvider with ChangeNotifier {
       if (response.statusCode == 204 || response.statusCode == 200) {
         await fetchRestaurantReferralData(true);
         CustomeToast.showSuccess("Delete Success");
+        debugPrint(response.body);
       } else {
         CustomeToast.showError("Something went wrong");
       }

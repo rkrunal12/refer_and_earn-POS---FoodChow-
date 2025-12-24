@@ -12,7 +12,6 @@ class CampaignModel {
   String? endDate;
   int? notifyCustomerInt;
   int? statusInt;
-  EndDate? endDateFetch;
 
   /// Saprate for fetch, as data is from API is in different data type
   String? statusStr;
@@ -33,7 +32,6 @@ class CampaignModel {
     this.endDate,
     this.notifyCustomerBool,
     this.statusStr,
-    this.endDateFetch,
   });
 
   CampaignModel({
@@ -98,9 +96,7 @@ class CampaignModel {
       expiryEnableBool: json['expiry_enable'],
       expiryType: json['expiry_type'],
       fixedPeriodType: json['fixed_period_type'],
-      endDateFetch: json['end_date'] != null
-          ? EndDate.fromJson(json['end_date'])
-          : null,
+      endDate: json['end_date'] != null ? json['end_date']['value'] : null,
       notifyCustomerBool: json['notify_customer'] ?? false,
       statusStr: json['status'],
     );
@@ -138,6 +134,27 @@ class CampaignModel {
       'end_date': endDate,
       'notify_customer': notifyCustomerInt,
       'status': statusInt,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'campaign_id': campaignId,
+      'shop_id': shopId,
+      'campaign_name': campaignName,
+      'reward_type': rewardType,
+      'customer_reward': customerReward,
+      'referrer_reward': referrerReward,
+      'min_purchase': minPurchase,
+      'expiry_enable': expiryEnableInt,
+      'expiry_type': expiryType,
+      'fixed_period_type': fixedPeriodType,
+      'end_date': endDate,
+      'notify_customer': notifyCustomerInt,
+      'status': statusInt,
+      'status_str': statusStr,
+      'expiry_enable_bool': expiryEnableBool,
+      'notify_customer_bool': notifyCustomerBool,
     };
   }
 }

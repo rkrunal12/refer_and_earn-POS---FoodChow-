@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,10 +8,61 @@ import '../../../chatboat/view/pop up screen/chat_ui.dart';
 import '../../../chatboat/view/pop up screen/chatbost_popup.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
+import '../../controller/service/campaign_service.dart';
+import '../../model/campaign_model.dart';
 import '../widgets/common_widget.dart';
 
-class ReferScreen extends StatelessWidget {
+class ReferScreen extends StatefulWidget {
   const ReferScreen({super.key});
+
+  @override
+  State<ReferScreen> createState() => _ReferScreenState();
+}
+
+class _ReferScreenState extends State<ReferScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final provider = Provider.of<ReferralProvider>(context, listen: false);
+      await provider.fetchData(false);
+      if (!mounted) return;
+
+      final now = DateTime.now();
+      for (CampaignModel campaign in provider.data) {
+        if (campaign.expiryEnableBool == true && campaign.statusStr == "1") {
+          if (campaign.expiryType != "After Friend's First Order") {
+            if (campaign.endDate != null) {
+              final expiryDate = DateTime.tryParse(campaign.endDate!);
+              if (expiryDate != null && now.isAfter(expiryDate)) {
+                CampaignService.updateCampaigns(
+                  CampaignModel(
+                    campaignId: campaign.campaignId,
+                    shopId: campaign.shopId,
+                    campaignName: campaign.campaignName,
+                    rewardType: campaign.rewardType,
+                    customerReward: campaign.customerReward,
+                    referrerReward: campaign.referrerReward,
+                    expiryEnableInt: campaign.expiryEnableBool! ? 1 : 0,
+                    minPurchase: campaign.minPurchase,
+                    expiryType: campaign.expiryType,
+                    fixedPeriodType: campaign.fixedPeriodType,
+                    endDate: campaign.endDate,
+                    notifyCustomerInt: campaign.notifyCustomerBool! ? 1 : 0,
+                    statusInt: 0,
+                  ),
+                  context,
+                  false,
+                  isExpired: true,
+                );
+                // log(campaign.toJson().toString());
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +80,7 @@ class ReferScreen extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 elevation: 2,
-                title: Text(
-                  "Refer & Earn",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 20,
-                  ),
-                ),
+                title: Text("Refer & Earn", style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 20)),
                 actions: [
                   ImageAssets(path: "assets/svg/dish.svg"),
                   SizedBox(width: 10),
@@ -75,28 +119,19 @@ class ReferScreen extends StatelessWidget {
                             height: double.infinity,
                             child: Consumer<ReferralProvider>(
                               builder: (context, form, _) {
-                                return buildSidebar(
-                                  context,
-                                  form.selectedIndex,
-                                );
+                                return buildSidebar(context, form.selectedIndex);
                               },
                             ),
                           ),
                         ),
-                        Container(
-                          width: 2,
-                          height: double.infinity,
-                          color: ColorsClass.deviderColor,
-                        ),
+                        Container(width: 2, height: double.infinity, color: ColorsClass.deviderColor),
 
                         /// Main content
                         Expanded(
                           flex: 4,
                           child: Consumer<ReferralProvider>(
                             builder: (context, form, _) {
-                              return BuildContent(
-                                selectedIndex: form.selectedIndex,
-                              );
+                              return BuildContent(selectedIndex: form.selectedIndex);
                             },
                           ),
                         ),
@@ -113,10 +148,7 @@ class ReferScreen extends StatelessWidget {
                 tooltip: "Talk To AI",
                 backgroundColor: ColorsClass.primary,
                 onPressed: () {
-                  Provider.of<ChatBoatProvider>(
-                    context,
-                    listen: false,
-                  ).setShowChatBoatPopup();
+                  Provider.of<ChatBoatProvider>(context, listen: false).setShowChatBoatPopup();
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(

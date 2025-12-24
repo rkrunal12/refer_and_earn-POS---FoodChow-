@@ -17,10 +17,8 @@ class AddCampaign extends StatefulWidget {
 
 class _AddCampaignState extends State<AddCampaign> {
   final TextEditingController _campaignNameController = TextEditingController();
-  final TextEditingController _customerRewardController =
-      TextEditingController();
-  final TextEditingController _referralRewardController =
-      TextEditingController();
+  final TextEditingController _customerRewardController = TextEditingController();
+  final TextEditingController _referralRewardController = TextEditingController();
   final TextEditingController _minPurchaseController = TextEditingController();
 
   @override
@@ -65,13 +63,7 @@ class _AddCampaignState extends State<AddCampaign> {
               children: [
                 Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Text(
-                    "Create New Campaign",
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: Text("Create New Campaign", style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
                 Card(
                   color: Colors.white,
@@ -160,9 +152,7 @@ class _AddCampaignState extends State<AddCampaign> {
                                   provider
                                     ..updateCampaignType(campaignType)
                                     ..updateExpiryOption(expiryOption)
-                                    ..updateExpiryDate(
-                                      selectedDate ?? DateTime.now(),
-                                    )
+                                    ..updateExpiryDate(selectedDate ?? DateTime.now())
                                     ..updateNotifyCustomers(notifyCustomers);
                                 },
                           ),
@@ -179,37 +169,21 @@ class _AddCampaignState extends State<AddCampaign> {
                                           isUpdate: false,
                                           provider: provider,
                                           context: context,
-                                          campaignNameText:
-                                              _campaignNameController.text,
-                                          customerRewardText:
-                                              _customerRewardController.text,
-                                          referralRewardText:
-                                              _referralRewardController.text,
-                                          minPurchaseText:
-                                              _minPurchaseController.text,
+                                          campaignNameText: _campaignNameController.text,
+                                          customerRewardText: _customerRewardController.text,
+                                          referralRewardText: _referralRewardController.text,
+                                          minPurchaseText: _minPurchaseController.text,
                                         );
                                         provider.setIsSaving(false);
                                         _clearForm(provider);
                                       },
-                                child: provider.loadingId == null
-                                    ? const CustomButton(
-                                        value: "Save",
-                                        color: ColorsClass.primary,
-                                      )
+                                child: !provider.isLoading
+                                    ? const CustomButton(value: "Save", color: ColorsClass.primary)
                                     : Container(
                                         height: 50,
                                         width: 200,
-                                        decoration: BoxDecoration(
-                                          color: ColorsClass.primary,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(6),
-                                          ),
-                                        ),
-                                        child: const Center(
-                                          child: CircularProgressIndicator(
-                                            color: ColorsClass.white,
-                                          ),
-                                        ),
+                                        decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.all(Radius.circular(6))),
+                                        child: const Center(child: CircularProgressIndicator(color: ColorsClass.white)),
                                       ),
                               ),
                             ),
@@ -217,10 +191,7 @@ class _AddCampaignState extends State<AddCampaign> {
                             Flexible(
                               child: GestureDetector(
                                 onTap: () => _clearForm(provider),
-                                child: const CustomButton(
-                                  value: "Cancel",
-                                  color: Colors.grey,
-                                ),
+                                child: const CustomButton(value: "Cancel", color: Colors.grey),
                               ),
                             ),
                           ],

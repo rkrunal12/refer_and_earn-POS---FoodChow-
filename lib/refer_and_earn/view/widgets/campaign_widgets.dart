@@ -140,13 +140,8 @@ class BuildCustomTableAllCampaign extends StatelessWidget {
                         expiryEnableInt: campaign.expiryEnableInt,
                         expiryType: campaign.expiryType,
                         fixedPeriodType: campaign.fixedPeriodType,
-                        endDate:
-                            "${campaign.endDateFetch?.year ?? DateTime.now().year}-"
-                            "${(campaign.endDateFetch?.month ?? DateTime.now().month).toString().padLeft(2, '0')}-"
-                            "${(campaign.endDateFetch?.day ?? DateTime.now().day).toString().padLeft(2, '0')} "
-                            "${(campaign.endDateFetch?.hour ?? DateTime.now().hour).toString().padLeft(2, '0')}:"
-                            "${(campaign.endDateFetch?.minute ?? DateTime.now().minute).toString().padLeft(2, '0')}:"
-                            "${(campaign.endDateFetch?.second ?? DateTime.now().second).toString().padLeft(2, '0')}",
+                        endDate: campaign.endDate,
+
                         notifyCustomerInt: campaign.notifyCustomerInt,
                         rewardType: campaign.rewardType,
                         shopId: campaign.shopId?.toString(),
@@ -168,7 +163,7 @@ class BuildCustomTableAllCampaign extends StatelessWidget {
                                   ? "No Expiry"
                                   : (campaign.expiryType == "After Friend's First Order")
                                   ? "Expires After Friend's First Order"
-                                  : "End: ${DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime(campaign.endDateFetch?.year ?? 1970, campaign.endDateFetch?.month ?? 1, campaign.endDateFetch?.day ?? 1, campaign.endDateFetch?.hour ?? 0, campaign.endDateFetch?.minute ?? 0, campaign.endDateFetch?.second ?? 0))}",
+                                  : "End: ${DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime.tryParse(campaign.endDate ?? "") ?? DateTime.now())}",
                             ),
                           ),
                           DataCell(
@@ -187,8 +182,10 @@ class BuildCustomTableAllCampaign extends StatelessWidget {
                                         : Switch.adaptive(
                                             value: campaignModel.statusStr == "1",
                                             onChanged: (val) {
-                                              if (val && (activeCount ) >= 1) {
+                                              if (val && (activeCount >= 1)) {
                                                 CustomeToast.showError("Only 1 campaign active at a time");
+                                              } else if (DateTime.now().isAfter(DateTime.parse(campaignModel.endDate!))) {
+                                                CustomeToast.showError("Campaign is expired");
                                               } else {
                                                 CampaignService.updateCampaigns(
                                                   CampaignModel(
