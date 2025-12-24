@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import '../widgets/common_widget.dart';
+import '../widgets/custom_toast.dart';
 
 class CampaignExpiryScreen extends StatelessWidget {
   final Function({
@@ -96,8 +96,8 @@ class CampaignExpiryScreen extends StatelessWidget {
                   if (constraints.maxWidth < 600) {
                     return Column(
                       children: [
-                        CustomRadioListTile(
-                          title: "Fixed Period",
+                        RadioListTile(
+                          title: Text("Fixed Period"),
                           value: "Fixed Period",
                           groupValue: provider.campaignType,
                           onChanged: (val) {
@@ -105,8 +105,8 @@ class CampaignExpiryScreen extends StatelessWidget {
                             _notifyParent(provider);
                           },
                         ),
-                        CustomRadioListTile(
-                          title: "After Friend's First Order",
+                        RadioListTile(
+                          title: Text("After Friend's First Order"),
                           value: "After Friend's First Order",
                           groupValue: provider.campaignType,
                           onChanged: (val) {
@@ -120,8 +120,8 @@ class CampaignExpiryScreen extends StatelessWidget {
                     return Row(
                       children: [
                         Expanded(
-                          child: CustomRadioListTile(
-                            title: "Fixed Period",
+                          child: RadioListTile(
+                            title: Text("Fixed Period"),
                             value: "Fixed Period",
                             groupValue: provider.campaignType,
                             onChanged: (val) {
@@ -131,8 +131,8 @@ class CampaignExpiryScreen extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          child: CustomRadioListTile(
-                            title: "After Friend's First Order",
+                          child: RadioListTile(
+                            title: Text("After Friend's First Order"),
                             value: "After Friend's First Order",
                             groupValue: provider.campaignType,
                             onChanged: (val) {
@@ -173,7 +173,7 @@ class CampaignExpiryScreen extends StatelessWidget {
                   ),
               ],
               ListTile(
-                leading: CustomCheckBox(
+                leading: Checkbox(
                   value: provider.notifyCustomers,
                   onChanged: (val) {
                     provider.updateNotifyCustomers(val ?? false);
@@ -212,27 +212,27 @@ class BuildExpiryContainerAllCampaign extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CustomRadioListTile(
+          RadioListTile(
             value: "Set Specific End Date & Time",
-            title: "Set Specific End Date & Time",
+            title: Text("Set Specific End Date & Time"),
             groupValue: provider.expiryOption,
             onChanged: (val) {
               provider.updateExpiryOption(val!);
               provider.updateExpiryDate(DateTime.now());
             },
           ),
-          CustomRadioListTile(
+          RadioListTile(
             value: "Based on Hours",
-            title: "Based on Hours",
+            title: Text("Based on Hours"),
             groupValue: provider.expiryOption,
             onChanged: (val) {
               provider.updateExpiryOption(val!);
               CustomeToast.showSuccess("Campaign will expire in 72 hours");
             },
           ),
-          CustomRadioListTile(
+          RadioListTile(
             value: "Based on Days",
-            title: "Based on Days",
+            title: Text("Based on Days"),
             groupValue: provider.expiryOption,
             onChanged: (val) {
               provider.updateExpiryOption(val!);

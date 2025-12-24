@@ -7,7 +7,7 @@ import '../../model/campaign_model.dart';
 import '../../model/cashback_model.dart';
 import '../../model/referral_row_data.dart';
 import '../../model/referred_restrauant_model.dart';
-import '../../view/widgets/common_widget.dart';
+import '../../view/widgets/custom_toast.dart';
 
 class ReferralProvider with ChangeNotifier {
   /// ********************************* Campaign API **************************///

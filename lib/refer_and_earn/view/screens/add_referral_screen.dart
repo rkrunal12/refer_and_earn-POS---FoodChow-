@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/refer_and_earn/view/widgets/send_all_button.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import '../widgets/common_widget.dart';
-import '../widgets/referral_widget.dart';
+import '../widgets/referral_list.dart';
 
 class AddReferralScreen extends StatefulWidget {
   const AddReferralScreen({super.key});
@@ -87,8 +87,8 @@ class ReferralHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        CustomText(
-          text: "Your Referred Restaurants",
+        Text(
+          "Your Referred Restaurants",
           style: GoogleFonts.poppins(
             fontSize: smallScreen ? 14 : 20,
             fontWeight: FontWeight.w500,
@@ -104,8 +104,8 @@ class ReferralHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Center(
-              child: CustomText(
-                text: "+ Add More",
+              child: Text(
+                "+ Add More",
                 style: GoogleFonts.poppins(
                   fontSize: smallScreen ? 12 : 15,
                   fontWeight: FontWeight.w600,

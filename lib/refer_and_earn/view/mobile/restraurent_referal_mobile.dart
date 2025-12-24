@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import '../widgets/common_widget.dart';
-import '../widgets/mobile_widgets.dart';
+import '../widgets/custome_table_restautant.dart';
+import '../widgets/mobile_app_baar.dart';
 import 'add_referral_screen_mobile.dart';
 
 class RestraurentReferalMobile extends StatefulWidget {
@@ -96,8 +96,8 @@ class MobileHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CustomText(
-            text: title,
+          Text(
+            title,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w400,
               fontSize: 14,

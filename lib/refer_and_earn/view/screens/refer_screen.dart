@@ -4,14 +4,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/chatboat/controller/chat_boat_controller.dart';
 import 'package:refer_and_earn/refer_and_earn/view/mobile/mobile_refer_screen.dart';
+import 'package:refer_and_earn/refer_and_earn/view/screens/add_campaign.dart';
+import 'package:refer_and_earn/refer_and_earn/view/screens/all_campaign.dart';
+import 'package:refer_and_earn/refer_and_earn/view/screens/cash_back.dart';
+import 'package:refer_and_earn/refer_and_earn/view/screens/restraurent_referal.dart';
 import '../../../chatboat/view/pop up screen/chat_ui.dart';
 import '../../../chatboat/view/pop up screen/chatbost_popup.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
-import '../widgets/common_widget.dart';
-
+import '../widgets/content_container_image.dart';
 class ReferScreen extends StatefulWidget {
   const ReferScreen({super.key});
 
@@ -82,13 +85,13 @@ class _ReferScreenState extends State<ReferScreen> {
                 elevation: 2,
                 title: Text("Refer & Earn", style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 20)),
                 actions: [
-                  ImageAssets(path: "assets/svg/dish.svg"),
+                  SvgPicture.asset("assets/svg/dish.svg"),
                   SizedBox(width: 10),
-                  ImageAssets(path: "assets/svg/home.svg"),
+                  SvgPicture.asset("assets/svg/home.svg"),
                   SizedBox(width: 10),
-                  ImageAssets(path: "assets/svg/wifi.svg"),
+                  SvgPicture.asset("assets/svg/wifi.svg"),
                   SizedBox(width: 10),
-                  ImageAssets(path: "assets/svg/sound.svg"),
+                  SvgPicture.asset("assets/svg/sound.svg"),
                   SizedBox(width: 10),
                 ],
                 backgroundColor: Colors.white,
@@ -131,7 +134,7 @@ class _ReferScreenState extends State<ReferScreen> {
                           flex: 4,
                           child: Consumer<ReferralProvider>(
                             builder: (context, form, _) {
-                              return BuildContent(selectedIndex: form.selectedIndex);
+                              return _buildContent(form.selectedIndex);
                             },
                           ),
                         ),
@@ -139,7 +142,7 @@ class _ReferScreenState extends State<ReferScreen> {
                     )
                   : Consumer<ReferralProvider>(
                       builder: (context, form, _) {
-                        return BuildContent(selectedIndex: form.selectedIndex);
+                        return _buildContent(form.selectedIndex);
                       },
                     ),
 
@@ -173,12 +176,35 @@ class _ReferScreenState extends State<ReferScreen> {
   }
 }
 
-class ImageAssets extends StatelessWidget {
-  const ImageAssets({super.key, required this.path});
+/// Side bar
+Widget buildSidebar(BuildContext context, int selectedIndex) {
+  final form = Provider.of<ReferralProvider>(context, listen: false);
 
-  final String path;
-  @override
-  Widget build(BuildContext context) {
-    return SvgPicture.asset(path);
-  }
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SizedBox(height: 10),
+      GestureDetector( 
+        onTap: () => form.setSelectedIndex(0),
+        child: ContentContainerImage(imagePath: "assets/svg/add.svg", title: "Add Campaign", isSelected: selectedIndex == 0),
+      ),
+      GestureDetector(
+        onTap: () => form.setSelectedIndex(1),
+        child: ContentContainerImage(imagePath: "assets/svg/all_campaign.svg", title: "All Campaign", isSelected: selectedIndex == 1),
+      ),
+      GestureDetector(
+        onTap: () => form.setSelectedIndex(2),
+        child: ContentContainerImage(imagePath: "assets/svg/cashback.svg", title: "Cash Back", isSelected: selectedIndex == 2),
+      ),
+      GestureDetector(
+        onTap: () => form.setSelectedIndex(3),
+        child: ContentContainerImage(imagePath: "assets/svg/restaurant.svg", title: "Restaurant Referral", isSelected: selectedIndex == 3),
+      ),
+      const Spacer(),
+    ],
+  );
+}
+
+Widget _buildContent(int selectedIndex) {
+  return IndexedStack(index: selectedIndex, children: const [AddCampaign(), AllCampaign(), CashBack(), RestraurentReferal()]);
 }

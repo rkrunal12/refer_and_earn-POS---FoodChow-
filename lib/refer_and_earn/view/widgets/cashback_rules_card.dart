@@ -1,0 +1,87 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:refer_and_earn/refer_and_earn/view/widgets/cashback_slider.dart';
+import '../../controller/provider/refer_provider.dart';
+
+
+/// Cashback rules card with tabs
+class CashbackRulesCard extends StatelessWidget {
+  final TabController tabController;
+
+  const CashbackRulesCard({super.key, required this.tabController});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 10.0),
+            child: Text(
+              "Cash Back Rules",
+              style: GoogleFonts.poppins(
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          TabBar(
+            controller: tabController,
+            isScrollable: true,
+            labelColor: Colors.teal,
+            unselectedLabelColor: Colors.black,
+            indicatorColor: Colors.teal,
+            labelPadding: const EdgeInsets.symmetric(horizontal: 20),
+            tabs: const [
+              Tab(text: "Percentage Discount"),
+              Tab(text: "Fixed Amount"),
+            ],
+          ),
+          SizedBox(
+            height: 100,
+            child: Consumer<ReferralProvider>(
+              builder: (context, data, _) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final newIndex = data.rewardCashbackType == "Flat" ? 1 : 0;
+                  if (tabController.index != newIndex &&
+                      !tabController.indexIsChanging &&
+                      newIndex < tabController.length) {
+                    tabController.index = newIndex;
+                  }
+                });
+
+                return TabBarView(
+                  controller: tabController,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: CashbackSlider(
+                        currentValue: data.percentageDiscount,
+                        maxValue: 50,
+                        labelPrefix: "Allow up to",
+                        onChanged: data.setPercentageDiscount,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: CashbackSlider(
+                        currentValue: data.fixedDiscount,
+                        maxValue: 500,
+                        labelPrefix: "Allow fixed amount of",
+                        onChanged: data.setFixedDiscount,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

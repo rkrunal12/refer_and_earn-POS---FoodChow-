@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../controller/provider/refer_provider.dart';
-import '../widgets/campaign_widgets.dart';
-import '../widgets/mobile_widgets.dart';
+import '../widgets/build_custome_table_all_campaign.dart';
+import '../widgets/campaign_detailed_campaign_info.dart';
+import '../widgets/mobile_campaign_card.dart';
 
 class AllCampaign extends StatefulWidget {
   const AllCampaign({super.key});
@@ -126,6 +127,46 @@ class ShowInactiveCampaignsAllCampaign extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Campaign info headers
+class CampaignInfoHeadersAllCampaign extends StatelessWidget {
+  const CampaignInfoHeadersAllCampaign({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<ReferralProvider>(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth <= 700;
+
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: isSmallScreen
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CampaignDetailedCampaignInfo(title: "Total Campaigns", number: provider.data.length.toString()),
+                CampaignDetailedCampaignInfo(title: "Active Campaigns", number: provider.activeCampaigns.length.toString()),
+                CampaignDetailedCampaignInfo(title: "Total referrals", number: provider.totalReferrals.toString()),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: CampaignDetailedCampaignInfo(title: "Total Campaigns", number: provider.data.length.toString()),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: CampaignDetailedCampaignInfo(title: "Active Campaigns", number: provider.activeCampaigns.length.toString()),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: CampaignDetailedCampaignInfo(title: "Total referrals", number: provider.totalReferrals.toString()),
+                ),
+              ],
+            ),
     );
   }
 }

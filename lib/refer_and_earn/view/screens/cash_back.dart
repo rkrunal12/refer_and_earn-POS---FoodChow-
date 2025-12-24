@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../model/cashback_model.dart';
-import '../widgets/cashback_widgets.dart';
-import '../widgets/common_widget.dart';
+import '../widgets/cashback_rules_card.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/text_field_column.dart';
+import '../widgets/toggle_card.dart';
 
 class CashBack extends StatefulWidget {
   const CashBack({super.key});
@@ -21,11 +23,7 @@ class CashBack extends StatefulWidget {
       shopId: existingData?.shopId ?? "7866",
       cashbackEnable: provider.isEnables ? 1 : 0,
       cashbackType: tab.index == 0 ? "Discount" : "Flat",
-      cashbackValue:
-          (tab.index == 0
-                  ? provider.percentageDiscount
-                  : provider.fixedDiscount)
-              .toInt(),
+      cashbackValue: (tab.index == 0 ? provider.percentageDiscount : provider.fixedDiscount).toInt(),
     );
 
     log(model.toJson().toString());
@@ -38,8 +36,7 @@ class CashBack extends StatefulWidget {
   State<CashBack> createState() => _CashBackState();
 }
 
-class _CashBackState extends State<CashBack>
-    with SingleTickerProviderStateMixin {
+class _CashBackState extends State<CashBack> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final minimumAmountController = TextEditingController();
@@ -82,13 +79,7 @@ class _CashBackState extends State<CashBack>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      "Cash Back",
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text("Cash Back", style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
                     ToggleCard(
                       isEnable: value.isEnables,
                       onChanged: (val) {
@@ -98,40 +89,26 @@ class _CashBackState extends State<CashBack>
 
                     const SizedBox(height: 20),
 
-                    ConditionalWidgerEditor(
-                      controller: minimumAmountController,
-                      header: "Minimum Order Amont",
-                      hint: "Enter Minimum Amount",
-                    ),
+                    ConditionalWidgerEditor(controller: minimumAmountController, header: "Minimum Order Amont", hint: "Enter Minimum Amount"),
 
                     SizedBox(
                       width: double.infinity,
                       child: CashbackRulesCard(tabController: _tabController),
                     ),
 
-                    ConditionalWidgerEditor(
-                      header: "Terms & Condition",
-                      hint: "Enter Terms & Condition",
-                      controller: termsAndConditionController,
-                    ),
+                    ConditionalWidgerEditor(header: "Terms & Condition", hint: "Enter Terms & Condition", controller: termsAndConditionController),
                     const SizedBox(height: 20),
                     SizedBox(
                       height: 50,
                       width: 200,
                       child: value.isCashbackAddLoading
                           ? const Center(child: CircularProgressIndicator())
-                          : GestureDetector(
-                              child: const CustomButton(
-                                value: "Save",
-                                color: ColorsClass.primary,
-                              ),
+                          : CustomButton(
+                              value: "Save",
+                              color: ColorsClass.primary,
                               onTap: () {
-                                value.setMimimumPriceEdiitngEnable(
-                                  double.parse(minimumAmountController.text),
-                                );
-                                value.setTermsAndConditions(
-                                  termsAndConditionController.text,
-                                );
+                                value.setMimimumPriceEdiitngEnable(double.parse(minimumAmountController.text));
+                                value.setTermsAndConditions(termsAndConditionController.text);
                                 CashBack.saveData(_tabController, context);
                               },
                             ),
@@ -148,13 +125,7 @@ class _CashBackState extends State<CashBack>
 }
 
 class ConditionalWidgerEditor extends StatelessWidget {
-  const ConditionalWidgerEditor({
-    super.key,
-    required this.header,
-    required this.hint,
-    required this.controller,
-    this.onChanged,
-  });
+  const ConditionalWidgerEditor({super.key, required this.header, required this.hint, required this.controller, this.onChanged});
   final String header;
   final String hint;
   final TextEditingController controller;
@@ -167,21 +138,9 @@ class ConditionalWidgerEditor extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            header,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(header, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500)),
           SizedBox(height: 0),
-          TextFieldColumn(
-            controller: controller,
-            hint: hint,
-            label: header,
-            type: TextInputType.number,
-            isTag: false,
-          ),
+          TextFieldColumn(controller: controller, hint: hint, label: header, type: TextInputType.number, isTag: false),
         ],
       ),
     );

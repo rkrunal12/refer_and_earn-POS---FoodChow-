@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/refer_and_earn/view/widgets/send_all_button.dart';
 import 'package:validate_phone_number/validation.dart';
 import '../../color_class.dart';
 
 import '../../controller/provider/refer_provider.dart';
 import '../../model/referred_restrauant_model.dart';
-import '../widgets/common_widget.dart';
-import '../widgets/mobile_widgets.dart';
-import '../widgets/referral_widget.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_toast.dart';
+import '../widgets/mobile_app_baar.dart';
+import '../widgets/referral_list.dart';
+import '../widgets/text_field_column.dart';
 
 class AddReferralScreenMobile extends StatefulWidget {
   const AddReferralScreenMobile({super.key});
 
   @override
-  State<AddReferralScreenMobile> createState() =>
-      _AddReferralScreenMobileState();
+  State<AddReferralScreenMobile> createState() => _AddReferralScreenMobileState();
 }
 
 class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
@@ -73,18 +75,11 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                         child: Container(
                           height: 36,
                           width: 130,
-                          decoration: BoxDecoration(
-                            color: ColorsClass.primary,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
+                          decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.circular(5)),
                           child: Center(
                             child: Text(
                               "+ Add More",
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: ColorsClass.white,
-                              ),
+                              style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: ColorsClass.white),
                             ),
                           ),
                         ),
@@ -98,25 +93,15 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
                     child: Card(
                       elevation: 3,
                       color: ColorsClass.white,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                      ),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(6))),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Divider(
-                            color: ColorsClass.deviderColor,
-                            thickness: 1,
-                          ),
+                          const Divider(color: ColorsClass.deviderColor, thickness: 1),
                           const SizedBox(height: 6),
-                          const Expanded(
-                            child: ReferralListAddReferral(),
-                          ),
+                          const Expanded(child: ReferralListAddReferral()),
                           const SizedBox(height: 8),
-                          SizedBox(
-                            width: double.infinity,
-                            child: SendAllButton(),
-                          ),
+                          SizedBox(width: double.infinity, child: SendAllButton()),
                         ],
                       ),
                     ),
@@ -163,69 +148,51 @@ class _AddReferralScreenMobileState extends State<AddReferralScreenMobile> {
 
                         Padding(
                           padding: const EdgeInsets.all(12.0),
-                          child: InkWell(
-                            onTap: () async {
-                              if (!validateField(
-                                referral.nameController,
-                                'name',
-                              )) {
-                                CustomeToast.showError('Enter a valid name');
-                                return;
-                              }
+                          child: SizedBox(
+                            height: 50,
+                            width: double.infinity,
+                            child: CustomButton(
+                              value: "Save",
+                              color: ColorsClass.primary,
+                              onTap: () async {
+                                if (!validateField(referral.nameController, 'name')) {
+                                  CustomeToast.showError('Enter a valid name');
+                                  return;
+                                }
 
-                              String rawNumber = referral.mobileController.text
-                                  .trim();
+                                String rawNumber = referral.mobileController.text.trim();
 
-                              String cleanNumber = rawNumber.replaceAll(
-                                RegExp(r'[\s\-\(\)]'),
-                                '',
-                              );
+                                String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
 
-                              bool isValid = Validator.validatePhoneNumber(
-                                cleanNumber,
-                                referral.isoCode,
-                              );
+                                bool isValid = Validator.validatePhoneNumber(cleanNumber, referral.isoCode);
 
-                              if (!isValid) {
-                                CustomeToast.showError(
-                                  "Enter Phone number properly",
+                                if (!isValid) {
+                                  CustomeToast.showError("Enter Phone number properly");
+                                  return;
+                                }
+
+                                if (!isValid) {
+                                  CustomeToast.showError("Invalid mobile number");
+                                  return;
+                                }
+
+                                if (!validateField(referral.emailController, 'email')) {
+                                  CustomeToast.showError('Enter a valid email');
+                                  return;
+                                }
+
+                                ReferredRestaurantsModel data = ReferredRestaurantsModel(
+                                  referringRestaurantId: "7866",
+                                  mobile: referral.mobileController.text,
+                                  email: referral.emailController.text,
+                                  name: referral.nameController.text,
                                 );
-                                return;
-                              }
 
-                              if (!isValid) {
-                                CustomeToast.showError("Invalid mobile number");
-                                return;
-                              }
+                                await provider.addRestaurantReferralData(data);
 
-                              if (!validateField(
-                                referral.emailController,
-                                'email',
-                              )) {
-                                CustomeToast.showError('Enter a valid email');
-                                return;
-                              }
-
-                              ReferredRestaurantsModel data =
-                                  ReferredRestaurantsModel(
-                                    referringRestaurantId: "7866",
-                                    mobile: referral.mobileController.text,
-                                    email: referral.emailController.text,
-                                    name: referral.nameController.text,
-                                  );
-
-                              await provider.addRestaurantReferralData(data);
-
-                              referral.clear();
-                              Navigator.pop(context);
-                            },
-                            child: SizedBox(
-                              height: 50,
-                              width: double.infinity,
-                              child: CustomButton(
-                                value: "Save",
-                                color: ColorsClass.primary,
-                              ),
+                                referral.clear();
+                                Navigator.pop(context);
+                              },
                             ),
                           ),
                         ),

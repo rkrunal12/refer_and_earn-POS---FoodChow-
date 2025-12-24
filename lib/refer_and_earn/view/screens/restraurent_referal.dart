@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/refer_and_earn/view/widgets/custome_table_restautant.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../model/referred_restrauant_model.dart';
-import '../widgets/campaign_widgets.dart';
-import '../widgets/common_widget.dart';
-import '../widgets/mobile_widgets.dart';
+import '../widgets/campaign_detailed_campaign_info.dart';
 import 'add_referral_screen.dart';
 
 class RestraurentReferal extends StatefulWidget {
@@ -21,10 +20,7 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ReferralProvider>(
-        context,
-        listen: false,
-      ).fetchRestaurantReferralData(false);
+      Provider.of<ReferralProvider>(context, listen: false).fetchRestaurantReferralData(false);
     });
   }
 
@@ -42,35 +38,20 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CustomText(
-                    text: "Dashboard",
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Text(
+                     "Dashboard",
+                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w500),
                   ),
                   InkWell(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AddReferralScreen(),
-                      ),
-                    ),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AddReferralScreen())),
                     child: Container(
                       height: 40,
                       width: 100,
-                      decoration: BoxDecoration(
-                        color: ColorsClass.primary,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+                      decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.circular(4)),
                       child: Center(
-                        child: CustomText(
-                          text: "+ Add",
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: ColorsClass.white,
-                          ),
+                        child: Text(
+                           "+ Add",
+                          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: ColorsClass.white),
                         ),
                       ),
                     ),
@@ -84,46 +65,26 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        CampaignDetailedCampaignInfo(
-                          title: "Total Referrals",
-                          number: referProvider.referralList.length.toString(),
-                        ),
+                        CampaignDetailedCampaignInfo(title: "Total Referrals", number: referProvider.referralList.length.toString()),
                         const SizedBox(height: 10),
-                        CampaignDetailedCampaignInfo(
-                          title: "Successfully Referrals",
-                          number: referProvider.activeRefer.length.toString(),
-                        ),
+                        CampaignDetailedCampaignInfo(title: "Successfully Referrals", number: referProvider.activeRefer.length.toString()),
                         const SizedBox(height: 10),
-                        CampaignDetailedCampaignInfo(
-                          title: "Pending Referrals",
-                          number: referProvider.inactiveRefer.length.toString(),
-                        ),
+                        CampaignDetailedCampaignInfo(title: "Pending Referrals", number: referProvider.inactiveRefer.length.toString()),
                       ],
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: CampaignDetailedCampaignInfo(
-                            title: "Total Referrals",
-                            number: referProvider.referralList.length
-                                .toString(),
-                          ),
+                          child: CampaignDetailedCampaignInfo(title: "Total Referrals", number: referProvider.referralList.length.toString()),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: CampaignDetailedCampaignInfo(
-                            title: "Successfully Referrals",
-                            number: referProvider.activeRefer.length.toString(),
-                          ),
+                          child: CampaignDetailedCampaignInfo(title: "Successfully Referrals", number: referProvider.activeRefer.length.toString()),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: CampaignDetailedCampaignInfo(
-                            title: "Pending Referrals",
-                            number: referProvider.inactiveRefer.length
-                                .toString(),
-                          ),
+                          child: CampaignDetailedCampaignInfo(title: "Pending Referrals", number: referProvider.inactiveRefer.length.toString()),
                         ),
                       ],
                     ),
@@ -139,9 +100,7 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                     child: Consumer<ReferralProvider>(
                       builder: (context, provider, _) {
                         if (provider.isReferralLoading) {
-                          return const Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          );
+                          return const Center(child: CircularProgressIndicator.adaptive());
                         }
 
                         if (provider.referralList.isEmpty) {
@@ -151,9 +110,7 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                         return SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.vertical,
-                          child: CustomReferralTableRestaurant(
-                            list: provider.referralList,
-                          ),
+                          child: CustomReferralTableRestaurant(list: provider.referralList),
                         );
                       },
                     ),
@@ -187,18 +144,9 @@ class CustomReferralTableRestaurant extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
               child: DataTable(
-                headingRowColor: MaterialStateProperty.all(
-                  const Color(0x550AA89E),
-                ),
-                headingTextStyle: GoogleFonts.poppins(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-                border: TableBorder.all(
-                  borderRadius: BorderRadius.circular(10),
-                  width: 1,
-                  color: ColorsClass.tableDevider,
-                ),
+                headingRowColor: MaterialStateProperty.all(const Color(0x550AA89E)),
+                headingTextStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
+                border: TableBorder.all(borderRadius: BorderRadius.circular(10), width: 1, color: ColorsClass.tableDevider),
                 columnSpacing: 20,
                 columns: const [
                   DataColumn(label: Center(child: Text("Name"))),
@@ -209,9 +157,7 @@ class CustomReferralTableRestaurant extends StatelessWidget {
                   DataColumn(label: Center(child: Text("Status"))),
                   DataColumn(label: Center(child: Text("Action"))),
                 ],
-                rows: list != null && list!.isNotEmpty
-                    ? list!.map((data) => _buildDataRow(data, context)).toList()
-                    : [],
+                rows: list != null && list!.isNotEmpty ? list!.map((data) => _buildDataRow(data, context)).toList() : [],
               ),
             ),
           );
@@ -228,11 +174,7 @@ class CustomReferralTableRestaurant extends StatelessWidget {
         DataCell(Center(child: Text(data.name ?? "-", style: cellStyle))),
         DataCell(Center(child: Text(data.mobile ?? "-", style: cellStyle))),
         DataCell(Center(child: Text(data.email ?? "-", style: cellStyle))),
-        DataCell(
-          Center(
-            child: Text(data.claimed == 1 ? "Yes" : "No", style: cellStyle),
-          ),
-        ),
+        DataCell(Center(child: Text(data.claimed == 1 ? "Yes" : "No", style: cellStyle))),
         DataCell(Center(child: Text("Claim(1 Month Free)", style: cellStyle))),
         DataCell(
           Center(
@@ -242,22 +184,12 @@ class CustomReferralTableRestaurant extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: data.claimed == 1
-                    ? const Color(0x808DBD90)
-                    : const Color(0x80D87E7E),
+                color: data.claimed == 1 ? const Color(0x808DBD90) : const Color(0x80D87E7E),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: data.claimed == 1
-                      ? const Color(0xFF007521)
-                      : const Color(0xFFFC0005),
-                  width: 2,
-                ),
+                border: Border.all(color: data.claimed == 1 ? const Color(0xFF007521) : const Color(0xFFFC0005), width: 2),
               ),
               child: FittedBox(
-                child: Text(
-                  data.claimed == 1 ? "Completed" : "Pending",
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w400),
-                ),
+                child: Text(data.claimed == 1 ? "Completed" : "Pending", style: GoogleFonts.poppins(fontWeight: FontWeight.w400)),
               ),
             ),
           ),
@@ -267,10 +199,7 @@ class CustomReferralTableRestaurant extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () async {
-                await Provider.of<ReferralProvider>(
-                  context,
-                  listen: false,
-                ).deleteRestaurantReferralData(data.restaurantId, data.id);
+                await Provider.of<ReferralProvider>(context, listen: false).deleteRestaurantReferralData(data.restaurantId, data.id);
               },
             ),
           ),

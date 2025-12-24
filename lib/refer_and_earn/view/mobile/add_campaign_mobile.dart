@@ -6,8 +6,10 @@ import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
 import '../screens/campaign_expiry_screen.dart';
-import '../widgets/common_widget.dart';
-import '../widgets/mobile_widgets.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/mobile_app_baar.dart';
+import '../widgets/reward_type_dropdown.dart';
+import '../widgets/text_field_column.dart';
 
 class AddCampaignMobile extends StatefulWidget {
   final CampaignModel? campaign;
@@ -28,18 +30,10 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
   void initState() {
     super.initState();
 
-    _campaignNameController = TextEditingController(
-      text: widget.campaign?.campaignName ?? '',
-    );
-    _customerRewardController = TextEditingController(
-      text: widget.campaign?.customerReward?.toString() ?? '',
-    );
-    _referralRewardController = TextEditingController(
-      text: widget.campaign?.referrerReward?.toString() ?? '',
-    );
-    _minPurchaseController = TextEditingController(
-      text: widget.campaign?.minPurchase?.toString() ?? '',
-    );
+    _campaignNameController = TextEditingController(text: widget.campaign?.campaignName ?? '');
+    _customerRewardController = TextEditingController(text: widget.campaign?.customerReward?.toString() ?? '');
+    _referralRewardController = TextEditingController(text: widget.campaign?.referrerReward?.toString() ?? '');
+    _minPurchaseController = TextEditingController(text: widget.campaign?.minPurchase?.toString() ?? '');
 
     final provider = Provider.of<ReferralProvider>(context, listen: false);
 
@@ -47,14 +41,9 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
       provider
         ..campaignExpiry = widget.campaign!.expiryEnableBool ?? false
         ..campaignType = widget.campaign!.expiryType ?? "Fixed Period"
-        ..expiryOption =
-            widget.campaign!.fixedPeriodType ?? "Set Specific End Date & Time"
-        ..expiryDate = DateFormat(
-          'yyyy-MM-dd HH:mm:ss',
-        ).parse(widget.campaign!.endDate ?? DateTime.now().toString())
-        ..notifyCustomers = widget.campaign!.notifyCustomerBool ?? false
-            ? true
-            : false
+        ..expiryOption = widget.campaign!.fixedPeriodType ?? "Set Specific End Date & Time"
+        ..expiryDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(widget.campaign!.endDate ?? DateTime.now().toString())
+        ..notifyCustomers = widget.campaign!.notifyCustomerBool ?? false ? true : false
         ..rewardType = widget.campaign!.rewardType ?? "Flat";
       debugPrint(widget.campaign!.endDate.toString());
     } else {
@@ -99,12 +88,7 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFieldColumn(
-                hint: "Enter campaign name",
-                label: "Campaign Name*",
-                controller: _campaignNameController,
-                type: TextInputType.text,
-              ),
+              TextFieldColumn(hint: "Enter campaign name", label: "Campaign Name*", controller: _campaignNameController, type: TextInputType.text),
               Consumer<ReferralProvider>(
                 builder: (context, provider, _) {
                   return RewardTypeDropdown(
@@ -140,7 +124,7 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
                       children: [
-                        CustomCheckBox(
+                        Checkbox(
                           value: provider.campaignExpiry,
                           onChanged: (val) {
                             if (val != null) provider.updateCampaignExpiry(val);
@@ -185,30 +169,28 @@ class _AddCampaignMobileState extends State<AddCampaignMobile> {
       ),
       bottomNavigationBar: Consumer<ReferralProvider>(
         builder: (context, provider, _) {
-          return GestureDetector(
-            onTap: provider.isSaving
-                ? null
-                : () async {
-                    await CampaignService.validateAndSaveCampaign(
-                      isUpdate: widget.campaign != null,
-                      provider: provider,
-                      context: context,
-                      campaignNameText: _campaignNameController.text,
-                      customerRewardText: _customerRewardController.text,
-                      referralRewardText: _referralRewardController.text,
-                      minPurchaseText: _minPurchaseController.text,
-                      campaignId: widget.campaign?.campaignId,
-                      shopId: widget.campaign?.shopId,
-                      status: widget.campaign?.statusStr,
-                    );
-                    _clearForm(provider);
-                  },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: CustomButton(
-                value: widget.campaign == null ? "Save" : "Update",
-                color: ColorsClass.primary,
-              ),
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomButton(
+              value: widget.campaign == null ? "Save" : "Update",
+              color: ColorsClass.primary,
+              onTap: provider.isSaving
+                  ? () {}
+                  : () async {
+                      await CampaignService.validateAndSaveCampaign(
+                        isUpdate: widget.campaign != null,
+                        provider: provider,
+                        context: context,
+                        campaignNameText: _campaignNameController.text,
+                        customerRewardText: _customerRewardController.text,
+                        referralRewardText: _referralRewardController.text,
+                        minPurchaseText: _minPurchaseController.text,
+                        campaignId: widget.campaign?.campaignId,
+                        shopId: widget.campaign?.shopId,
+                        status: widget.campaign?.statusStr,
+                      );
+                      _clearForm(provider);
+                    },
             ),
           );
         },

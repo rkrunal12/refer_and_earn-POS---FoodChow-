@@ -1,85 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/view/widgets/update_campaign.dart';
-import 'common_widget.dart';
-import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
+import 'custom_toast.dart';
 
-class CampaignDetailedCampaignInfo extends StatelessWidget {
-  final String title;
-  final String number;
-
-  const CampaignDetailedCampaignInfo({super.key, required this.title, required this.number});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: Card(
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FittedBox(
-                child: Text(title, style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 14)),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                number,
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 29, color: ColorsClass.primary),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Campaign info headers
-class CampaignInfoHeadersAllCampaign extends StatelessWidget {
-  const CampaignInfoHeadersAllCampaign({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<ReferralProvider>(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth <= 700;
-
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: isSmallScreen
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CampaignDetailedCampaignInfo(title: "Total Campaigns", number: provider.data.length.toString()),
-                CampaignDetailedCampaignInfo(title: "Active Campaigns", number: provider.activeCampaigns.length.toString()),
-                CampaignDetailedCampaignInfo(title: "Total referrals", number: provider.totalReferrals.toString()),
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(
-                  child: CampaignDetailedCampaignInfo(title: "Total Campaigns", number: provider.data.length.toString()),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: CampaignDetailedCampaignInfo(title: "Active Campaigns", number: provider.activeCampaigns.length.toString()),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: CampaignDetailedCampaignInfo(title: "Total referrals", number: provider.totalReferrals.toString()),
-                ),
-              ],
-            ),
-    );
-  }
-}
 
 /// Build campaign DataTable (desktop/tablet)
 class BuildCustomTableAllCampaign extends StatelessWidget {

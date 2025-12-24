@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/campaign_model.dart';
-import '../../view/widgets/common_widget.dart';
+import '../../view/widgets/custom_toast.dart';
 import '../provider/refer_provider.dart';
 
 class CampaignService {

@@ -5,7 +5,9 @@ import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../mobile/add_campaign_mobile.dart';
-import '../widgets/common_widget.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/reward_type_dropdown.dart';
+import '../widgets/text_field_column.dart';
 import 'campaign_expiry_screen.dart';
 
 class AddCampaign extends StatefulWidget {
@@ -128,7 +130,7 @@ class _AddCampaignState extends State<AddCampaign> {
                         const SizedBox(height: 16),
                         // Campaign Expiry Checkbox
                         ListTile(
-                          leading: CustomCheckBox(
+                          leading: Checkbox(
                             value: provider.campaignExpiry,
                             onChanged: (val) {
                               if (val != null) {
@@ -160,39 +162,37 @@ class _AddCampaignState extends State<AddCampaign> {
                         Row(
                           children: [
                             Flexible(
-                              child: GestureDetector(
-                                onTap: provider.isSaving
-                                    ? null
-                                    : () async {
-                                        provider.setIsSaving(true);
-                                        await CampaignService.validateAndSaveCampaign(
-                                          isUpdate: false,
-                                          provider: provider,
-                                          context: context,
-                                          campaignNameText: _campaignNameController.text,
-                                          customerRewardText: _customerRewardController.text,
-                                          referralRewardText: _referralRewardController.text,
-                                          minPurchaseText: _minPurchaseController.text,
-                                        );
-                                        provider.setIsSaving(false);
-                                        _clearForm(provider);
-                                      },
-                                child: !provider.isLoading
-                                    ? const CustomButton(value: "Save", color: ColorsClass.primary)
-                                    : Container(
-                                        height: 50,
-                                        width: 200,
-                                        decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.all(Radius.circular(6))),
-                                        child: const Center(child: CircularProgressIndicator(color: ColorsClass.white)),
-                                      ),
-                              ),
+                              child: !provider.isLoading
+                                  ? CustomButton(
+                                      value: "Save",
+                                      color: ColorsClass.primary,
+                                      onTap: provider.isSaving
+                                          ? () {}
+                                          : () async {
+                                              provider.setIsSaving(true);
+                                              await CampaignService.validateAndSaveCampaign(
+                                                isUpdate: false,
+                                                provider: provider,
+                                                context: context,
+                                                campaignNameText: _campaignNameController.text,
+                                                customerRewardText: _customerRewardController.text,
+                                                referralRewardText: _referralRewardController.text,
+                                                minPurchaseText: _minPurchaseController.text,
+                                              );
+                                              provider.setIsSaving(false);
+                                              _clearForm(provider);
+                                            },
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      width: 200,
+                                      decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.all(Radius.circular(6))),
+                                      child: const Center(child: CircularProgressIndicator(color: ColorsClass.white)),
+                                    ),
                             ),
                             const SizedBox(width: 10),
                             Flexible(
-                              child: GestureDetector(
-                                onTap: () => _clearForm(provider),
-                                child: const CustomButton(value: "Cancel", color: Colors.grey),
-                              ),
+                              child: CustomButton(value: "Cancel", color: Colors.grey, onTap: () => _clearForm(provider)),
                             ),
                           ],
                         ),

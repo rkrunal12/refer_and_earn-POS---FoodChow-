@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:refer_and_earn/refer_and_earn/view/widgets/cashback_slider.dart';
 
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../screens/cash_back.dart';
-import '../widgets/cashback_widgets.dart';
-import '../widgets/common_widget.dart';
-import '../widgets/mobile_widgets.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/mobile_app_baar.dart';
 
 class MobileCashback extends StatefulWidget {
   const MobileCashback({super.key});
@@ -15,8 +15,7 @@ class MobileCashback extends StatefulWidget {
   State<MobileCashback> createState() => _MobileCashbackState();
 }
 
-class _MobileCashbackState extends State<MobileCashback>
-    with SingleTickerProviderStateMixin {
+class _MobileCashbackState extends State<MobileCashback> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final minimumAmountController = TextEditingController();
@@ -60,17 +59,9 @@ class _MobileCashbackState extends State<MobileCashback>
                           value.setIsEnables(val);
                         },
                       ),
-                      ConditionalWidgerEditor(
-                        controller: minimumAmountController,
-                        header: "Minimum Order Amont",
-                        hint: "Enter Minimum Amount",
-                      ),
+                      ConditionalWidgerEditor(controller: minimumAmountController, header: "Minimum Order Amont", hint: "Enter Minimum Amount"),
                       MobileRulesCardCashback(tabController: _tabController),
-                      ConditionalWidgerEditor(
-                        header: "Terms & Condition",
-                        hint: "Enter Terms & Condition",
-                        controller: termsAndConditionController,
-                      ),
+                      ConditionalWidgerEditor(header: "Terms & Condition", hint: "Enter Terms & Condition", controller: termsAndConditionController),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -81,18 +72,12 @@ class _MobileCashbackState extends State<MobileCashback>
                   padding: const EdgeInsets.all(8.0),
                   child: value.isCashbackAddLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : GestureDetector(
-                          child: CustomButton(
-                            value: "Save",
-                            color: ColorsClass.primary,
-                          ),
+                      : CustomButton(
+                          value: "Save",
+                          color: ColorsClass.primary,
                           onTap: () {
-                            value.setMimimumPriceEdiitngEnable(
-                              double.parse(minimumAmountController.text),
-                            );
-                            value.setTermsAndConditions(
-                              termsAndConditionController.text,
-                            );
+                            value.setMimimumPriceEdiitngEnable(double.parse(minimumAmountController.text));
+                            value.setTermsAndConditions(termsAndConditionController.text);
                             CashBack.saveData(_tabController, context);
                           },
                         ),
@@ -112,26 +97,15 @@ class MobileToggleCardCashback extends StatelessWidget {
   final bool isEnable;
   final ValueChanged<bool> onChanged;
 
-  const MobileToggleCardCashback({
-    super.key,
-    required this.isEnable,
-    required this.onChanged,
-  });
+  const MobileToggleCardCashback({super.key, required this.isEnable, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(
-        "Authorised FoodChow Cash",
-        style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600),
-      ),
+      title: Text("Authorised FoodChow Cash", style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
       subtitle: Text(
         "Enable this to start accepting FoodChow Cash",
-        style: GoogleFonts.poppins(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          color: Colors.grey,
-        ),
+        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w400, color: Colors.grey),
       ),
       trailing: Switch(value: isEnable, onChanged: onChanged),
     );
@@ -153,13 +127,7 @@ class MobileRulesCardCashback extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.symmetric(vertical: 10.0),
-            child: Text(
-              "Cash Back Rules",
-              style: GoogleFonts.poppins(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: Text("Cash Back Rules", style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w500)),
           ),
           TabBar(
             controller: tabController,
@@ -179,9 +147,7 @@ class MobileRulesCardCashback extends StatelessWidget {
               builder: (context, data, _) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   final newIndex = data.rewardCashbackType == "Flat" ? 1 : 0;
-                  if (tabController.index != newIndex &&
-                      !tabController.indexIsChanging &&
-                      newIndex < tabController.length) {
+                  if (tabController.index != newIndex && !tabController.indexIsChanging && newIndex < tabController.length) {
                     tabController.index = newIndex;
                   }
                 });
