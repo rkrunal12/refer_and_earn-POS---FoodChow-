@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../reponsive.dart';
 import '../../color_class.dart';
-import '../../controller/provider/refer_provider.dart' show ReferralProvider;
+import '../../controller/provider/refer_provider.dart';
 import '../../model/referred_restrauant_model.dart';
 import 'custome_table_restautant.dart';
 

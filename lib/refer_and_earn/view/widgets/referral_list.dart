@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/custom_toast.dart';
 import 'package:validate_phone_number/validation.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../model/referred_restrauant_model.dart';
+import 'custom_toast.dart';
 import 'referral_row.dart';
 
 /// List of referral rows

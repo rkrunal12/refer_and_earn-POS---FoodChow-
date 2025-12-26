@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/campaign_expiry_screen.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
+import '../screens/campaign_expiry_screen.dart';
 import 'custom_button.dart';
 import 'reward_type_dropdown.dart';
 import 'text_field_column.dart';

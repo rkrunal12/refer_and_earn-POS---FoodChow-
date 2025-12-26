@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/update_campaign.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
 import 'custom_toast.dart';
+import 'update_campaign.dart';
 
 /// Build campaign DataTable (desktop/tablet)
 class BuildCustomTableAllCampaign extends StatelessWidget {

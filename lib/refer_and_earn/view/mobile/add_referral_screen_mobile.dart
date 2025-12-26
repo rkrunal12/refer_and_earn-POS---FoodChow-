@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/send_all_button.dart';
 import 'package:validate_phone_number/validation.dart';
 import '../../color_class.dart';
 
@@ -11,6 +10,7 @@ import '../widgets/custom_button.dart';
 import '../widgets/custom_toast.dart';
 import '../widgets/mobile_app_baar.dart';
 import '../widgets/referral_list.dart';
+import '../widgets/send_all_button.dart';
 import '../widgets/text_field_column.dart';
 
 class AddReferralScreenMobile extends StatefulWidget {

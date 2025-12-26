@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:refer_and_earn/refer_and_earn/color_class.dart';
+
+import '../../color_class.dart';
 
 /// Build slider for cashback
 class CashbackSlider extends StatelessWidget {

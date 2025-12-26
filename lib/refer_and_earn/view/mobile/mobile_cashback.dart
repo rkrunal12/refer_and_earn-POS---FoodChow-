@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/cashback_slider.dart';
 
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../screens/cash_back.dart';
+import '../widgets/cashback_slider.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/mobile_app_baar.dart';
 

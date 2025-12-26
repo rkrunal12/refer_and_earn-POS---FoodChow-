@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/send_all_button.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../../reponsive.dart';
 import '../../model/referred_restrauant_model.dart';
 import '../widgets/referral_row.dart';
+import '../widgets/send_all_button.dart';
 
 class AddReferralScreen extends StatefulWidget {
   const AddReferralScreen({super.key});

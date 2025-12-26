@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/cashback_slider.dart';
 import '../../controller/provider/refer_provider.dart';
+import 'cashback_slider.dart';
 
 /// Cashback rules card with tabs
 class CashbackRulesCard extends StatelessWidget {

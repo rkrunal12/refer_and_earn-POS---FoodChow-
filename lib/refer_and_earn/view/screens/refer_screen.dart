@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/chatboat/controller/chat_boat_controller.dart';
-import 'package:refer_and_earn/refer_and_earn/view/mobile/mobile_refer_screen.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/add_campaign.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/all_campaign.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/cash_back.dart';
-import 'package:refer_and_earn/refer_and_earn/view/screens/restraurent_referal.dart';
-import '../../../chatboat/view/pop up screen/chat_ui.dart';
-import '../../../chatboat/view/pop up screen/chatbost_popup.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../../reponsive.dart';
+import '../mobile/mobile_refer_screen.dart';
+import 'add_campaign.dart';
+import 'all_campaign.dart';
+import 'cash_back.dart';
+import 'restraurent_referal.dart';
 
 class ReferScreen extends StatefulWidget {
   const ReferScreen({super.key});
@@ -42,31 +39,47 @@ class _ReferScreenState extends State<ReferScreen> {
       return const MobileReferenceScreen();
     }
 
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            elevation: 2,
-            title: Text("Refer & Earn", style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 20)),
-            actions: [
-              SvgPicture.asset("assets/svg/dish.svg"),
-              SizedBox(width: 10),
-              SvgPicture.asset("assets/svg/home.svg"),
-              SizedBox(width: 10),
-              SvgPicture.asset("assets/svg/wifi.svg"),
-              SizedBox(width: 10),
-              SvgPicture.asset("assets/svg/sound.svg"),
-              SizedBox(width: 10),
-            ],
-            backgroundColor: Colors.white,
-          ),
-
-          drawer: useSidebar
-              ? null
-              : Drawer(
-                  child: SafeArea(
-                    child: Align(
-                      alignment: Alignment.topLeft,
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 2,
+        title: Text("Refer & Earn", style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 20)),
+        actions: [
+          SvgPicture.asset("assets/svg/dish.svg"),
+          SizedBox(width: 10),
+          SvgPicture.asset("assets/svg/home.svg"),
+          SizedBox(width: 10),
+          SvgPicture.asset("assets/svg/wifi.svg"),
+          SizedBox(width: 10),
+          SvgPicture.asset("assets/svg/sound.svg"),
+          SizedBox(width: 10),
+        ],
+        backgroundColor: Colors.white,
+      ),
+    
+      drawer: useSidebar
+          ? null
+          : Drawer(
+              child: SafeArea(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Consumer<ReferralProvider>(
+                    builder: (context, form, _) {
+                      return buildSidebar(context, form.selectedIndex);
+                    },
+                  ),
+                ),
+              ),
+            ),
+    
+      body: SafeArea(
+        child: useSidebar
+            ? Row(
+                children: [
+                  /// Side bar
+                  Expanded(
+                    flex: 1,
+                    child: SizedBox(
+                      height: double.infinity,
                       child: Consumer<ReferralProvider>(
                         builder: (context, form, _) {
                           return buildSidebar(context, form.selectedIndex);
@@ -74,69 +87,50 @@ class _ReferScreenState extends State<ReferScreen> {
                       ),
                     ),
                   ),
-                ),
-
-          body: SafeArea(
-            child: useSidebar
-                ? Row(
-                    children: [
-                      /// Side bar
-                      Expanded(
-                        flex: 1,
-                        child: SizedBox(
-                          height: double.infinity,
-                          child: Consumer<ReferralProvider>(
-                            builder: (context, form, _) {
-                              return buildSidebar(context, form.selectedIndex);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(width: 2, height: double.infinity, color: ColorsClass.deviderColor),
-
-                      /// Main content
-                      Expanded(
-                        flex: 4,
-                        child: Consumer<ReferralProvider>(
-                          builder: (context, form, _) {
-                            return _buildContent(form.selectedIndex);
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                : Consumer<ReferralProvider>(
-                    builder: (context, form, _) {
-                      return _buildContent(form.selectedIndex);
-                    },
+                  Container(width: 2, height: double.infinity, color: ColorsClass.deviderColor),
+    
+                  /// Main content
+                  Expanded(
+                    flex: 4,
+                    child: Consumer<ReferralProvider>(
+                      builder: (context, form, _) {
+                        return _buildContent(form.selectedIndex);
+                      },
+                    ),
                   ),
-          ),
-
-          floatingActionButton: FloatingActionButton(
-            shape: const CircleBorder(),
-            tooltip: "Talk To AI",
-            backgroundColor: ColorsClass.primary,
-            onPressed: () {
-              Provider.of<ChatBoatProvider>(context, listen: false).setShowChatBoatPopup();
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => const ChatboatFullscreen(),
-              //   ),
-              // );
-            },
-            child: Image.asset("assets/images/charboat.png"),
-          ),
-        ),
-
-        Consumer<ChatBoatProvider>(
-          builder: (context, value, _) {
-            if (!value.showChatBoatPopup) return const SizedBox();
-            return value.chatPopupPage ? const ChatUi() : const ChatbostPopup();
-          },
-        ),
-      ],
-    );
+                ],
+              )
+            : Consumer<ReferralProvider>(
+                builder: (context, form, _) {
+                  return _buildContent(form.selectedIndex);
+                },
+              ),
+      ),
+    
+    //   floatingActionButton: FloatingActionButton(
+    //     shape: const CircleBorder(),
+    //     tooltip: "Talk To AI",
+    //     backgroundColor: ColorsClass.primary,
+    //     onPressed: () {
+    //       Provider.of<ChatBoatProvider>(context, listen: false).setShowChatBoatPopup();
+    //       // Navigator.push(
+    //       //   context,
+    //       //   MaterialPageRoute(
+    //       //     builder: (context) => const ChatboatFullscreen(),
+    //       //   ),
+    //       // );
+    //     },
+    //     child: Image.asset("assets/images/charboat.png"),
+    //   ),
+    // ),
+    
+    // Consumer<ChatBoatProvider>(
+    //   builder: (context, value, _) {
+    //     if (!value.showChatBoatPopup) return const SizedBox();
+    //     return value.chatPopupPage ? const ChatUi() : const ChatbostPopup();
+    //   },
+    // ),
+     ) ;
   }
 }
 
