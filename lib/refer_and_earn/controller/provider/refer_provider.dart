@@ -87,7 +87,6 @@ class ReferralProvider with ChangeNotifier {
     try {
       final addUrl = Uri.parse("$baseUrl/AddCampaign");
       final addData = jsonEncode(campaign.toAddJson());
-      log(campaign.toAddJson().toString());
 
       final response = await http.post(addUrl, headers: contentTypeHeader, body: addData);
 
@@ -170,7 +169,7 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final fetchCashbackUrl = Uri.parse("$baseUrl/GetCashback?shop_id=7872");
+      final fetchCashbackUrl = Uri.parse("$baseUrl/GetCashback?shop_id=7866");
       final response = await http.get(fetchCashbackUrl);
 
       if (response.statusCode == 200) {
@@ -179,22 +178,25 @@ class ReferralProvider with ChangeNotifier {
         if (decoded["data"] != null && decoded["data"].isNotEmpty) {
           final cashbackJson = decoded["data"][0];
           _allCashback = CashbackModel.fromJson(cashbackJson);
-
+          log(_allCashback!.toJson().toString());
           _isEnables = _allCashback!.cashbackEnable == 1;
           _rewardCashbackType = _allCashback!.cashbackType ?? "Flat";
           _percentageDiscount = _rewardCashbackType == "Discount" ? (_allCashback!.cashbackValue?.toDouble() ?? 0) : 0;
           _fixedDiscount = _rewardCashbackType == "Flat" ? (_allCashback!.cashbackValue?.toDouble() ?? 0) : 0;
-
+          _termsAndConditions = _allCashback!.termsAndConditions ?? "T & C";
+          _minimumOrderAmount = _allCashback!.minimumOrderAmount ?? 0;
           return true;
         } else {
+          log("null data");
           _allCashback = null;
           return false;
         }
       } else {
         CustomeToast.showError("Something went wrong");
       }
-    } catch (_) {
+    } catch (e) {
       CustomeToast.showError("Unexpected error");
+      debugPrint(e.toString());
     } finally {
       _isCashbackGetLoading = false;
       notifyListeners();
@@ -208,10 +210,11 @@ class ReferralProvider with ChangeNotifier {
 
     try {
       final isUpdate = await fetchCashbackData(false) ?? false;
+      log("is update : $isUpdate");
       final saveCashbackUrl = Uri.parse(isUpdate ? "$baseUrl/UpdateCashback" : "$baseUrl/AddCashback");
       final saveCashbackData = jsonEncode(model.toJson());
+      log("Updateting data $saveCashbackData");
       final response = await http.post(saveCashbackUrl, body: saveCashbackData, headers: contentTypeHeader);
-      log(saveCashbackUrl.toString());
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         await fetchCashbackData(false);
@@ -219,8 +222,9 @@ class ReferralProvider with ChangeNotifier {
       } else {
         CustomeToast.showError("Something went wrong");
       }
-    } catch (_) {
+    } catch (e) {
       CustomeToast.showError("Unexpected error");
+      debugPrint(e.toString());
     } finally {
       _isCashbackAddLoading = false;
       notifyListeners();
@@ -237,8 +241,6 @@ class ReferralProvider with ChangeNotifier {
 
   List<ReferredRestaurantsModel> get activeRefer => _referralList.where((c) => c.claimed == 1).toList();
 
-  List<ReferredRestaurantsModel> get inactiveRefer => _referralList.where((c) => c.claimed == 1).toList();
-
   List<ReferredRestaurantsModel> get pendingRefer => _referralList.where((c) => c.claimed == 0).toList();
 
   Future<void> fetchRestaurantReferralData(bool isUpdate) async {
@@ -246,12 +248,13 @@ class ReferralProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final getReferralUrl = Uri.parse("$basereferralUrl/GetReferredRestaurantsByShopId?shop_id=7872");
+      final getReferralUrl = Uri.parse("$basereferralUrl/GetReferredRestaurantsByShopId?shop_id=7866");
       final response = await http.get(getReferralUrl);
       if (response.statusCode == 200) {
         final decode = jsonDecode(response.body);
         if (decode["data"] != null) {
           _referralList = (decode["data"] as List).map((jsonItem) => ReferredRestaurantsModel.fromJson(jsonItem)).toList();
+          log(decode["data"].toString());
         } else {
           _referralList = [];
         }
@@ -290,11 +293,15 @@ class ReferralProvider with ChangeNotifier {
     final deleteUrl = Uri.parse("$basereferralUrl/DeleteReferredRestaurant?id=$id&restaurant_id=$restaurantId");
     final response = await http.delete(deleteUrl);
 
+    // log
+    log(response.body);
+    log(response.statusCode.toString());
+    log("Url : $deleteUrl");
+
     try {
       if (response.statusCode == 204 || response.statusCode == 200) {
         await fetchRestaurantReferralData(true);
         CustomeToast.showSuccess("Delete Success");
-        debugPrint(response.body);
       } else {
         CustomeToast.showError("Something went wrong");
       }
@@ -365,8 +372,8 @@ class ReferralProvider with ChangeNotifier {
 
   /// ********************************* Cashback Details **************************///
   bool _isEnables = false;
-  double minimumPrice = 0;
-  String termsCodition = "Not Applicable for baverages";
+  int _minimumOrderAmount = 0;
+  String _termsAndConditions = "";
   double _percentageDiscount = 0;
   double _fixedDiscount = 0;
   String _rewardCashbackType = "Flat";
@@ -375,19 +382,21 @@ class ReferralProvider with ChangeNotifier {
   double get percentageDiscount => _percentageDiscount;
   bool get isEnables => _isEnables;
   String get rewardCashbackType => _rewardCashbackType;
+  int get minimumOrderAmount => _minimumOrderAmount;
+  String get termsAndConditions => _termsAndConditions;
 
   void setIsEnables(bool value) {
     _isEnables = value;
     notifyListeners();
   }
 
-  void setMimimumPriceEdiitngEnable(double price) {
-    minimumPrice = price;
+  void setMinimumOrderAmt(int price) {
+    _minimumOrderAmount = price;
     notifyListeners();
   }
 
   void setTermsAndConditions(String value) {
-    termsCodition = value;
+    _termsAndConditions = value;
     notifyListeners();
   }
 

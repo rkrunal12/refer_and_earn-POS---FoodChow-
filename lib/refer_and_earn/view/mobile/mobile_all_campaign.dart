@@ -29,90 +29,93 @@ class _MobileAllCampaignState extends State<MobileAllCampaign> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const MobileAppBar(title: "Refer and Earn"),
-      body: Consumer<ReferralProvider>(
-        builder: (context, value, _) {
-          if (value.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final data = value.data;
-          if (data.isEmpty) {
-            return ListView(
+      body: SafeArea(
+        child: Consumer<ReferralProvider>(
+          builder: (context, value, _) {
+            if (value.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final data = value.data;
+            if (data.isEmpty) {
+              return ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Campaign Details", style: GoogleFonts.poppins(fontWeight: FontWeight.w400, fontSize: 14)),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const AddCampaignMobile()));
+                            },
+                            child: Container(
+                              height: 36,
+                              width: 130,
+                              decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.circular(5)),
+                              child: Center(
+                                child: Text(
+                                  "+ Add Campaign",
+                                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: ColorsClass.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Center(child: Text("No Data")),
+                ],
+              );
+            }
+
+            return ListView.builder(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(vertical: 8),
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-                  child: MobileHeader(
-                    title: "Campaign Details",
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AddCampaignMobile()));
-                    },
-                    mobileTitle: "+ Add Campaign",
-                  ),
-                ),
-                Center(child: Text("No Data")),
-              ],
+              itemCount: data.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Campaign Details", style: GoogleFonts.poppins(fontWeight: FontWeight.w400, fontSize: 14)),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const AddCampaignMobile()));
+                            },
+                            child: Container(
+                              height: 36,
+                              width: 130,
+                              decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.circular(5)),
+                              child: Center(
+                                child: Text(
+                                  "+ Add Campaign",
+                                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: ColorsClass.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                final campaign = data[index - 1];
+                return MobileCampaignCardMobileAllCampaign(data: campaign);
+              },
             );
-          }
-
-          return ListView.builder(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: data.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-                  child: MobileHeader(
-                    title: "Campaign Details",
-                    mobileTitle: "+ Add Campaign",
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AddCampaignMobile()));
-                    },
-                  ),
-                );
-              }
-
-              final campaign = data[index - 1];
-              return MobileCampaignCardMobileAllCampaign(data: campaign);
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-/// mobile header
-class MobileHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback onTap;
-  final String mobileTitle;
-  const MobileHeader({super.key, required this.title, required this.onTap, required this.mobileTitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: GoogleFonts.poppins(fontWeight: FontWeight.w400, fontSize: 14)),
-          InkWell(
-            onTap: onTap,
-            child: Container(
-              height: 36,
-              width: 130,
-              decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.circular(5)),
-              child: Center(
-                child: Text(
-                  mobileTitle,
-                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: ColorsClass.white),
-                ),
-              ),
-            ),
-          ),
-        ],
+          },
+        ),
       ),
     );
   }

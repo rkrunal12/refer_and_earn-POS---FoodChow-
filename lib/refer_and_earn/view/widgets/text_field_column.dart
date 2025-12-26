@@ -11,6 +11,10 @@ class TextFieldColumn extends StatelessWidget {
   final bool? mobile;
   final ValueChanged<String?>? onIsoCodeChanged;
   final bool isTag;
+  final String? Function(String?)? validator;
+  final int? maxLength;
+  final ValueChanged<String?>? onChanged;
+  final String? suffixText;
 
   const TextFieldColumn({
     super.key,
@@ -22,6 +26,10 @@ class TextFieldColumn extends StatelessWidget {
     this.isPhone,
     this.mobile,
     this.isTag = true,
+    this.validator,
+    this.maxLength,
+    this.onChanged,
+    this.suffixText,
   });
 
   @override
@@ -38,15 +46,16 @@ class TextFieldColumn extends StatelessWidget {
               onInputChanged: (PhoneNumber number) {
                 onIsoCodeChanged?.call(number.isoCode);
               },
+              validator: validator,
               spaceBetweenSelectorAndTextField: 1,
               selectorConfig: const SelectorConfig(
                 selectorType: PhoneInputSelectorType.DROPDOWN,
-                showFlags: true,
+                showFlags: false,
                 useBottomSheetSafeArea: true,
                 leadingPadding: 0,
-                trailingSpace: true,
+                trailingSpace: false,
+                setSelectorButtonAsPrefixIcon: true,
               ),
-              autoValidateMode: AutovalidateMode.disabled,
               textFieldController: controller,
               formatInput: true,
               initialValue: PhoneNumber(isoCode: "IN"),
@@ -58,13 +67,18 @@ class TextFieldColumn extends StatelessWidget {
               keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: false),
             ),
           ] else
-            TextField(
+            TextFormField(
               controller: controller,
+              maxLength: maxLength,
               keyboardType: type,
+              validator: validator,
               decoration: InputDecoration(
+                counter: const SizedBox(),
                 hintText: hint,
+                suffixText: suffixText,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
+              onChanged: onChanged,
             ),
         ],
       ),

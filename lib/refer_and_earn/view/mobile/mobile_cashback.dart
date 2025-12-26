@@ -20,16 +20,20 @@ class _MobileCashbackState extends State<MobileCashback> with SingleTickerProvid
 
   final minimumAmountController = TextEditingController();
   final termsAndConditionController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
-      provider.fetchCashbackData(false);
-      minimumAmountController.text = provider.minimumPrice.toString();
-      termsAndConditionController.text = provider.termsCodition;
+      if (provider.allCashback == null) {
+        await provider.fetchCashbackData(false);
+      }
+      if (!mounted) return;
+      minimumAmountController.text = provider.minimumOrderAmount.toString();
+      termsAndConditionController.text = provider.termsAndConditions;
     });
   }
 
@@ -43,56 +47,84 @@ class _MobileCashbackState extends State<MobileCashback> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MobileAppBar(title: "Cashback"),
-      body: Consumer<ReferralProvider>(
-        builder: (context, value, child) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      MobileToggleCardCashback(
-                        isEnable: value.isEnables,
-                        onChanged: (val) {
-                          value.setIsEnables(val);
-                        },
-                      ),
-                      ConditionalWidgerEditor(controller: minimumAmountController, header: "Minimum Order Amont", hint: "Enter Minimum Amount"),
-                      MobileRulesCardCashback(tabController: _tabController),
-                      ConditionalWidgerEditor(header: "Terms & Condition", hint: "Enter Terms & Condition", controller: termsAndConditionController),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8.0),
-                  child: value.isCashbackAddLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : CustomButton(
-                          value: "Save",
-                          color: ColorsClass.primary,
-                          onTap: () {
-                            value.setMimimumPriceEdiitngEnable(double.parse(minimumAmountController.text));
-                            value.setTermsAndConditions(termsAndConditionController.text);
-                            CashBack.saveData(_tabController, context);
-                          },
+      body: SafeArea(
+        child: Consumer<ReferralProvider>(
+          builder: (context, value, child) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MobileToggleCardCashback(
+                              isEnable: value.isEnables,
+                              onChanged: (val) {
+                                value.setIsEnables(val);
+                              },
+                            ),
+                            ConditionalWidgerEditor(
+                              controller: minimumAmountController,
+                              header: "Minimum Order Amount",
+                              hint: "Enter Minimum Amount",
+                              maxLength: 6,
+                              inputType: TextInputType.number,
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) return "Enter Amount";
+                                if (int.tryParse(val.trim()) == null) return "Enter valid number";
+                                return null;
+                              },
+                            ),
+                            MobileRulesCardCashback(tabController: _tabController),
+                            ConditionalWidgerEditor(
+                              header: "Terms & Condition",
+                              hint: "Enter Terms & Condition",
+                              controller: termsAndConditionController,
+                              inputType: TextInputType.multiline,
+                              validator: (val) {
+                                if (val == null || val.trim().isEmpty) return "Enter Terms";
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                          ],
                         ),
+                      ),
+                    ),
+
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8.0),
+                      child: value.isCashbackAddLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : CustomButton(
+                              value: "Save",
+                              color: ColorsClass.primary,
+                              onTap: () {
+                                if (_formKey.currentState!.validate()) {
+                                  value.setMinimumOrderAmt(int.parse(minimumAmountController.text));
+                                  value.setTermsAndConditions(termsAndConditionController.text);
+                                  CashBack.saveData(_tabController, context);
+                                }
+                              },
+                            ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
                 ),
-                const SizedBox(height: 10),
-              ],
-            ),
-          );
-        },
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
-/// Foodchow cash toggle
 class MobileToggleCardCashback extends StatelessWidget {
   final bool isEnable;
   final ValueChanged<bool> onChanged;

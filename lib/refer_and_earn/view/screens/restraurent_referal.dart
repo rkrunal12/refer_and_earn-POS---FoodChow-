@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:refer_and_earn/refer_and_earn/view/widgets/custome_table_restautant.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import '../../model/referred_restrauant_model.dart';
-import '../widgets/campaign_detailed_campaign_info.dart';
+
+import '../widgets/custome_referal_table_restaurant.dart';
 import 'add_referral_screen.dart';
+import '../../../reponsive.dart';
 
 class RestraurentReferal extends StatefulWidget {
   const RestraurentReferal({super.key});
@@ -20,7 +20,10 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ReferralProvider>(context, listen: false).fetchRestaurantReferralData(false);
+      final provider = Provider.of<ReferralProvider>(context, listen: false);
+      if (provider.referralList.isEmpty) {
+        provider.fetchRestaurantReferralData(false);
+      }
     });
   }
 
@@ -30,7 +33,7 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final smallScreen = constraints.maxWidth <= 700;
+        final smallScreen = Responsive.isMobile(context);
         return Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -38,10 +41,7 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                     "Dashboard",
-                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
+                  Text("Dashboard", style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w500)),
                   InkWell(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AddReferralScreen())),
                     child: Container(
@@ -50,7 +50,7 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                       decoration: BoxDecoration(color: ColorsClass.primary, borderRadius: BorderRadius.circular(4)),
                       child: Center(
                         child: Text(
-                           "+ Add",
+                          "+ Add",
                           style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: ColorsClass.white),
                         ),
                       ),
@@ -65,26 +65,26 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        CampaignDetailedCampaignInfo(title: "Total Referrals", number: referProvider.referralList.length.toString()),
+                        _CampaignDetailedCampaignInfo(title: "Total Referrals", number: referProvider.referralList.length.toString()),
                         const SizedBox(height: 10),
-                        CampaignDetailedCampaignInfo(title: "Successfully Referrals", number: referProvider.activeRefer.length.toString()),
+                        _CampaignDetailedCampaignInfo(title: "Successfully Referrals", number: referProvider.activeRefer.length.toString()),
                         const SizedBox(height: 10),
-                        CampaignDetailedCampaignInfo(title: "Pending Referrals", number: referProvider.inactiveRefer.length.toString()),
+                        _CampaignDetailedCampaignInfo(title: "Pending Referrals", number: referProvider.pendingRefer.length.toString()),
                       ],
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: CampaignDetailedCampaignInfo(title: "Total Referrals", number: referProvider.referralList.length.toString()),
+                          child: _CampaignDetailedCampaignInfo(title: "Total Referrals", number: referProvider.referralList.length.toString()),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: CampaignDetailedCampaignInfo(title: "Successfully Referrals", number: referProvider.activeRefer.length.toString()),
+                          child: _CampaignDetailedCampaignInfo(title: "Successfully Referrals", number: referProvider.activeRefer.length.toString()),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: CampaignDetailedCampaignInfo(title: "Pending Referrals", number: referProvider.inactiveRefer.length.toString()),
+                          child: _CampaignDetailedCampaignInfo(title: "Pending Referrals", number: referProvider.pendingRefer.length.toString()),
                         ),
                       ],
                     ),
@@ -125,86 +125,34 @@ class _RestraurentReferalState extends State<RestraurentReferal> {
   }
 }
 
-/// Table showing restaurant referrals
-class CustomReferralTableRestaurant extends StatelessWidget {
-  final List<ReferredRestaurantsModel>? list;
+class _CampaignDetailedCampaignInfo extends StatelessWidget {
+  final String title;
+  final String number;
 
-  const CustomReferralTableRestaurant({super.key, required this.list});
+  const _CampaignDetailedCampaignInfo({required this.title, required this.number});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 650) {
-          return CustomTableRestaurantMobileReferral(list: list);
-        } else {
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minWidth: constraints.maxWidth),
-              child: DataTable(
-                headingRowColor: MaterialStateProperty.all(const Color(0x550AA89E)),
-                headingTextStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                border: TableBorder.all(borderRadius: BorderRadius.circular(10), width: 1, color: ColorsClass.tableDevider),
-                columnSpacing: 20,
-                columns: const [
-                  DataColumn(label: Center(child: Text("Name"))),
-                  DataColumn(label: Center(child: Text("Mobile No."))),
-                  DataColumn(label: Center(child: Text("Email"))),
-                  DataColumn(label: Center(child: Text("Sign Up"))),
-                  DataColumn(label: Center(child: Text("Reward"))),
-                  DataColumn(label: Center(child: Text("Status"))),
-                  DataColumn(label: Center(child: Text("Action"))),
-                ],
-                rows: list != null && list!.isNotEmpty ? list!.map((data) => _buildDataRow(data, context)).toList() : [],
+    return SizedBox(
+      height: 100,
+      child: Card(
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FittedBox(
+                child: Text(title, style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 14)),
               ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  DataRow _buildDataRow(ReferredRestaurantsModel data, BuildContext context) {
-    const cellStyle = TextStyle(fontWeight: FontWeight.w400);
-
-    return DataRow(
-      cells: [
-        DataCell(Center(child: Text(data.name ?? "-", style: cellStyle))),
-        DataCell(Center(child: Text(data.mobile ?? "-", style: cellStyle))),
-        DataCell(Center(child: Text(data.email ?? "-", style: cellStyle))),
-        DataCell(Center(child: Text(data.claimed == 1 ? "Yes" : "No", style: cellStyle))),
-        DataCell(Center(child: Text("Claim(1 Month Free)", style: cellStyle))),
-        DataCell(
-          Center(
-            child: Container(
-              height: 25,
-              width: 100,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: data.claimed == 1 ? const Color(0x808DBD90) : const Color(0x80D87E7E),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: data.claimed == 1 ? const Color(0xFF007521) : const Color(0xFFFC0005), width: 2),
+              const SizedBox(height: 10),
+              Text(
+                number,
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 29, color: ColorsClass.primary),
               ),
-              child: FittedBox(
-                child: Text(data.claimed == 1 ? "Completed" : "Pending", style: GoogleFonts.poppins(fontWeight: FontWeight.w400)),
-              ),
-            ),
+            ],
           ),
         ),
-        DataCell(
-          Center(
-            child: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () async {
-                await Provider.of<ReferralProvider>(context, listen: false).deleteRestaurantReferralData(data.restaurantId, data.id);
-              },
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

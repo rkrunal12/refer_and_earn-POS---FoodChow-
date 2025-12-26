@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:validate_phone_number/validation.dart';
 
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
@@ -39,25 +38,16 @@ class SendAllButton extends StatelessWidget {
             for (int i = 0; i < referrals.length; i++) {
               ReferralRowData referral = referrals[i];
 
-              if (!validateField(referral.nameController, 'name')) {
-                CustomeToast.showError('Form ${i + 1}: Enter a valid name');
+              if (referral.formKey.currentState != null && !referral.formKey.currentState!.validate()) {
+                CustomeToast.showError('Form ${i + 1}: Please fix errors');
                 return;
               }
+            }
 
+            for (int i = 0; i < referrals.length; i++) {
+              ReferralRowData referral = referrals[i];
               String rawNumber = referral.mobileController.text.trim();
               String cleanNumber = rawNumber.replaceAll(RegExp(r'[\s\-\(\)]'), '');
-
-              bool isValid = Validator.validatePhoneNumber(cleanNumber, referral.isoCode);
-
-              if (!isValid) {
-                CustomeToast.showError('Form ${i + 1}: Enter phone number properly');
-                return;
-              }
-
-              if (!validateField(referral.emailController, 'email')) {
-                CustomeToast.showError('Form ${i + 1}: Enter a valid email');
-                return;
-              }
 
               ReferredRestaurantsModel data = ReferredRestaurantsModel(
                 referringRestaurantId: "7866",

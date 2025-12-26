@@ -12,9 +12,8 @@ import '../../../chatboat/view/pop up screen/chat_ui.dart';
 import '../../../chatboat/view/pop up screen/chatbost_popup.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
-import '../../controller/service/campaign_service.dart';
-import '../../model/campaign_model.dart';
-import '../widgets/content_container_image.dart';
+import '../../../reponsive.dart';
+
 class ReferScreen extends StatefulWidget {
   const ReferScreen({super.key});
 
@@ -28,81 +27,64 @@ class _ReferScreenState extends State<ReferScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = Provider.of<ReferralProvider>(context, listen: false);
-      await provider.fetchData(false);
-      if (!mounted) return;
-
-      final now = DateTime.now();
-      for (CampaignModel campaign in provider.data) {
-        if (campaign.expiryEnableBool == true && campaign.statusStr == "1") {
-          if (campaign.expiryType != "After Friend's First Order") {
-            if (campaign.endDate != null) {
-              final expiryDate = DateTime.tryParse(campaign.endDate!);
-              if (expiryDate != null && now.isAfter(expiryDate)) {
-                CampaignService.updateCampaigns(
-                  CampaignModel(
-                    campaignId: campaign.campaignId,
-                    shopId: campaign.shopId,
-                    campaignName: campaign.campaignName,
-                    rewardType: campaign.rewardType,
-                    customerReward: campaign.customerReward,
-                    referrerReward: campaign.referrerReward,
-                    expiryEnableInt: campaign.expiryEnableBool! ? 1 : 0,
-                    minPurchase: campaign.minPurchase,
-                    expiryType: campaign.expiryType,
-                    fixedPeriodType: campaign.fixedPeriodType,
-                    endDate: campaign.endDate,
-                    notifyCustomerInt: campaign.notifyCustomerBool! ? 1 : 0,
-                    statusInt: 0,
-                  ),
-                  context,
-                  false,
-                  isExpired: true,
-                );
-                // log(campaign.toJson().toString());
-              }
-            }
-          }
-        }
+      if (provider.data.isEmpty) {
+        await provider.fetchData(false);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool useSidebar = Responsive.isLargeScreen(context);
+    final bool mobileLayout = Responsive.isMobile(context);
+
+    if (mobileLayout) {
+      return const MobileReferenceScreen();
+    }
+
     return Stack(
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final bool useSidebar = constraints.maxWidth >= 900;
-            final bool mobileLayout = constraints.maxWidth < 550;
+        Scaffold(
+          appBar: AppBar(
+            elevation: 2,
+            title: Text("Refer & Earn", style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 20)),
+            actions: [
+              SvgPicture.asset("assets/svg/dish.svg"),
+              SizedBox(width: 10),
+              SvgPicture.asset("assets/svg/home.svg"),
+              SizedBox(width: 10),
+              SvgPicture.asset("assets/svg/wifi.svg"),
+              SizedBox(width: 10),
+              SvgPicture.asset("assets/svg/sound.svg"),
+              SizedBox(width: 10),
+            ],
+            backgroundColor: Colors.white,
+          ),
 
-            if (mobileLayout) {
-              return const MobileReferenceScreen();
-            }
+          drawer: useSidebar
+              ? null
+              : Drawer(
+                  child: SafeArea(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Consumer<ReferralProvider>(
+                        builder: (context, form, _) {
+                          return buildSidebar(context, form.selectedIndex);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
 
-            return Scaffold(
-              appBar: AppBar(
-                elevation: 2,
-                title: Text("Refer & Earn", style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 20)),
-                actions: [
-                  SvgPicture.asset("assets/svg/dish.svg"),
-                  SizedBox(width: 10),
-                  SvgPicture.asset("assets/svg/home.svg"),
-                  SizedBox(width: 10),
-                  SvgPicture.asset("assets/svg/wifi.svg"),
-                  SizedBox(width: 10),
-                  SvgPicture.asset("assets/svg/sound.svg"),
-                  SizedBox(width: 10),
-                ],
-                backgroundColor: Colors.white,
-              ),
-
-              drawer: useSidebar
-                  ? null
-                  : Drawer(
-                      child: SafeArea(
-                        child: Align(
-                          alignment: Alignment.topLeft,
+          body: SafeArea(
+            child: useSidebar
+                ? Row(
+                    children: [
+                      /// Side bar
+                      Expanded(
+                        flex: 1,
+                        child: SizedBox(
+                          height: double.infinity,
                           child: Consumer<ReferralProvider>(
                             builder: (context, form, _) {
                               return buildSidebar(context, form.selectedIndex);
@@ -110,59 +92,41 @@ class _ReferScreenState extends State<ReferScreen> {
                           ),
                         ),
                       ),
-                    ),
+                      Container(width: 2, height: double.infinity, color: ColorsClass.deviderColor),
 
-              body: useSidebar
-                  ? Row(
-                      children: [
-                        /// Side bar
-                        Expanded(
-                          flex: 1,
-                          child: SizedBox(
-                            height: double.infinity,
-                            child: Consumer<ReferralProvider>(
-                              builder: (context, form, _) {
-                                return buildSidebar(context, form.selectedIndex);
-                              },
-                            ),
-                          ),
+                      /// Main content
+                      Expanded(
+                        flex: 4,
+                        child: Consumer<ReferralProvider>(
+                          builder: (context, form, _) {
+                            return _buildContent(form.selectedIndex);
+                          },
                         ),
-                        Container(width: 2, height: double.infinity, color: ColorsClass.deviderColor),
+                      ),
+                    ],
+                  )
+                : Consumer<ReferralProvider>(
+                    builder: (context, form, _) {
+                      return _buildContent(form.selectedIndex);
+                    },
+                  ),
+          ),
 
-                        /// Main content
-                        Expanded(
-                          flex: 4,
-                          child: Consumer<ReferralProvider>(
-                            builder: (context, form, _) {
-                              return _buildContent(form.selectedIndex);
-                            },
-                          ),
-                        ),
-                      ],
-                    )
-                  : Consumer<ReferralProvider>(
-                      builder: (context, form, _) {
-                        return _buildContent(form.selectedIndex);
-                      },
-                    ),
-
-              floatingActionButton: FloatingActionButton(
-                shape: const CircleBorder(),
-                tooltip: "Talk To AI",
-                backgroundColor: ColorsClass.primary,
-                onPressed: () {
-                  Provider.of<ChatBoatProvider>(context, listen: false).setShowChatBoatPopup();
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const ChatboatFullscreen(),
-                  //   ),
-                  // );
-                },
-                child: Image.asset("assets/images/charboat.png"),
-              ),
-            );
-          },
+          floatingActionButton: FloatingActionButton(
+            shape: const CircleBorder(),
+            tooltip: "Talk To AI",
+            backgroundColor: ColorsClass.primary,
+            onPressed: () {
+              Provider.of<ChatBoatProvider>(context, listen: false).setShowChatBoatPopup();
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const ChatboatFullscreen(),
+              //   ),
+              // );
+            },
+            child: Image.asset("assets/images/charboat.png"),
+          ),
         ),
 
         Consumer<ChatBoatProvider>(
@@ -184,21 +148,21 @@ Widget buildSidebar(BuildContext context, int selectedIndex) {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const SizedBox(height: 10),
-      GestureDetector( 
+      GestureDetector(
         onTap: () => form.setSelectedIndex(0),
-        child: ContentContainerImage(imagePath: "assets/svg/add.svg", title: "Add Campaign", isSelected: selectedIndex == 0),
+        child: _SidebarItem(imagePath: "assets/svg/add.svg", title: "Add Campaign", isSelected: selectedIndex == 0),
       ),
       GestureDetector(
         onTap: () => form.setSelectedIndex(1),
-        child: ContentContainerImage(imagePath: "assets/svg/all_campaign.svg", title: "All Campaign", isSelected: selectedIndex == 1),
+        child: _SidebarItem(imagePath: "assets/svg/all_campaign.svg", title: "All Campaign", isSelected: selectedIndex == 1),
       ),
       GestureDetector(
         onTap: () => form.setSelectedIndex(2),
-        child: ContentContainerImage(imagePath: "assets/svg/cashback.svg", title: "Cash Back", isSelected: selectedIndex == 2),
+        child: _SidebarItem(imagePath: "assets/svg/cashback.svg", title: "Cash Back", isSelected: selectedIndex == 2),
       ),
       GestureDetector(
         onTap: () => form.setSelectedIndex(3),
-        child: ContentContainerImage(imagePath: "assets/svg/restaurant.svg", title: "Restaurant Referral", isSelected: selectedIndex == 3),
+        child: _SidebarItem(imagePath: "assets/svg/restaurant.svg", title: "Restaurant Referral", isSelected: selectedIndex == 3),
       ),
       const Spacer(),
     ],
@@ -207,4 +171,43 @@ Widget buildSidebar(BuildContext context, int selectedIndex) {
 
 Widget _buildContent(int selectedIndex) {
   return IndexedStack(index: selectedIndex, children: const [AddCampaign(), AllCampaign(), CashBack(), RestraurentReferal()]);
+}
+
+class _SidebarItem extends StatelessWidget {
+  final String imagePath;
+  final String title;
+  final bool isSelected;
+
+  const _SidebarItem({required this.imagePath, required this.title, this.isSelected = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isSelected ? ColorsClass.primary : ColorsClass.white,
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))],
+      ),
+      child: Row(
+        children: [
+          SizedBox(height: 30, child: SvgPicture.asset(imagePath, color: isSelected ? ColorsClass.white : ColorsClass.blackColor)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? ColorsClass.white : ColorsClass.blackColor,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

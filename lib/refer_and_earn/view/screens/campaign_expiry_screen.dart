@@ -4,25 +4,17 @@ import 'package:provider/provider.dart';
 import '../../color_class.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../widgets/custom_toast.dart';
+import '../../../reponsive.dart';
 
 class CampaignExpiryScreen extends StatelessWidget {
-  final Function({
-    required String campaignType,
-    required String expiryOption,
-    DateTime? selectedDate,
-    required bool notifyCustomers,
-    int? duration,
-  })
+  final Function({required String campaignType, required String expiryOption, DateTime? selectedDate, required bool notifyCustomers, int? duration})
   onChanged;
 
   CampaignExpiryScreen({super.key, required this.onChanged});
 
   final TextEditingController _dateController = TextEditingController();
 
-  Future<void> _pickDateTime(
-    BuildContext context,
-    ReferralProvider provider,
-  ) async {
+  Future<void> _pickDateTime(BuildContext context, ReferralProvider provider) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: provider.expiryDate ?? DateTime.now(),
@@ -33,19 +25,11 @@ class CampaignExpiryScreen extends StatelessWidget {
 
     TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: provider.expiryDate != null
-          ? TimeOfDay.fromDateTime(provider.expiryDate!)
-          : TimeOfDay.now(),
+      initialTime: provider.expiryDate != null ? TimeOfDay.fromDateTime(provider.expiryDate!) : TimeOfDay.now(),
     );
     if (pickedTime == null) return;
 
-    final combinedDateTime = DateTime(
-      pickedDate.year,
-      pickedDate.month,
-      pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
-    );
+    final combinedDateTime = DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
 
     provider.updateExpiryDate(combinedDateTime);
 
@@ -53,8 +37,7 @@ class CampaignExpiryScreen extends StatelessWidget {
   }
 
   void _notifyParent(ReferralProvider provider) {
-    if (provider.campaignType == "Fixed Period" &&
-        provider.expiryOption != "Set Specific End Date & Time") {
+    if (provider.campaignType == "Fixed Period" && provider.expiryOption != "Set Specific End Date & Time") {
       DateTime defaultDate = DateTime.now();
       if (provider.expiryOption == "Based on Hours") {
         defaultDate = defaultDate.add(const Duration(hours: 72));
@@ -93,7 +76,7 @@ class CampaignExpiryScreen extends StatelessWidget {
             children: [
               LayoutBuilder(
                 builder: (context, constraints) {
-                  if (constraints.maxWidth < 600) {
+                  if (Responsive.isMobile(context)) {
                     return Column(
                       children: [
                         RadioListTile(
@@ -149,7 +132,7 @@ class CampaignExpiryScreen extends StatelessWidget {
               const SizedBox(height: 10),
 
               if (provider.campaignType == "Fixed Period") ...[
-                BuildExpiryContainerAllCampaign(provider: provider),
+                _BuildExpiryContainerAllCampaign(),
                 const SizedBox(height: 20),
 
                 if (provider.expiryOption == "Set Specific End Date & Time")
@@ -161,13 +144,8 @@ class CampaignExpiryScreen extends StatelessWidget {
                       onTap: () => _pickDateTime(context, provider),
                       decoration: InputDecoration(
                         hintText: "dd-MM-yyyy HH:mm",
-                        suffixIcon: const Icon(
-                          Icons.calendar_today,
-                          color: ColorsClass.primary,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
+                        suffixIcon: const Icon(Icons.calendar_today, color: ColorsClass.primary),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
                       ),
                     ),
                   ),
@@ -180,13 +158,7 @@ class CampaignExpiryScreen extends StatelessWidget {
                     _notifyParent(provider);
                   },
                 ),
-                title: Text(
-                  "Notify customer before expiry",
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                title: Text("Notify customer before expiry", style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500)),
               ),
             ],
           ),
@@ -197,12 +169,13 @@ class CampaignExpiryScreen extends StatelessWidget {
 }
 
 /// Expiry container
-class BuildExpiryContainerAllCampaign extends StatelessWidget {
-  final ReferralProvider provider;
-  const BuildExpiryContainerAllCampaign({super.key, required this.provider});
+class _BuildExpiryContainerAllCampaign extends StatelessWidget {
+  const _BuildExpiryContainerAllCampaign();
 
   @override
   Widget build(BuildContext context) {
+    final ReferralProvider provider = Provider.of<ReferralProvider>(context, listen: false);
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(

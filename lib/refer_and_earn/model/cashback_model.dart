@@ -4,6 +4,8 @@ class CashbackModel {
   int? cashbackEnable;
   String? cashbackType;
   int? cashbackValue;
+  int? minimumOrderAmount;
+  String? termsAndConditions;
 
   CashbackModel({
     this.cashbackId,
@@ -11,6 +13,8 @@ class CashbackModel {
     this.cashbackEnable,
     this.cashbackType,
     this.cashbackValue,
+    this.minimumOrderAmount,
+    this.termsAndConditions,
   });
 
   factory CashbackModel.fromJson(Map<String, dynamic> json) {
@@ -19,8 +23,10 @@ class CashbackModel {
       shopId: json['shop_id'],
       cashbackEnable: json['cashback_enable'],
       cashbackType: json['cashback_type'],
-      cashbackValue: json['cashback_value'],
-    );
+      cashbackValue: json['cashback_value'],  
+      minimumOrderAmount: json['minimum_order_amount'],
+      termsAndConditions: json['term_and_condition'],
+    ); 
   }
 
   Map<String, dynamic> toJson() {
@@ -30,7 +36,8 @@ class CashbackModel {
       'cashback_enable': cashbackEnable,
       'cashback_type': cashbackType,
       'cashback_value': cashbackValue,
+      'minimum_amount': minimumOrderAmount,
+      'term_and_condition': termsAndConditions,
     };
   }
-
 }

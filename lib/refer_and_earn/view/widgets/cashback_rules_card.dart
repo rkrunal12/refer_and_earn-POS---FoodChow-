@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/view/widgets/cashback_slider.dart';
 import '../../controller/provider/refer_provider.dart';
 
-
 /// Cashback rules card with tabs
 class CashbackRulesCard extends StatelessWidget {
   final TabController tabController;
@@ -20,13 +19,7 @@ class CashbackRulesCard extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.only(top: 10.0),
-            child: Text(
-              "Cash Back Rules",
-              style: GoogleFonts.poppins(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: Text("Cash Back Rules", style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w500)),
           ),
           TabBar(
             controller: tabController,
@@ -46,9 +39,7 @@ class CashbackRulesCard extends StatelessWidget {
               builder: (context, data, _) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   final newIndex = data.rewardCashbackType == "Flat" ? 1 : 0;
-                  if (tabController.index != newIndex &&
-                      !tabController.indexIsChanging &&
-                      newIndex < tabController.length) {
+                  if (tabController.index != newIndex && !tabController.indexIsChanging && newIndex < tabController.length) {
                     tabController.index = newIndex;
                   }
                 });
@@ -84,4 +75,3 @@ class CashbackRulesCard extends StatelessWidget {
     );
   }
 }
-

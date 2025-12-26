@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/view/screens/campaign_expiry_screen.dart';
 import '../../color_class.dart';
@@ -23,6 +22,7 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
   late final TextEditingController _customerRewardController;
   late final TextEditingController _referralRewardController;
   late final TextEditingController _minPurchaseController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
         ..updateCampaignExpiry(widget.data.expiryEnableBool ?? true)
         ..updateCampaignType(widget.data.expiryType ?? "Fixed Period")
         ..updateExpiryOption(widget.data.fixedPeriodType ?? "Set Specific End Date & Time")
-        ..updateExpiryDate(DateFormat("yyyy-MM-dd HH:mm:ss").parse(widget.data.endDate ?? DateTime.now().toString()))
+        ..updateExpiryDate(DateTime.tryParse(widget.data.endDate ?? "") ?? DateTime.now())
         ..updateNotifyCustomers(widget.data.notifyCustomerBool ?? false)
         ..setIsSaving(false);
     });
@@ -69,122 +69,159 @@ class _UpdateCampaignState extends State<UpdateCampaign> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFieldColumn(
-                        hint: "Enter campaign name",
-                        label: "Campaign Name*",
-                        controller: _campaignNameController,
-                        type: TextInputType.text,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFieldColumn(
+                          hint: "Enter campaign name",
+                          label: "Campaign Name*",
+                          controller: _campaignNameController,
+                          type: TextInputType.text,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) return "Campaign name is required";
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: RewardTypeDropdown(
-                        selectedValue: provider.rewardType,
-                        onChanged: (value) {
-                          if (value != null) {
-                            provider.updateRewardType(value);
-                          }
-                        },
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: RewardTypeDropdown(
+                          selectedValue: provider.rewardType,
+                          onChanged: (value) {
+                            if (value != null) {
+                              provider.updateRewardType(value);
+                              if (value == "Percentage") {
+                                if (_customerRewardController.text.length > 2) {
+                                  _customerRewardController.text = _customerRewardController.text.substring(0, 2);
+                                }
+                                if (_referralRewardController.text.length > 2) {
+                                  _referralRewardController.text = _referralRewardController.text.substring(0, 2);
+                                }
+                              }
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFieldColumn(
-                        hint: "Enter Customer Reward",
-                        label: "New Customer Reward (Friend)*",
-                        controller: _customerRewardController,
-                        type: TextInputType.number,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextFieldColumn(
-                        hint: "Enter Referral Reward",
-                        label: "Referral Reward (You)*",
-                        controller: _referralRewardController,
-                        type: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                TextFieldColumn(
-                  hint: "Enter Minimum Purchase",
-                  label: "Minimum Purchase (Optional)*",
-                  controller: _minPurchaseController,
-                  type: TextInputType.number,
-                ),
-
-                const SizedBox(height: 16),
-
-                ListTile(
-                  leading: Checkbox(value: provider.campaignExpiry, onChanged: (value) => provider.updateCampaignExpiry(value ?? false)),
-                  title: const Text("Set Campaign Expiry"),
-                ),
-
-                if (provider.campaignExpiry)
-                  CampaignExpiryScreen(
-                    onChanged:
-                        ({
-                          required String campaignType,
-                          required String expiryOption,
-                          DateTime? selectedDate,
-                          required bool notifyCustomers,
-                          int? duration,
-                        }) {
-                          provider
-                            ..updateCampaignType(campaignType)
-                            ..updateExpiryOption(expiryOption)
-                            ..updateExpiryDate(selectedDate ?? DateTime.now())
-                            ..updateNotifyCustomers(notifyCustomers);
-                        },
+                    ],
                   ),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
-                provider.isSaving
-                    ? const SizedBox(height: 40, width: 40, child: CircularProgressIndicator(strokeWidth: 2))
-                    : CustomButton(
-                        value: "Save",
-                        color: ColorsClass.primary,
-                        onTap: () async {
-                          provider.setIsSaving(true);
-
-                          final result = await CampaignService.validateAndSaveCampaign(
-                            isUpdate: true,
-                            provider: provider,
-                            context: context,
-                            campaignNameText: _campaignNameController.text,
-                            customerRewardText: _customerRewardController.text,
-                            referralRewardText: _referralRewardController.text,
-                            minPurchaseText: _minPurchaseController.text,
-                            status: widget.data.statusStr,
-                            shopId: widget.data.shopId,
-                            campaignId: widget.data.campaignId,
-                          );
-
-                          if (!mounted) return;
-                          provider.setIsSaving(false);
-
-                          if (result) {
-                            Navigator.pop(context);
-                          }
-                        },
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFieldColumn(
+                          hint: "Enter Customer Reward",
+                          label: "New Customer Reward (Friend)*",
+                          controller: _customerRewardController,
+                          suffixText: provider.rewardType == "Percentage" ? "%" : null,
+                          maxLength: provider.rewardType == "Percentage" ? 2 : 6,
+                          type: TextInputType.number,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) return "Reward is required";
+                            if (int.tryParse(val.trim()) == null) return "Enter valid number";
+                            return null;
+                          },
+                        ),
                       ),
-              ],
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFieldColumn(
+                          hint: "Enter Referral Reward",
+                          label: "Referral Reward (You)*",
+                          controller: _referralRewardController,
+                          suffixText: provider.rewardType == "Percentage" ? "%" : null,
+                          maxLength: provider.rewardType == "Percentage" ? 2 : 6,
+                          type: TextInputType.number,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) return "Reward is required";
+                            if (int.tryParse(val.trim()) == null) return "Enter valid number";
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  TextFieldColumn(
+                    hint: "Enter Minimum Purchase",
+                    label: "Minimum Purchase (Optional)*",
+                    controller: _minPurchaseController,
+                    type: TextInputType.number,
+                    maxLength: 7,
+                    validator: (val) {
+                      if (val != null && val.trim().isNotEmpty && int.tryParse(val.trim()) == null) {
+                        return "Enter valid number";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  ListTile(
+                    leading: Checkbox(value: provider.campaignExpiry, onChanged: (value) => provider.updateCampaignExpiry(value ?? false)),
+                    title: const Text("Set Campaign Expiry"),
+                  ),
+
+                  if (provider.campaignExpiry)
+                    CampaignExpiryScreen(
+                      onChanged:
+                          ({
+                            required String campaignType,
+                            required String expiryOption,
+                            DateTime? selectedDate,
+                            required bool notifyCustomers,
+                            int? duration,
+                          }) {
+                            provider
+                              ..updateCampaignType(campaignType)
+                              ..updateExpiryOption(expiryOption)
+                              ..updateExpiryDate(selectedDate ?? DateTime.now())
+                              ..updateNotifyCustomers(notifyCustomers);
+                          },
+                    ),
+
+                  const SizedBox(height: 24),
+
+                  provider.isSaving
+                      ? const SizedBox(height: 40, width: 40, child: CircularProgressIndicator(strokeWidth: 2))
+                      : CustomButton(
+                          value: "Save",
+                          color: ColorsClass.primary,
+                          onTap: () async {
+                            if (_formKey.currentState!.validate()) {
+                              provider.setIsSaving(true);
+                              final result = await CampaignService.validateAndSaveCampaign(
+                                isUpdate: true,
+                                provider: provider,
+                                context: context,
+                                campaignNameText: _campaignNameController.text,
+                                customerRewardText: _customerRewardController.text,
+                                referralRewardText: _referralRewardController.text,
+                                minPurchaseText: _minPurchaseController.text,
+                                status: widget.data.statusStr,
+                                shopId: widget.data.shopId,
+                                campaignId: widget.data.campaignId,
+                              );
+
+                              if (!mounted) return;
+                              provider.setIsSaving(false);
+
+                              if (result) {
+                                Navigator.pop(context);
+                              }
+                            }
+                          },
+                        ),
+                ],
+              ),
             ),
           ),
         ),

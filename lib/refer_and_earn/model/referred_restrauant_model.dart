@@ -7,15 +7,7 @@ class ReferredRestaurantsModel {
   String? email;
   int? claimed;
 
-  ReferredRestaurantsModel({
-    this.restaurantId,
-    this.referringRestaurantId,
-    this.name,
-    this.mobile,
-    this.email,
-    this.claimed,
-    this.id,
-  });
+  ReferredRestaurantsModel({this.restaurantId, this.referringRestaurantId, this.name, this.mobile, this.email, this.claimed, this.id});
 
   factory ReferredRestaurantsModel.fromJson(Map<String, dynamic> json) {
     return ReferredRestaurantsModel(
@@ -24,16 +16,11 @@ class ReferredRestaurantsModel {
       name: json['Name'],
       mobile: json['Mobile'],
       email: json['Email'],
-      claimed: json['IsClaimed'],
+      claimed: json['Claimed'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'ReferringRestaurantId': referringRestaurantId,
-      'Name': name,
-      'Mobile': mobile,
-      'Email': email,
-    };
+    return {'ReferringRestaurantId': referringRestaurantId, 'Name': name, 'Mobile': mobile, 'Email': email};
   }
 }

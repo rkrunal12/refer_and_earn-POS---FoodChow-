@@ -67,31 +67,33 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                           ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
                           : Switch(
                               value: (data.statusStr == "1"),
-                              onChanged: (val) {
-                                if (val && (activeCount) >= 1) {
-                                  CustomeToast.showError("Only 1 campaign active at a time");
-                                } else {
-                                  CampaignService.updateCampaigns(
-                                    CampaignModel(
-                                      campaignId: campaignModel.campaignId,
-                                      shopId: campaignModel.shopId,
-                                      campaignName: campaignModel.campaignName,
-                                      rewardType: campaignModel.rewardType,
-                                      customerReward: campaignModel.customerReward,
-                                      referrerReward: campaignModel.referrerReward,
-                                      expiryEnableInt: campaignModel.expiryEnableBool! ? 1 : 0,
-                                      minPurchase: campaignModel.minPurchase,
-                                      expiryType: campaignModel.expiryType,
-                                      fixedPeriodType: campaignModel.fixedPeriodType,
-                                      endDate: campaignModel.endDate,
-                                      notifyCustomerInt: campaignModel.notifyCustomerBool! ? 1 : 0,
-                                      statusInt: val ? 1 : 0,
-                                    ),
-                                    context,
-                                    true,
-                                  );
-                                }
-                              },
+                              onChanged: value.loadingId != null
+                                  ? null
+                                  : (val) async {
+                                      if (val && (activeCount) >= 1) {
+                                        CustomeToast.showError("Only 1 campaign active at a time");
+                                      } else {
+                                        await CampaignService.updateCampaigns(
+                                          CampaignModel(
+                                            campaignId: campaignModel.campaignId,
+                                            shopId: campaignModel.shopId,
+                                            campaignName: campaignModel.campaignName,
+                                            rewardType: campaignModel.rewardType,
+                                            customerReward: campaignModel.customerReward,
+                                            referrerReward: campaignModel.referrerReward,
+                                            expiryEnableInt: campaignModel.expiryEnableBool! ? 1 : 0,
+                                            minPurchase: campaignModel.minPurchase,
+                                            expiryType: campaignModel.expiryType,
+                                            fixedPeriodType: campaignModel.fixedPeriodType,
+                                            endDate: campaignModel.endDate,
+                                            notifyCustomerInt: campaignModel.notifyCustomerBool! ? 1 : 0,
+                                            statusInt: val ? 1 : 0,
+                                          ),
+                                          context,
+                                          true,
+                                        );
+                                      }
+                                    },
                             );
                     },
                   ),
@@ -100,18 +102,15 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
               const Divider(color: Colors.grey, thickness: 1),
 
               gap,
+              Text("Reward Type: ${data.rewardType}", style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400)),
+              gap,
               Text(
-                "Reward Type: ${data.rewardType}",
+                "Friend's Reward: ${data.customerReward}${data.rewardType == "Percentage" ? "%" : ""}",
                 style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
               ),
               gap,
               Text(
-                "Friend's Reward: ${data.customerReward}",
-                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
-              ),
-              gap,
-              Text(
-                "Your Reward: ${data.referrerReward}",
+                "Your Reward: ${data.referrerReward}${data.rewardType == "Percentage" ? "%" : ""}",
                 style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
               ),
               gap,
@@ -141,10 +140,70 @@ class MobileCampaignCardMobileAllCampaign extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       InkWell(
-                        onTap: () async {
-                          await Provider.of<ReferralProvider>(context, listen: false).deleteCampaign(data.campaignId, data.shopId);
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return Dialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: SizedBox(
+                                    width: 300,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.delete_outline, color: Colors.teal, size: 48),
+                                        const SizedBox(height: 16),
+                                        Text("Delete Campaign", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600)),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "Are you sure you want to delete this campaign?",
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                                        ),
+                                        const SizedBox(height: 24),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: OutlinedButton(
+                                                style: OutlinedButton.styleFrom(
+                                                  side: const BorderSide(color: Colors.teal),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                ),
+                                                onPressed: () => Navigator.pop(context),
+                                                child: Text("Cancel", style: GoogleFonts.poppins(color: Colors.teal)),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                ),
+                                                onPressed: () async {
+                                                  await Provider.of<ReferralProvider>(
+                                                    context,
+                                                    listen: false,
+                                                  ).deleteCampaign(data.campaignId, data.shopId);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text("Delete", style: GoogleFonts.poppins(color: Colors.white)),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         },
-                        child: SizedBox(height: 30, width: 30, child: SvgPicture.asset("assets/svg/mobile_delete.svg")),
+                        child: SizedBox(height: 36, width: 36, child: SvgPicture.asset("assets/svg/mobile_delete.svg")),
                       ),
                     ],
                   ),

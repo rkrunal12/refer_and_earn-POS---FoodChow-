@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:refer_and_earn/refer_and_earn/view/widgets/update_campaign.dart';
 import '../../controller/provider/refer_provider.dart';
 import '../../controller/service/campaign_service.dart';
 import '../../model/campaign_model.dart';
 import 'custom_toast.dart';
-
 
 /// Build campaign DataTable (desktop/tablet)
 class BuildCustomTableAllCampaign extends StatelessWidget {
@@ -82,8 +82,8 @@ class BuildCustomTableAllCampaign extends StatelessWidget {
                         cells: [
                           DataCell(Text(campaign.campaignName ?? "")),
                           DataCell(Text(campaign.rewardType ?? "")),
-                          DataCell(Text("${campaign.customerReward}%")),
-                          DataCell(Text("${campaign.referrerReward}%")),
+                          DataCell(Text("${campaign.customerReward}${campaign.rewardType == "Percentage" ? "%" : ""}")),
+                          DataCell(Text("${campaign.referrerReward}${campaign.rewardType == "Percentage" ? "%" : ""}")),
                           DataCell(
                             Text(
                               campaign.expiryEnableBool == false
@@ -108,40 +108,102 @@ class BuildCustomTableAllCampaign extends StatelessWidget {
                                         ? const CircularProgressIndicator()
                                         : Switch.adaptive(
                                             value: campaignModel.statusStr == "1",
-                                            onChanged: (val) {
-                                              if (val && (activeCount >= 1)) {
-                                                CustomeToast.showError("Only 1 campaign active at a time");
-                                              } else if (DateTime.now().isAfter(DateTime.parse(campaignModel.endDate!))) {
-                                                CustomeToast.showError("Campaign is expired");
-                                              } else {
-                                                CampaignService.updateCampaigns(
-                                                  CampaignModel(
-                                                    campaignId: campaignModel.campaignId,
-                                                    shopId: campaignModel.shopId,
-                                                    campaignName: campaignModel.campaignName,
-                                                    rewardType: campaignModel.rewardType,
-                                                    customerReward: campaignModel.customerReward,
-                                                    referrerReward: campaignModel.referrerReward,
-                                                    expiryEnableInt: campaignModel.expiryEnableBool! ? 1 : 0,
-                                                    minPurchase: campaignModel.minPurchase,
-                                                    expiryType: campaignModel.expiryType,
-                                                    fixedPeriodType: campaignModel.fixedPeriodType,
-                                                    endDate: campaignModel.endDate,
-                                                    notifyCustomerInt: campaignModel.notifyCustomerBool! ? 1 : 0,
-                                                    statusInt: val ? 1 : 0,
-                                                  ),
-                                                  context,
-                                                  true,
-                                                );
-                                              }
-                                            },
+                                            onChanged: provider.loadingId != null
+                                                ? null
+                                                : (val) {
+                                                    if (val && (activeCount >= 1)) {
+                                                      CustomeToast.showError("Only 1 campaign active at a time");
+                                                    } else if (DateTime.now().isAfter(DateTime.parse(campaignModel.endDate!))) {
+                                                      CustomeToast.showError("Campaign is expired");
+                                                    } else {
+                                                      CampaignService.updateCampaigns(
+                                                        CampaignModel(
+                                                          campaignId: campaignModel.campaignId,
+                                                          shopId: campaignModel.shopId,
+                                                          campaignName: campaignModel.campaignName,
+                                                          rewardType: campaignModel.rewardType,
+                                                          customerReward: campaignModel.customerReward,
+                                                          referrerReward: campaignModel.referrerReward,
+                                                          expiryEnableInt: campaignModel.expiryEnableBool! ? 1 : 0,
+                                                          minPurchase: campaignModel.minPurchase,
+                                                          expiryType: campaignModel.expiryType,
+                                                          fixedPeriodType: campaignModel.fixedPeriodType,
+                                                          endDate: campaignModel.endDate,
+                                                          notifyCustomerInt: campaignModel.notifyCustomerBool! ? 1 : 0,
+                                                          statusInt: val ? 1 : 0,
+                                                        ),
+                                                        context,
+                                                        true,
+                                                      );
+                                                    }
+                                                  },
                                           );
                                   },
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete, color: Colors.red),
                                   onPressed: () async {
-                                    await Provider.of<ReferralProvider>(context, listen: false).deleteCampaign(campaign.campaignId, campaign.shopId);
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          backgroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: SizedBox(
+                                              width: 300,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Icon(Icons.delete_outline, color: Colors.teal, size: 48),
+                                                  const SizedBox(height: 16),
+                                                  Text("Delete Campaign", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600)),
+                                                  const SizedBox(height: 8),
+                                                  Text(
+                                                    "Are you sure you want to delete this campaign?",
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: OutlinedButton(
+                                                          style: OutlinedButton.styleFrom(
+                                                            side: const BorderSide(color: Colors.teal),
+                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                          ),
+                                                          onPressed: () => Navigator.pop(context),
+                                                          child: Text("Cancel", style: GoogleFonts.poppins(color: Colors.teal)),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 16),
+                                                      Expanded(
+                                                        child: ElevatedButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Colors.red,
+                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                          ),
+                                                          onPressed: () async {
+                                                            await Provider.of<ReferralProvider>(
+                                                              context,
+                                                              listen: false,
+                                                            ).deleteCampaign(campaign.campaignId, campaign.shopId);
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: Text("Delete", style: GoogleFonts.poppins(color: Colors.white)),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
                                   },
                                 ),
                               ],
